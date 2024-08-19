@@ -1,0 +1,17 @@
+<Project  Sdk="Microsoft.Docker.Sdk">
+    <PropertyGroup Label="Globals">
+        <ProjectVersion>2.1</ProjectVersion>
+        <DockerTargetOS>Linux</DockerTargetOS>
+        <ProjectGuid>572a772b-bdfc-4ca5-b3f2-c1cb8ea866f4</ProjectGuid>
+        <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
+        <DockerServiceUrl>{Scheme}://localhost:{ServerPort}/swagger</DockerServiceUrl>
+        <DockerServiceName>StarWarsProgressBarIssueTracker.App</DockerServiceName>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="docker-compose.override.yml">
+            <DependentUpon>docker-compose.yml</DependentUpon>
+        </None>
+        <None Include="docker-compose.yml"/>
+        <None Include="..\.dockerignore"/>
+    </ItemGroup>
+</Project>

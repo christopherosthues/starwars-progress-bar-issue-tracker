@@ -1,0 +1,7 @@
+services:
+  issuetracker:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Httos:/root/.aspnet/https:ro

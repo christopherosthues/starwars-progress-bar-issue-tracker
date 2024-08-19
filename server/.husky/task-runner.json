@@ -1,0 +1,41 @@
+{
+  "tasks": [
+    {
+      "name": "welcome-message-example",
+      "command": "bash",
+      "args": [
+        "-c",
+        "echo Husky.Net is awesome!"
+      ],
+      "windows": {
+        "command": "cmd",
+        "args": [
+          "/c",
+          "echo Husky.Net is awesome!"
+        ]
+      }
+    },
+    {
+      "name": "commit-message-linter",
+      "command": "dotnet",
+      "args": [
+        "husky",
+        "exec",
+        ".husky/csx/commit-lint.csx",
+        "--args",
+        "${args}"
+      ]
+    },
+    {
+      "name": "Execute unit and integration tests",
+      "group": "pre-commit",
+      "command": "dotnet",
+      "args": [
+        "test",
+        "src/StarWarsProgressBarIssueTracker.sln",
+        "--filter",
+        "TestCategory=Unit|TestCategory=Integration"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "dotnet-stryker": {
+      "version": "4.1.0",
+      "commands": [
+        "dotnet-stryker"
+      ]
+    },
+    "dotnet-format": {
+      "version": "5.1.250801",
+      "commands": [
+        "dotnet-format"
+      ]
+    },
+    "husky": {
+      "version": "0.7.1",
+      "commands": [
+        "husky"
+      ]
+    },
+    "strawberryshake.tools": {
+      "version": "13.9.11",
+      "commands": [
+        "dotnet-graphql"
+      ]
+    }
+  }
+}

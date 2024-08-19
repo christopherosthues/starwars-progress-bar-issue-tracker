@@ -1,0 +1,5 @@
+using StarWarsProgressBarIssueTracker.Domain.Configuration;
+
+namespace StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Configuration;
+
+public class GitlabConfiguration : IssuesConnectionConfig;

@@ -1,0 +1,52 @@
+query GetMilestones($project: ID!) {
+    project(fullPath: $project) {
+        id,
+        milestones {
+            nodes {
+                ...MilestoneFragment
+            }
+        }
+    }
+}
+
+query GetMilestone($project: ID!, $id: MilestoneID!, $title: [String]) {
+    milestone(id: $id) {
+        description,
+        ...MilestoneFragment
+    },
+    project(fullPath: $project) {
+        id,
+        openIssues: issues(milestoneTitle: $title, state: opened, sort: TITLE_ASC) {
+            ...IssueFragment
+        },
+        closedIssues: issues(milestoneTitle: $title, state: closed, sort: TITLE_ASC) {
+            ...IssueFragment
+        },
+    }
+}
+
+fragment MilestoneFragment on Milestone {
+    id,
+    iid,
+    title,
+    state,
+    stats {
+        closedIssuesCount,
+        totalIssuesCount
+    },
+}
+
+fragment IssueFragment on IssueConnection {
+    count,
+    nodes {
+        id,
+        iid,
+        title,
+        state,
+        labels {
+            nodes {
+                ...IssueLabel
+            }
+        }
+    }
+}

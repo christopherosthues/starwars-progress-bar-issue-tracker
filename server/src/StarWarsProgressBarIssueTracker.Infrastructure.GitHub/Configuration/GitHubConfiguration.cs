@@ -1,0 +1,5 @@
+using StarWarsProgressBarIssueTracker.Domain.Configuration;
+
+namespace StarWarsProgressBarIssueTracker.Infrastructure.GitHub.Configuration;
+
+public class GitHubConfiguration : IssuesConnectionConfig;

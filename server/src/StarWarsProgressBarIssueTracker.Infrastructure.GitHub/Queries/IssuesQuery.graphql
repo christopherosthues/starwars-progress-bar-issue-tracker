@@ -1,0 +1,12 @@
+query GetIssues {
+    repository(name: "starwars-progress-bar", owner: "christopherosthues") {
+        issues {
+            totalCount
+            nodes {
+                state
+                id
+                body
+            }
+        }
+    }
+}

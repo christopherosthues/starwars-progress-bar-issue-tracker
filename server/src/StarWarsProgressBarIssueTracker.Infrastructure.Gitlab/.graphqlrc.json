@@ -1,0 +1,12 @@
+{
+  "schema": "schema.graphql",
+  "documents": "**/*.graphql",
+  "extensions": {
+    "strawberryShake": {
+      "name": "GitlabClient",
+      "namespace": "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.GraphQL",
+      "url": "https://gitlab.com/api/graphql",
+      "dependencyInjection": true
+    }
+  }
+}

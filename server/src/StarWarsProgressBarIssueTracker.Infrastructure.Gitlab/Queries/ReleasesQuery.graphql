@@ -1,0 +1,54 @@
+query GetReleases($project: ID!) {
+    project(fullPath: $project) {
+        issues(first: 100, sort: TITLE_ASC, search: "Release", in: [TITLE]){
+            nodes {
+                ...Release
+            }
+        }
+    }
+}
+
+query GetRelease($id: IssueID!) {
+    issue(id: $id) {
+        ...Release
+    }
+}
+
+query GetReleaseIssues($project: ID!, $iids: [String!]) {
+    project(fullPath: $project) {
+        openIssues: issues(first: 100, sort: TITLE_ASC, iids: $iids, state: opened) {
+            ...Issues
+        }
+        closedIssues: issues(first: 100, sort: TITLE_ASC, iids: $iids, state: closed) {
+            ...Issues
+        }
+    }
+}
+
+mutation CreateRelease($input: CreateIssueInput!) {
+    createIssue(input: $input) {
+        issue {
+            id
+        },
+        errors
+    }
+}
+
+mutation UpdateRelease($input: UpdateIssueInput!) {
+    updateIssue(input: $input) {
+        issue {
+            id
+        },
+        errors
+    }
+}
+
+fragment Release on Issue {
+    id,
+    iid,
+    projectId,
+    title,
+    description,
+    state,
+    dueDate
+}

@@ -1,0 +1,36 @@
+query GetLabels($project: ID!) {
+    project(fullPath: $project) {
+        id,
+        labels {
+            nodes {
+                ...Label
+            }
+        }
+    }
+}
+
+query GetLabel($project: ID!, $title: String!) {
+    project(fullPath: $project) {
+        id,
+        label(title: $title) {
+            ...Label
+        }
+    }
+}
+
+mutation CreateLabel($input: LabelCreateInput!) {
+    labelCreate(input: $input) {
+        label {
+            ...Label
+        },
+        errors
+    }
+}
+
+fragment Label on Label {
+    id,
+    description,
+    color,
+    textColor,
+    title,
+}

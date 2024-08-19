@@ -1,0 +1,87 @@
+query GetAll($project: ID!) {
+    project(fullPath: $project) {
+        id
+        issues(first: 100, sort: TITLE_ASC) {
+            count
+            pageInfo {
+                endCursor
+                hasNextPage
+                hasPreviousPage
+            }
+            nodes {
+                projectId
+                iid
+                id
+                title
+                description
+                webUrl
+                state
+                dueDate
+                updatedAt
+                labels {
+                    nodes {
+                        id
+                        title
+                    }
+                }
+                milestone {
+                    id
+                    iid
+                }
+            }
+        }
+        milestones {
+            nodes {
+                id
+                iid
+                title
+                description
+                state
+                updatedAt
+            }
+        }
+        labels {
+            nodes {
+                id
+                description
+                color
+                textColor
+                title
+                updatedAt
+            }
+        }
+    }
+}
+
+query GetFurtherIssues($project: ID!, $after: String!) {
+    project(fullPath: $project) {
+        issues(after: $after, sort: TITLE_ASC) {
+            pageInfo {
+                endCursor
+                hasNextPage
+                hasPreviousPage
+            }
+            nodes {
+                projectId
+                iid
+                id
+                title
+                description
+                webUrl
+                state
+                updatedAt
+                dueDate
+                labels {
+                    nodes {
+                        id,
+                        title
+                    }
+                }
+                milestone {
+                    id
+                    iid
+                }
+            }
+        }
+    }
+}

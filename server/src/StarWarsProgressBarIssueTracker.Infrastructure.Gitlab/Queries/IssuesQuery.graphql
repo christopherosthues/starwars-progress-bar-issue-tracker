@@ -1,0 +1,124 @@
+query GetInitialIssues($project: ID!) {
+    project(fullPath: $project) {
+        id,
+        openIssues: issues(first: 100, sort: TITLE_ASC, state: opened) {
+            ...InitialIssues
+        },
+        closedIssues: issues(first: 100, sort: TITLE_ASC, state: closed) {
+            ...InitialIssues
+        }
+    }
+}
+
+query GetNextIssues($project: ID!, $after: String!, $state: IssuableState) {
+    project(fullPath: $project) {
+        issues(after: $after, sort: TITLE_ASC, state: $state) {
+            ...Issues
+        }
+    }
+}
+
+query GetIssue($id: IssueID!) {
+    issue(id: $id) {
+        ...Issue
+    }
+}
+
+query GetEditIssue($iid: String!, $project: ID!) {
+    project(fullPath: $project) {
+        ...Project
+        issue(iid: $iid) {
+            ...Issue
+        },
+    }
+}
+query GetProject($project: ID!) {
+    project(fullPath: $project) {
+        ...Project
+    }
+}
+
+mutation CreateIssue($input: CreateIssueInput!) {
+    createIssue(input: $input) {
+        issue {
+            id,
+            iid
+        },
+        errors
+    }
+}
+
+mutation UpdateIssue($input: UpdateIssueInput!) {
+    updateIssue(input: $input) {
+        issue {
+            id
+        },
+        errors
+    }
+}
+
+fragment Issues on IssueConnection {
+    pageInfo {
+        endCursor,
+        hasNextPage,
+        hasPreviousPage
+    },
+    nodes {
+        ...Issue
+    }
+}
+
+fragment InitialIssues on IssueConnection {
+    count,
+    ...Issues
+}
+
+fragment Project on Project {
+    id,
+    labels {
+        nodes {
+            ...IssueLabel
+        }
+    },
+    milestones {
+        nodes {
+            ...IssueMilestone
+        }
+    },
+    releases: issues(sort: TITLE_ASC, search: "Release", in: [TITLE]){
+        nodes {
+            ...Release
+        }
+    }
+}
+
+fragment Issue on Issue {
+    projectId,
+    iid,
+    id,
+    title,
+    description,
+    webUrl,
+    state,
+    labels {
+        nodes {
+            ...IssueLabel
+        }
+    },
+    milestone {
+        ...IssueMilestone
+    }
+}
+
+fragment IssueMilestone on Milestone {
+    id,
+    iid,
+    title
+}
+
+fragment IssueLabel on Label {
+    id,
+    title,
+    color,
+    textColor
+}

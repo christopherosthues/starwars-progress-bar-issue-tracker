@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    hostname: issuetrackerdb
+    container_name: issue_tracker_db
+    restart: unless-stopped
+    networks:
+      - issue_tracker_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_MAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgdata:/var/lib/pgadmin/data
+    container_name: issue_tracker_pgadmin
+    hostname: issuetrackerpgadmin
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - issue_tracker_network
+
+  issuetracker:
+    build:
+      context: ./src/StarWarsProgressBarIssueTracker.App
+      dockerfile: Dockerfile
+    hostname: issuetrackerserver
+    container_name: issue_tracker_server
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - issue_tracker_network
+
+volumes:
+  pgdata:
+
+networks:
+  issue_tracker_network:
+    external: false
