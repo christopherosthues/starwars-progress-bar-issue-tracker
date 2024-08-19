@@ -35,7 +35,7 @@ updates:
 
   # Maintain dependencies for Gradle dependencies
   - package-ecosystem: "gradle" # See documentation for possible values
-    directory: "/" # Location of package manifests
+    directory: "/app/" # Location of package manifests
     target-branch: "main"
     schedule:
       interval: "daily"
