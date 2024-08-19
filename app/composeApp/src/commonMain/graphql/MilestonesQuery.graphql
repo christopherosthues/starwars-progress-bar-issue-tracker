@@ -1,0 +1,7 @@
+query MilestonesQuery {
+    milestones {
+        id,
+        title,
+        state,
+    }
+}

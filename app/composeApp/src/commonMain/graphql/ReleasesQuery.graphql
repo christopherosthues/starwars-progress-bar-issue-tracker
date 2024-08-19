@@ -1,0 +1,9 @@
+query ReleasesQuery {
+    releases {
+        id,
+        title,
+        notes,
+        state,
+        date,
+    }
+}

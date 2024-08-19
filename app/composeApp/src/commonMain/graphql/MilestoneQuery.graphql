@@ -1,0 +1,18 @@
+query MilestoneQuery($id: UUID!) {
+    milestone(id: $id) {
+        id,
+        gitHubId,
+        gitlabId,
+        gitlabIid,
+        createdAt,
+        title,
+        description,
+        state,
+        lastModifiedAt,
+        issues {
+            id,
+            title,
+            state,
+        }
+    }
+}

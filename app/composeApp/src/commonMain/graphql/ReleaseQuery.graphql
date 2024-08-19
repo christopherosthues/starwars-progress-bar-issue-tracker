@@ -1,0 +1,14 @@
+query ReleaseQuery($id: UUID!) {
+    release(id: $id) {
+        id,
+        gitlabId,
+        gitHubId,
+        gitlabIid,
+        date,
+        state,
+        title,
+        notes,
+        createdAt,
+        lastModifiedAt,
+    }
+}

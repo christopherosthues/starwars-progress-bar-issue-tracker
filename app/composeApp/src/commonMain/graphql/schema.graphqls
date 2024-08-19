@@ -1,0 +1,437 @@
+schema {
+  query: IssueTrackerQueries
+  mutation: IssueTrackerMutations
+}
+
+interface Error {
+  message: String!
+}
+
+type AddAppearancePayload {
+  appearance: Appearance
+  errors: [AddAppearanceError!]
+}
+
+type AddIssuePayload {
+  issue: Issue
+}
+
+type AddLabelPayload {
+  label: Label
+  errors: [AddLabelError!]
+}
+
+type AddMilestonePayload {
+  milestone: Milestone
+  errors: [AddMilestoneError!]
+}
+
+type AddReleasePayload {
+  release: Release
+}
+
+type Appearance {
+  title: String!
+  description: String
+  color: String!
+  textColor: String!
+  gitlabId: String
+  gitHubId: String
+  id: UUID!
+  createdAt: DateTime!
+  lastModifiedAt: DateTime
+}
+
+type ColorFormatError implements Error {
+  message: String!
+}
+
+type DeleteAppearancePayload {
+  appearance: Appearance
+  errors: [DeleteAppearanceError!]
+}
+
+type DeleteIssuePayload {
+  issue: Issue
+}
+
+type DeleteLabelPayload {
+  label: Label
+  errors: [DeleteLabelError!]
+}
+
+type DeleteMilestonePayload {
+  milestone: Milestone
+  errors: [DeleteMilestoneError!]
+}
+
+type DeleteReleasePayload {
+  release: Release
+}
+
+type DomainIdNotFoundError implements Error {
+  message: String!
+}
+
+type Issue {
+  title: String!
+  description: String
+  priority: Priority!
+  state: IssueState!
+  milestone: Milestone
+  release: Release
+  vehicle: Vehicle
+  labels: [Label!]!
+  linkedIssues: [IssueLink!]!
+  gitlabId: String
+  gitlabIid: String
+  gitHubId: String
+  id: UUID!
+  createdAt: DateTime!
+  lastModifiedAt: DateTime
+}
+
+type IssueLink {
+  type: LinkType!
+  linkedIssue: Issue!
+  id: UUID!
+  createdAt: DateTime!
+  lastModifiedAt: DateTime
+}
+
+type IssueTrackerMutations {
+  addAppearance(input: AddAppearanceInput!): AddAppearancePayload!
+  updateAppearance(input: UpdateAppearanceInput!): UpdateAppearancePayload!
+  deleteAppearance(input: DeleteAppearanceInput!): DeleteAppearancePayload!
+  addIssue(input: AddIssueInput!): AddIssuePayload!
+  updateIssue(input: UpdateIssueInput!): UpdateIssuePayload!
+  deleteIssue(input: DeleteIssueInput!): DeleteIssuePayload!
+  addLabel(input: AddLabelInput!): AddLabelPayload!
+  updateLabel(input: UpdateLabelInput!): UpdateLabelPayload!
+  deleteLabel(input: DeleteLabelInput!): DeleteLabelPayload!
+  addMilestone(input: AddMilestoneInput!): AddMilestonePayload!
+  updateMilestone(input: UpdateMilestoneInput!): UpdateMilestonePayload!
+  deleteMilestone(input: DeleteMilestoneInput!): DeleteMilestonePayload!
+  addRelease(input: AddReleaseInput!): AddReleasePayload!
+  updateRelease(input: UpdateReleaseInput!): UpdateReleasePayload!
+  deleteRelease(input: DeleteReleaseInput!): DeleteReleasePayload!
+}
+
+type IssueTrackerQueries {
+  appearances: [Appearance!]!
+  appearance(id: UUID!): Appearance
+  issues: [Issue!]!
+  issue(id: UUID!): Issue
+  labels: [Label!]!
+  label(id: UUID!): Label
+  milestones: [Milestone!]!
+  milestone(id: UUID!): Milestone
+  releases: [Release!]!
+  release(id: UUID!): Release
+}
+
+type Label {
+  title: String!
+  description: String
+  color: String!
+  textColor: String!
+  issues: [Issue!]!
+  gitlabId: String
+  gitHubId: String
+  id: UUID!
+  createdAt: DateTime!
+  lastModifiedAt: DateTime
+}
+
+type Milestone {
+  title: String!
+  description: String
+  state: MilestoneState!
+  issues: [Issue!]!
+  gitlabId: String
+  gitlabIid: String
+  gitHubId: String
+  id: UUID!
+  createdAt: DateTime!
+  lastModifiedAt: DateTime
+}
+
+type Photo {
+  filePath: String!
+  id: UUID!
+  createdAt: DateTime!
+  lastModifiedAt: DateTime
+}
+
+type Release {
+  title: String!
+  notes: String
+  state: ReleaseState!
+  date: DateTime
+  issues: [Issue!]!
+  gitlabId: String
+  gitlabIid: String
+  gitHubId: String
+  id: UUID!
+  createdAt: DateTime!
+  lastModifiedAt: DateTime
+}
+
+type StringTooLongError implements Error {
+  message: String!
+}
+
+type StringTooShortError implements Error {
+  message: String!
+}
+
+type Translation {
+  country: String!
+  text: String!
+  id: UUID!
+  createdAt: DateTime!
+  lastModifiedAt: DateTime
+}
+
+type UpdateAppearancePayload {
+  appearance: Appearance
+  errors: [UpdateAppearanceError!]
+}
+
+type UpdateIssuePayload {
+  issue: Issue
+}
+
+type UpdateLabelPayload {
+  label: Label
+  errors: [UpdateLabelError!]
+}
+
+type UpdateMilestonePayload {
+  milestone: Milestone
+  errors: [UpdateMilestoneError!]
+}
+
+type UpdateReleasePayload {
+  release: Release
+}
+
+type ValueNotSetError implements Error {
+  message: String!
+}
+
+type Vehicle {
+  appearances: [Appearance!]!
+  engineColor: EngineColor!
+  translations: [Translation!]!
+  photos: [Photo!]!
+  id: UUID!
+  createdAt: DateTime!
+  lastModifiedAt: DateTime
+}
+
+union AddAppearanceError = ValueNotSetError | StringTooShortError | StringTooLongError | ColorFormatError
+
+union AddLabelError = ValueNotSetError | StringTooShortError | StringTooLongError | ColorFormatError
+
+union AddMilestoneError = ValueNotSetError | StringTooShortError | StringTooLongError
+
+union DeleteAppearanceError = DomainIdNotFoundError
+
+union DeleteLabelError = DomainIdNotFoundError
+
+union DeleteMilestoneError = DomainIdNotFoundError
+
+union UpdateAppearanceError = ValueNotSetError | StringTooShortError | StringTooLongError | ColorFormatError | DomainIdNotFoundError
+
+union UpdateLabelError = ValueNotSetError | StringTooShortError | StringTooLongError | ColorFormatError | DomainIdNotFoundError
+
+union UpdateMilestoneError = ValueNotSetError | StringTooShortError | StringTooLongError | DomainIdNotFoundError
+
+input AddAppearanceInput {
+  title: String!
+  color: String!
+  textColor: String!
+  description: String
+}
+
+input AddIssueInput {
+  title: String!
+  description: String
+  priority: Priority!
+  milestoneId: UUID
+  releaseId: UUID
+  vehicle: VehicleInput
+}
+
+input AddLabelInput {
+  title: String!
+  color: String!
+  textColor: String!
+  description: String
+}
+
+input AddMilestoneInput {
+  title: String!
+  description: String
+}
+
+input AddReleaseInput {
+  title: String!
+  releaseNotes: String
+  releaseDate: DateTime
+}
+
+input AppearanceInput {
+  title: String!
+  description: String
+  color: String!
+  textColor: String!
+  gitlabId: String
+  gitHubId: String
+  id: UUID!
+  createdAt: DateTime!
+  lastModifiedAt: DateTime
+}
+
+input DeleteAppearanceInput {
+  id: UUID!
+}
+
+input DeleteIssueInput {
+  id: UUID!
+}
+
+input DeleteLabelInput {
+  id: UUID!
+}
+
+input DeleteMilestoneInput {
+  id: UUID!
+}
+
+input DeleteReleaseInput {
+  id: UUID!
+}
+
+input PhotoInput {
+  filePath: String!
+  id: UUID!
+  createdAt: DateTime!
+  lastModifiedAt: DateTime
+}
+
+input TranslationInput {
+  country: String!
+  text: String!
+  id: UUID!
+  createdAt: DateTime!
+  lastModifiedAt: DateTime
+}
+
+input UpdateAppearanceInput {
+  id: UUID!
+  title: String!
+  color: String!
+  textColor: String!
+  description: String
+}
+
+input UpdateIssueInput {
+  id: UUID!
+  title: String!
+  description: String
+  priority: Priority!
+  milestoneId: UUID
+  releaseId: UUID
+  vehicle: VehicleInput
+}
+
+input UpdateLabelInput {
+  id: UUID!
+  title: String!
+  color: String!
+  textColor: String!
+  description: String
+}
+
+input UpdateMilestoneInput {
+  id: UUID!
+  title: String!
+  state: MilestoneState!
+  description: String
+}
+
+input UpdateReleaseInput {
+  id: UUID!
+  title: String!
+  state: ReleaseState!
+  releaseNotes: String
+  releaseDate: DateTime
+}
+
+input VehicleInput {
+  appearances: [AppearanceInput!]!
+  engineColor: EngineColor!
+  translations: [TranslationInput!]!
+  photos: [PhotoInput!]!
+  id: UUID!
+  createdAt: DateTime!
+  lastModifiedAt: DateTime
+}
+
+enum EngineColor {
+  UNKNOWN
+  BLUE
+  BROWN
+  GREEN
+  ORANGE
+  PURPLE
+  RED
+  YELLOW
+  WHITE
+}
+
+enum IssueState {
+  UNKNOWN
+  OPEN
+  CLOSED
+}
+
+enum LinkType {
+  UNKNOWN
+  BLOCKS
+  IS_BLOCKED_BY
+  RELATES_TO
+  IS_RELATED_TO
+  DUPLICATES
+  IS_DUPLICATED_BY
+}
+
+enum MilestoneState {
+  UNKNOWN
+  OPEN
+  CLOSED
+}
+
+enum Priority {
+  UNKNOWN
+  MINOR
+  LOWEST
+  LOW
+  MEDIUM
+  HIGH
+  HIGHEST
+  BLOCKER
+}
+
+enum ReleaseState {
+  UNKNOWN
+  PLANNED
+  RELEASED
+}
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")

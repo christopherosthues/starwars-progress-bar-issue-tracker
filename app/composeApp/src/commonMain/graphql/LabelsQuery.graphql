@@ -1,0 +1,9 @@
+query LabelsQuery{
+    labels {
+        id,
+        title,
+        color,
+        textColor,
+        description
+    }
+}

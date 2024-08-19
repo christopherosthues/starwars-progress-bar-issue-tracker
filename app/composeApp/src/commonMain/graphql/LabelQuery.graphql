@@ -1,0 +1,15 @@
+query LabelQuery($id: UUID!) {
+    label(id: $id) {
+        id,
+        gitHubId,
+        gitlabId,
+        description,
+        title,
+        textColor,
+        color,
+        createdAt,
+        lastModifiedAt,
+        gitHubId,
+        gitlabId
+    }
+}
