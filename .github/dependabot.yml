@@ -7,7 +7,7 @@ version: 2
 updates:
   # Maintain dependencies for .NET dependencies
   - package-ecosystem: "nuget"
-    directory: "/server/"
+    directory: "/server/src/"
     target-branch: "develop"
     schedule:
       interval: "daily"
@@ -21,7 +21,7 @@ updates:
           
   # Maintain dependencies for Docker dependencies
   - package-ecosystem: "docker"
-    directory: "/server/StarWarsProgressBarIssueTracker.App"
+    directory: "/server/src/StarWarsProgressBarIssueTracker.App"
     target-branch: "develop"
     schedule:
       interval: "daily"
