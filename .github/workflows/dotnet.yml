@@ -1,0 +1,140 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'server/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'server/**'
+
+env:
+  HUSKY: 0
+
+jobs:
+  appTests:
+    name: App tests
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+
+    - name: Restore dependencies
+      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.App.Tests/StarWarsProgressBarIssueTracker.App.Tests.csproj
+
+    - name: Generate GitHub GraphQL client
+      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj
+
+    - name: Generate Gitlab GraphQL client
+      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj
+
+    - name: Build
+      run: dotnet build server/src/StarWarsProgressBarIssueTracker.App.Tests/StarWarsProgressBarIssueTracker.App.Tests.csproj --no-restore
+
+    - name: Test
+      run: dotnet test server/src/StarWarsProgressBarIssueTracker.App.Tests/StarWarsProgressBarIssueTracker.App.Tests.csproj --no-build --verbosity q --logger "trx;LogFileName=App.trx" --results-directory "TestResults-App" --filter "TestCategory=Unit|TestCategory=Integration"
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: App test results
+        path: TestResults-App
+      if: ${{ always() }}
+
+  domainTests:
+    name: Domain tests
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+
+    - name: Restore dependencies
+      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.Domain.Tests/StarWarsProgressBarIssueTracker.Domain.Tests.csproj
+
+    - name: Build
+      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Domain.Tests/StarWarsProgressBarIssueTracker.Domain.Tests.csproj --no-restore
+
+    - name: Test
+      run: dotnet test server/src/StarWarsProgressBarIssueTracker.Domain.Tests/StarWarsProgressBarIssueTracker.Domain.Tests.csproj --no-build --verbosity q --logger "trx;LogFileName=Domain.trx" --results-directory "TestResults-Domain" --filter "TestCategory=Unit|TestCategory=Integration"
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: Domain test results
+        path: TestResults-Domain
+      if: ${{ always() }}
+
+  infrastructureTests:
+    name: Infrastructure tests
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+
+    - name: Restore dependencies
+      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.Infrastructure.Tests/StarWarsProgressBarIssueTracker.Infrastructure.Tests.csproj
+
+    - name: Build
+      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Tests/StarWarsProgressBarIssueTracker.Infrastructure.Tests.csproj --no-restore
+
+    - name: Test
+      run: dotnet test server/src/StarWarsProgressBarIssueTracker.Infrastructure.Tests/StarWarsProgressBarIssueTracker.Infrastructure.Tests.csproj --no-build --verbosity q --logger "trx;LogFileName=Infrastructure.trx" --results-directory "TestResults-Infrastructure" --filter "TestCategory=Unit|TestCategory=Integration"
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: Infrastructure test results
+        path: TestResults-Infrastructure
+      if: ${{ always() }}
+
+  infrastructureGitlabTests:
+    name: Infrastructure Gitlab tests
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+
+    - name: Restore dependencies
+      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests.csproj
+
+    - name: Build
+      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests.csproj --no-restore
+
+    - name: Test
+      run: dotnet test server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests.csproj --no-build --verbosity q --logger "trx;LogFileName=Infrastructure.Gitlab.trx" --results-directory "TestResults-Gitlab" --filter "TestCategory=Unit|TestCategory=Integration"
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: Infrastructure Gitlab test results
+        path: TestResults-Gitlab
+      if: ${{ always() }}
