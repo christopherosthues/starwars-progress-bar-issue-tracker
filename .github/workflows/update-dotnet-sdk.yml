@@ -23,7 +23,7 @@ jobs:
       with:
         ref: 'main' # Checkout the develop branch instead of the default branch
 
-    - name: Update .NET SKD
+    - name: Update .NET SDK
       uses: martincostello/update-dotnet-sdk@v3
       with:
         global-json-file: server/global.json
