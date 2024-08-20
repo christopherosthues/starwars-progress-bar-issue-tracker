@@ -21,7 +21,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        ref: 'develop' # Checkout the develop branch instead of the default branch
+        ref: 'main' # Checkout the develop branch instead of the default branch
 
     - name: Update .NET SKD
       uses: martincostello/update-dotnet-sdk@v3
