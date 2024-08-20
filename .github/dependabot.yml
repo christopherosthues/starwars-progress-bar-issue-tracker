@@ -8,7 +8,7 @@ updates:
   # Maintain dependencies for .NET dependencies
   - package-ecosystem: "nuget"
     directory: "/server/src/"
-    target-branch: "develop"
+    target-branch: "main"
     schedule:
       interval: "daily"
     commit-message:
@@ -22,7 +22,7 @@ updates:
   # Maintain dependencies for Docker dependencies
   - package-ecosystem: "docker"
     directory: "/server/src/StarWarsProgressBarIssueTracker.App"
-    target-branch: "develop"
+    target-branch: "main"
     schedule:
       interval: "daily"
     commit-message:
@@ -50,7 +50,7 @@ updates:
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
-    target-branch: "develop"
+    target-branch: "main"
     schedule:
       interval: "daily"
     commit-message:
