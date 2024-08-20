@@ -26,5 +26,6 @@ jobs:
     - name: Update .NET SKD
       uses: martincostello/update-dotnet-sdk@v3
       with:
+        global-json-file: server/global.json
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         commit-message-prefix: "chore: "
