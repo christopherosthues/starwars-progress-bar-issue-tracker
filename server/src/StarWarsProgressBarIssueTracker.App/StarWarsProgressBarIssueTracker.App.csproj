@@ -13,6 +13,7 @@
     <PackageReference Include="AutoMapper"/>
     <PackageReference Include="HotChocolate.AspNetCore"/>
     <PackageReference Include="HotChocolate.Data.EntityFramework"/>
+    <PackageReference Include="HotChocolate.Pagination.Core" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">

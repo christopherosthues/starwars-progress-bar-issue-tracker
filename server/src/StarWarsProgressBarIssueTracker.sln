@@ -13,10 +13,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".meta", ".meta", "{86AE95DA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{705452CE-6D9D-468E-9148-51BB8279812D}"
 	ProjectSection(SolutionItems) = preProject
-		Directory.Build.props = Directory.Build.props
-		Directory.Build.targets = Directory.Build.targets
+		Directory.Build.props = ..\Directory.Build.props
+		Directory.Build.targets = ..\Directory.Build.targets
 		global.json = ..\global.json
-		Directory.Packages.props = Directory.Packages.props
+		Directory.Packages.props = ..\Directory.Packages.props
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTracker.Domain", "StarWarsProgressBarIssueTracker.Domain\StarWarsProgressBarIssueTracker.Domain.csproj", "{69A87A6D-A232-4F4A-B01A-B5072D2F7BDE}"
@@ -41,6 +41,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{5D23A55C-D
 		LICENSE = ..\LICENSE
 		README.md = ..\README.md
 		CHANGELOG.md = ..\CHANGELOG.md
+		..\..\CODE_OF_CONDUCT.md = ..\..\CODE_OF_CONDUCT.md
+		..\..\LICENSE = ..\..\LICENSE
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTracker.Infrastructure", "StarWarsProgressBarIssueTracker.Infrastructure\StarWarsProgressBarIssueTracker.Infrastructure.csproj", "{DE7C2874-1C2C-4F74-B1DC-F09868D2224F}"
