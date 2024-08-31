@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".meta", ".meta", "{86AE95DA
 		.config\dotnet-tools.json = ..\.config\dotnet-tools.json
 		..\.env = ..\.env
 		..\.dockerignore = ..\.dockerignore
+		..\..\.config\dotnet-tools.json = ..\..\.config\dotnet-tools.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{705452CE-6D9D-468E-9148-51BB8279812D}"
@@ -25,15 +26,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git hooks", "git hooks", "{A854F50E-9FA0-420C-B764-E56137D66B62}"
 	ProjectSection(SolutionItems) = preProject
-		.husky\task-runner.json = ..\.husky\task-runner.json
-		.husky\_\husky.sh = ..\.husky\_\husky.sh
-		.husky\post-checkout = ..\.husky\post-checkout
-		.husky\post-commit = ..\.husky\post-commit
-		.husky\post-merge = ..\.husky\post-merge
-		.husky\pre-push = ..\.husky\pre-push
-		.husky\csx\commit-lint.csx = ..\.husky\csx\commit-lint.csx
-		.husky\commit-msg = ..\.husky\commit-msg
-		.husky\pre-commit = ..\.husky\pre-commit
+		.husky\task-runner.json = ..\..\.husky\task-runner.json
+		.husky\_\husky.sh = ..\..\.husky\_\husky.sh
+		.husky\post-checkout = ..\..\.husky\post-checkout
+		.husky\post-commit = ..\..\.husky\post-commit
+		.husky\post-merge = ..\..\.husky\post-merge
+		.husky\pre-push = ..\..\.husky\pre-push
+		.husky\csx\commit-lint.csx = ..\..\.husky\csx\commit-lint.csx
+		.husky\commit-msg = ..\..\.husky\commit-msg
+		.husky\pre-commit = ..\..\.husky\pre-commit
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{5D23A55C-DFFE-40D8-9168-6AE8CC9DDFFD}"
@@ -57,6 +58,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", 
 		.github\workflows\test.yml = ..\.github\workflows\test.yml
 		.github\workflows\update-dotnet-sdk.yml = ..\.github\workflows\update-dotnet-sdk.yml
 		.github\workflows\update-nuget-packages.yml = ..\.github\workflows\update-nuget-packages.yml
+		..\..\.github\dependabot.yml = ..\..\.github\dependabot.yml
+		..\..\.github\workflows\dotnet.yml = ..\..\.github\workflows\dotnet.yml
+		..\..\.github\workflows\update-dotnet-sdk.yml = ..\..\.github\workflows\update-dotnet-sdk.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTracker.Infrastructure.GitHub", "StarWarsProgressBarIssueTracker.Infrastructure.GitHub\StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj", "{6820DDF7-48EC-4C94-9267-F2B9A4B14A8C}"
