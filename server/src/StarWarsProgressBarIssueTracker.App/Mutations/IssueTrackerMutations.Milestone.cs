@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using HotChocolate.Types.Relay;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 
@@ -23,7 +24,7 @@ public partial class IssueTrackerMutations
     [Error<StringTooShortException>]
     [Error<StringTooLongException>]
     [Error<DomainIdNotFoundException>]
-    public async Task<Milestone> UpdateMilestone(Guid id, string title, MilestoneState state, string? description, CancellationToken cancellationToken)
+    public async Task<Milestone> UpdateMilestone([ID] Guid id, string title, MilestoneState state, string? description, CancellationToken cancellationToken)
     {
         return await milestoneService.UpdateMilestoneAsync(new Milestone
         {
@@ -35,7 +36,7 @@ public partial class IssueTrackerMutations
     }
 
     [Error<DomainIdNotFoundException>]
-    public async Task<Milestone> DeleteMilestone(Guid id, CancellationToken cancellationToken)
+    public async Task<Milestone> DeleteMilestone([ID] Guid id, CancellationToken cancellationToken)
     {
         return await milestoneService.DeleteMilestoneAsync(id, cancellationToken);
     }

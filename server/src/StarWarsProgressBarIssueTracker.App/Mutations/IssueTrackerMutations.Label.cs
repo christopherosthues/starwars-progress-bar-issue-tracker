@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using HotChocolate.Types.Relay;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
 
@@ -26,7 +27,7 @@ public partial class IssueTrackerMutations
     [Error<StringTooLongException>]
     [Error<ColorFormatException>]
     [Error<DomainIdNotFoundException>]
-    public async Task<Label> UpdateLabel(Guid id, string title, string color, string textColor, string? description, CancellationToken cancellationToken)
+    public async Task<Label> UpdateLabel([ID] Guid id, string title, string color, string textColor, string? description, CancellationToken cancellationToken)
     {
         return await labelService.UpdateLabelAsync(new()
         {
@@ -39,7 +40,7 @@ public partial class IssueTrackerMutations
     }
 
     [Error<DomainIdNotFoundException>]
-    public async Task<Label> DeleteLabel(Guid id, CancellationToken cancellationToken)
+    public async Task<Label> DeleteLabel([ID] Guid id, CancellationToken cancellationToken)
     {
         return await labelService.DeleteLabelAsync(id, cancellationToken);
     }

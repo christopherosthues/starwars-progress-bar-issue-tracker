@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using HotChocolate.Types.Relay;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
@@ -26,7 +27,7 @@ public partial class IssueTrackerMutations
     [Error<StringTooLongException>]
     [Error<ColorFormatException>]
     [Error<DomainIdNotFoundException>]
-    public async Task<Appearance> UpdateAppearance(Guid id, string title, string color, string textColor, string? description, CancellationToken cancellationToken)
+    public async Task<Appearance> UpdateAppearance([ID] Guid id, string title, string color, string textColor, string? description, CancellationToken cancellationToken)
     {
         return await appearanceService.UpdateAppearanceAsync(new()
         {
@@ -39,7 +40,7 @@ public partial class IssueTrackerMutations
     }
 
     [Error<DomainIdNotFoundException>]
-    public async Task<Appearance> DeleteAppearance(Guid id, CancellationToken cancellationToken)
+    public async Task<Appearance> DeleteAppearance([ID] Guid id, CancellationToken cancellationToken)
     {
         return await appearanceService.DeleteAppearanceAsync(id, cancellationToken);
     }

@@ -1,3 +1,4 @@
+using HotChocolate.Types.Relay;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
 
 namespace StarWarsProgressBarIssueTracker.App.Mutations;
@@ -15,7 +16,7 @@ public partial class IssueTrackerMutations
         }, cancellationToken);
     }
 
-    public async Task<Release> UpdateRelease(Guid id, string title, ReleaseState state, string? releaseNotes, DateTime? releaseDate, CancellationToken cancellationToken)
+    public async Task<Release> UpdateRelease([ID] Guid id, string title, ReleaseState state, string? releaseNotes, DateTime? releaseDate, CancellationToken cancellationToken)
     {
         return await releaseService.UpdateReleaseAsync(new Release
         {
@@ -27,7 +28,7 @@ public partial class IssueTrackerMutations
         }, cancellationToken);
     }
 
-    public async Task<Release> DeleteRelease(Guid id, CancellationToken cancellationToken)
+    public async Task<Release> DeleteRelease([ID] Guid id, CancellationToken cancellationToken)
     {
         return await releaseService.DeleteReleaseAsync(id, cancellationToken);
     }

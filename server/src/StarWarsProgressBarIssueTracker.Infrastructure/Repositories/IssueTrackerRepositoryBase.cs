@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using StarWarsProgressBarIssueTracker.Infrastructure.Database;
 using StarWarsProgressBarIssueTracker.Infrastructure.Models;
 
@@ -46,7 +47,7 @@ public class IssueTrackerRepositoryBase<TDbEntity> : IRepository<TDbEntity> wher
 
     public async Task<TDbEntity> AddAsync(TDbEntity entity, CancellationToken cancellationToken = default)
     {
-        var resultEntry = await DbSet.AddAsync(entity, cancellationToken);
+        EntityEntry<TDbEntity> resultEntry = await DbSet.AddAsync(entity, cancellationToken);
         await Context.SaveChangesAsync(cancellationToken);
         return resultEntry.Entity;
     }
@@ -59,16 +60,17 @@ public class IssueTrackerRepositoryBase<TDbEntity> : IRepository<TDbEntity> wher
 
     public async Task<TDbEntity> UpdateAsync(TDbEntity entity, CancellationToken cancellationToken = default)
     {
-        var entry = Context.Entry(entity);
+        EntityEntry<TDbEntity> entry = Context.Entry(entity);
         entry.State = EntityState.Modified;
         await Context.SaveChangesAsync(cancellationToken);
 
-        return entry.Entity;
+        return (await GetByIdAsync(entity.Id, cancellationToken))!;
     }
 
     public async Task<TDbEntity> DeleteAsync(TDbEntity entity, CancellationToken cancellationToken = default)
     {
-        var deletedEntity = DbSet.Remove(entity).Entity;
+        TDbEntity deletedEntity = (await GetByIdAsync(entity.Id, cancellationToken))!;
+        DbSet.Remove(entity);
         await Context.SaveChangesAsync(cancellationToken);
         return deletedEntity;
     }

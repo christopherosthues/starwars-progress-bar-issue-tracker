@@ -1,3 +1,4 @@
+using HotChocolate.Types.Relay;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
@@ -33,7 +34,7 @@ public partial class IssueTrackerMutations
         }, cancellationToken);
     }
 
-    public async Task<Issue> UpdateIssue(Guid id, string title, string? description, Priority priority,
+    public async Task<Issue> UpdateIssue([ID] Guid id, string title, string? description, Priority priority,
         Guid? milestoneId, Guid? releaseId, Vehicle? vehicle, CancellationToken cancellationToken)
     {
         Milestone? milestone = null;
@@ -60,7 +61,7 @@ public partial class IssueTrackerMutations
         }, cancellationToken);
     }
 
-    public async Task<Issue> DeleteIssue(Guid id, CancellationToken cancellationToken)
+    public async Task<Issue> DeleteIssue([ID] Guid id, CancellationToken cancellationToken)
     {
         return await issueService.DeleteIssueAsync(id, cancellationToken);
     }
