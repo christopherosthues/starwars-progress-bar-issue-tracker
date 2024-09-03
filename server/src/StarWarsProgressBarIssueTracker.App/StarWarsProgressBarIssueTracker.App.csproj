@@ -6,6 +6,7 @@
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
     <!-- Disable warning for RouteHandlerAnalyzer throws InvalidOperationException (https://github.com/dotnet/aspnetcore/issues/50836) -->
     <NoWarn>$(NoWarn);AD0001</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <UserSecretsId>26e2fc24-5de9-4860-b503-9983f5ae0e73</UserSecretsId>
   </PropertyGroup>
 
@@ -14,6 +15,7 @@
     <PackageReference Include="HotChocolate.AspNetCore"/>
     <PackageReference Include="HotChocolate.Data.EntityFramework"/>
     <PackageReference Include="HotChocolate.Pagination.Core" />
+    <PackageReference Include="HotChocolate.Types.Scalars" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
