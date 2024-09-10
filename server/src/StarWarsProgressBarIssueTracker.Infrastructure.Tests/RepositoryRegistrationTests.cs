@@ -1,6 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using StarWarsProgressBarIssueTracker.Common.Tests;
+using StarWarsProgressBarIssueTracker.Domain;
+using StarWarsProgressBarIssueTracker.Domain.Labels;
+using StarWarsProgressBarIssueTracker.Domain.Milestones;
+using StarWarsProgressBarIssueTracker.Domain.Releases;
 using StarWarsProgressBarIssueTracker.Infrastructure.Models;
 using StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
@@ -26,7 +30,7 @@ public class RepositoryRegistrationTests
                 sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
         serviceCollectionMock.Verify(
             mock => mock.Add(It.Is<ServiceDescriptor>(sd =>
-                sd.ServiceType == typeof(IRepository<DbLabel>) && sd.ImplementationType == typeof(LabelRepository) &&
+                sd.ServiceType == typeof(IRepository<Label>) && sd.ImplementationType == typeof(LabelRepository) &&
                 sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
         serviceCollectionMock.Verify(
             mock => mock.Add(It.Is<ServiceDescriptor>(sd =>
@@ -34,11 +38,11 @@ public class RepositoryRegistrationTests
                 sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
         serviceCollectionMock.Verify(
             mock => mock.Add(It.Is<ServiceDescriptor>(sd =>
-                sd.ServiceType == typeof(IRepository<DbMilestone>) && sd.ImplementationType == typeof(MilestoneRepository) &&
+                sd.ServiceType == typeof(IRepository<Milestone>) && sd.ImplementationType == typeof(MilestoneRepository) &&
                 sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
         serviceCollectionMock.Verify(
             mock => mock.Add(It.Is<ServiceDescriptor>(sd =>
-                sd.ServiceType == typeof(IRepository<DbRelease>) && sd.ImplementationType == typeof(ReleaseRepository) &&
+                sd.ServiceType == typeof(IRepository<Release>) && sd.ImplementationType == typeof(ReleaseRepository) &&
                 sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
         serviceCollectionMock.Verify(
             mock => mock.Add(It.Is<ServiceDescriptor>(sd =>

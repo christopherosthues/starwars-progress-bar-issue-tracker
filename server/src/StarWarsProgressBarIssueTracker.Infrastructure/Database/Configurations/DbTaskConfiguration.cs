@@ -4,7 +4,7 @@ using StarWarsProgressBarIssueTracker.Infrastructure.Models;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Configurations;
 
-public class DbTasksConfiguration : IEntityTypeConfiguration<DbTask>
+public class DbTaskConfiguration : IEntityTypeConfiguration<DbTask>
 {
     public void Configure(EntityTypeBuilder<DbTask> builder)
     {

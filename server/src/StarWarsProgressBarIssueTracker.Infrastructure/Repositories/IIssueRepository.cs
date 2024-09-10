@@ -1,14 +1,16 @@
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Domain;
+using StarWarsProgressBarIssueTracker.Domain.Issues;
+using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
-public interface IIssueRepository : IRepository<DbIssue>
+public interface IIssueRepository : IRepository<Issue>
 {
-    void DeleteVehicle(DbVehicle dbVehicle);
+    void DeleteVehicle(Vehicle dbVehicle);
 
-    void DeleteTranslations(IEnumerable<DbTranslation> dbTranslations);
+    void DeleteTranslations(IEnumerable<Translation> dbTranslations);
 
-    void DeletePhotos(IEnumerable<DbPhoto> dbPhotos);
+    void DeletePhotos(IEnumerable<Photo> dbPhotos);
 
-    void DeleteLinks(IEnumerable<DbIssueLink> dbLinks);
+    void DeleteLinks(IEnumerable<IssueLink> dbLinks);
 }

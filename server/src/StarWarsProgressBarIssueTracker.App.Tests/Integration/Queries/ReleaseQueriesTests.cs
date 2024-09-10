@@ -7,7 +7,7 @@ using StarWarsProgressBarIssueTracker.Common.Tests;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
@@ -42,28 +42,28 @@ public class ReleaseQueriesTests : IntegrationTestBase
     public async Task GetReleasesShouldReturnAllReleases()
     {
         // Arrange
-        var dbRelease = new DbRelease
+        var dbRelease = new Release
         {
             Title = "Release 1",
             State = ReleaseState.Planned
         };
 
-        var dbIssue = new DbIssue
+        var dbIssue = new Issue
         {
             Title = "issue title",
             State = IssueState.Closed,
-            Milestone = new DbMilestone { Title = "milestone title", State = MilestoneState.Open },
-            Vehicle = new DbVehicle
+            Milestone = new Milestone { Title = "milestone title", State = MilestoneState.Open },
+            Vehicle = new Vehicle
             {
                 Appearances =
                 [
-                    new DbAppearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
+                    new Appearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
                 ],
-                Translations = [new DbTranslation { Country = "en", Text = "translation" }],
-                Photos = [new DbPhoto { FilePath = string.Empty }]
+                Translations = [new Translation { Country = "en", Text = "translation" }],
+                Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbRelease2 = new DbRelease
+        var dbRelease2 = new Release
         {
             Title = "Release 2",
             Notes = "Notes 2",
@@ -140,7 +140,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         // Arrange
         await SeedDatabaseAsync(context =>
         {
-            context.Releases.Add(new DbRelease
+            context.Releases.Add(new Release
             {
                 Id = new Guid("5888CDB6-57E2-4774-B6E8-7AABE82E2A5F"),
                 Title = "Release 1",
@@ -195,22 +195,22 @@ public class ReleaseQueriesTests : IntegrationTestBase
     {
         // Arrange
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var dbIssue = new DbIssue
+        var dbIssue = new Issue
         {
             Title = "issue title",
             State = IssueState.Closed,
-            Milestone = new DbMilestone { Title = "milestone title", State = MilestoneState.Open },
-            Vehicle = new DbVehicle
+            Milestone = new Milestone { Title = "milestone title", State = MilestoneState.Open },
+            Vehicle = new Vehicle
             {
                 Appearances =
                 [
-                    new DbAppearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
+                    new Appearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
                 ],
-                Translations = [new DbTranslation { Country = "en", Text = "translation" }],
-                Photos = [new DbPhoto { FilePath = string.Empty }]
+                Translations = [new Translation { Country = "en", Text = "translation" }],
+                Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbRelease = new DbRelease
+        var dbRelease = new Release
         {
             Id = new Guid(id),
             Title = "Release 2",
@@ -222,7 +222,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         };
         await SeedDatabaseAsync(context =>
         {
-            context.Releases.Add(new DbRelease
+            context.Releases.Add(new Release
             {
                 Id = new Guid("5888CDB6-57E2-4774-B6E8-7AABE82E2A5F"),
                 Title = "Release 1",

@@ -7,7 +7,7 @@ using StarWarsProgressBarIssueTracker.Common.Tests;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
@@ -42,28 +42,28 @@ public class MilestoneQueriesTests : IntegrationTestBase
     public async Task GetMilestonesShouldReturnAllMilestones()
     {
         // Arrange
-        var dbMilestone = new DbMilestone
+        var dbMilestone = new Milestone
         {
             Title = "Milestone 1",
             State = MilestoneState.Open
         };
 
-        var dbIssue = new DbIssue
+        var dbIssue = new Issue
         {
             Title = "issue title",
             State = IssueState.Closed,
-            Release = new DbRelease { Title = "milestone title", State = ReleaseState.Planned },
-            Vehicle = new DbVehicle
+            Release = new Release { Title = "milestone title", State = ReleaseState.Planned },
+            Vehicle = new Vehicle
             {
                 Appearances =
                 [
-                    new DbAppearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
+                    new Appearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
                 ],
-                Translations = [new DbTranslation { Country = "en", Text = "translation" }],
-                Photos = [new DbPhoto { FilePath = string.Empty }]
+                Translations = [new Translation { Country = "en", Text = "translation" }],
+                Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbMilestone2 = new DbMilestone
+        var dbMilestone2 = new Milestone
         {
             Title = "Milestone 2",
             Description = "Notes 2",
@@ -137,7 +137,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
         // Arrange
         await SeedDatabaseAsync(context =>
         {
-            context.Milestones.Add(new DbMilestone
+            context.Milestones.Add(new Milestone
             {
                 Id = new Guid("5888CDB6-57E2-4774-B6E8-7AABE82E2A5F"),
                 Title = "Milestone 1",
@@ -191,23 +191,23 @@ public class MilestoneQueriesTests : IntegrationTestBase
     {
         // Arrange
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var dbIssue = new DbIssue
+        var dbIssue = new Issue
         {
             Id = new Guid("CB547CF5-CB28-412E-8DA4-2A7F10E3A5FE"),
             Title = "issue title",
             State = IssueState.Closed,
-            Release = new DbRelease { Title = "milestone title", State = ReleaseState.Planned },
-            Vehicle = new DbVehicle
+            Release = new Release { Title = "milestone title", State = ReleaseState.Planned },
+            Vehicle = new Vehicle
             {
                 Appearances =
                 [
-                    new DbAppearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
+                    new Appearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
                 ],
-                Translations = [new DbTranslation { Country = "en", Text = "translation" }],
-                Photos = [new DbPhoto { FilePath = string.Empty }]
+                Translations = [new Translation { Country = "en", Text = "translation" }],
+                Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbMilestone = new DbMilestone
+        var dbMilestone = new Milestone
         {
             Id = new Guid(id),
             Title = "Milestone 2",
@@ -218,7 +218,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
         };
         await SeedDatabaseAsync(context =>
         {
-            context.Milestones.Add(new DbMilestone
+            context.Milestones.Add(new Milestone
             {
                 Id = new Guid("5888CDB6-57E2-4774-B6E8-7AABE82E2A5F"),
                 Title = "Milestone 1",

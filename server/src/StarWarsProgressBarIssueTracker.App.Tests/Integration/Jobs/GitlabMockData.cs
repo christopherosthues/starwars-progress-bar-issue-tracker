@@ -1,6 +1,7 @@
+using StarWarsProgressBarIssueTracker.Domain.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Jobs;
 
@@ -215,11 +216,11 @@ public static class GitlabMockData
                                           }
                                           """;
 
-    public static IList<DbLabel> AddedLabels()
+    public static IList<Label> AddedLabels()
     {
         return
         [
-            new DbLabel
+            new Label
             {
                 Title = "Andor",
                 Description = "Vehicles appearing in Andor",
@@ -228,7 +229,7 @@ public static class GitlabMockData
                 GitlabId = "gid://gitlab/ProjectLabel/1",
                 LastModifiedAt = new DateTime(2023, 2, 25, 12, 57, 46, DateTimeKind.Utc)
             },
-            new DbLabel
+            new Label
             {
                 Title = "Bad Batch",
                 Description = string.Empty,
@@ -237,7 +238,7 @@ public static class GitlabMockData
                 GitlabId = "gid://gitlab/ProjectLabel/2",
                 LastModifiedAt = new DateTime(2022, 11, 2, 15, 1, 41, DateTimeKind.Utc)
             },
-            new DbLabel
+            new Label
             {
                 Title = "Clone Wars",
                 Description = "The old Clone Wars series",
@@ -249,11 +250,11 @@ public static class GitlabMockData
         ];
     }
 
-    public static IList<DbAppearance> AddedAppearances()
+    public static IList<Appearance> AddedAppearances()
     {
         return
         [
-            new DbAppearance
+            new Appearance
             {
                 Title = "Andor",
                 Description = "Vehicles appearing in Andor",
@@ -262,7 +263,7 @@ public static class GitlabMockData
                 GitlabId = "gid://gitlab/ProjectLabel/4",
                 LastModifiedAt = new DateTime(2023, 2, 25, 12, 57, 46, DateTimeKind.Utc)
             },
-            new DbAppearance
+            new Appearance
             {
                 Title = "Bad Batch",
                 Description = string.Empty,
@@ -271,7 +272,7 @@ public static class GitlabMockData
                 GitlabId = "gid://gitlab/ProjectLabel/5",
                 LastModifiedAt = new DateTime(2022, 11, 2, 15, 1, 41, DateTimeKind.Utc)
             },
-            new DbAppearance
+            new Appearance
             {
                 Title = "Clone Wars",
                 Description = "The old Clone Wars series",
@@ -283,11 +284,11 @@ public static class GitlabMockData
         ];
     }
 
-    public static IList<DbMilestone> AddedMilestones()
+    public static IList<Milestone> AddedMilestones()
     {
         return
         [
-            new DbMilestone
+            new Milestone
             {
                 Title = "Features",
                 Description = string.Empty,
@@ -296,7 +297,7 @@ public static class GitlabMockData
                 State = MilestoneState.Closed,
                 LastModifiedAt = new DateTime(2022, 12, 30, 11, 49, 41, DateTimeKind.Utc)
             },
-            new DbMilestone
+            new Milestone
             {
                 Title = "Yuuzhan-Vong",
                 Description = string.Empty,
@@ -305,7 +306,7 @@ public static class GitlabMockData
                 State = MilestoneState.Open,
                 LastModifiedAt = new DateTime(2022, 11, 2, 22, 12, 15, DateTimeKind.Utc)
             },
-            new DbMilestone
+            new Milestone
             {
                 Title = "Mandalorians",
                 Description = "Desc3",
@@ -317,11 +318,11 @@ public static class GitlabMockData
         ];
     }
 
-    public static IList<DbRelease> AddedReleases()
+    public static IList<Release> AddedReleases()
     {
         return
         [
-            new DbRelease
+            new Release
             {
                 Title = "Release 1.0.0",
                 Notes = "Hello there",
@@ -331,7 +332,7 @@ public static class GitlabMockData
                 State = ReleaseState.Released,
                 LastModifiedAt = new DateTime(2023, 3, 5, 13, 54, 6, DateTimeKind.Utc)
             },
-            new DbRelease
+            new Release
             {
                 Title = "Release 1.1.0",
                 Notes = string.Empty,
@@ -340,7 +341,7 @@ public static class GitlabMockData
                 State = ReleaseState.Planned,
                 LastModifiedAt = new DateTime(2023, 4, 22, 19, 7, 14, DateTimeKind.Utc)
             },
-            new DbRelease
+            new Release
             {
                 Title = "Release 1.2.0",
                 Notes = "Desc3",

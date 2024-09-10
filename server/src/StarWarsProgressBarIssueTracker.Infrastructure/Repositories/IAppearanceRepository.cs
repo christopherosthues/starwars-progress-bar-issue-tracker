@@ -1,8 +1,9 @@
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Domain;
+using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
-public interface IAppearanceRepository : IRepository<DbAppearance>
+public interface IAppearanceRepository : IRepository<Appearance>
 {
-    IQueryable<DbAppearance> GetAppearancesById(IEnumerable<Guid> appearanceIds);
+    IQueryable<Appearance> GetAppearancesById(IEnumerable<Guid> appearanceIds);
 }

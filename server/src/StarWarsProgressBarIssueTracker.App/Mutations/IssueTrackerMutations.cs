@@ -7,8 +7,9 @@ using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 namespace StarWarsProgressBarIssueTracker.App.Mutations;
 
 public partial class IssueTrackerMutations(
-    IAppearanceService appearanceService,
-    ILabelService labelService,
-    IIssueService issueService,
-    IMilestoneService milestoneService,
-    IReleaseService releaseService);
+    // IAppearanceService appearanceService,
+    ILabelService labelService
+    // IIssueService issueService,
+    // IMilestoneService milestoneService,
+    // IReleaseService releaseService)
+    );

@@ -4,7 +4,7 @@ using GraphQL;
 using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Appearances;
 using StarWarsProgressBarIssueTracker.Common.Tests;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
@@ -39,14 +39,14 @@ public class AppearanceQueriesTests : IntegrationTestBase
     public async Task GetAppearancesShouldReturnAllAppearances()
     {
         // Arrange
-        var dbAppearance = new DbAppearance
+        var dbAppearance = new Appearance
         {
             Color = "001122",
             TextColor = "223344",
             Title = "Appearance 1",
             Description = "Description 1"
         };
-        var dbAppearance2 = new DbAppearance
+        var dbAppearance2 = new Appearance
         {
             Color = "112233",
             TextColor = "334455",
@@ -103,7 +103,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
         // Arrange
         await SeedDatabaseAsync(context =>
         {
-            context.Appearances.Add(new DbAppearance
+            context.Appearances.Add(new Appearance
             {
                 Id = new Guid("5888CDB6-57E2-4774-B6E8-7AABE82E2A5F"),
                 Color = "001122",
@@ -157,7 +157,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
     {
         // Arrange
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var dbAppearance = new DbAppearance
+        var dbAppearance = new Appearance
         {
             Id = new Guid(id),
             Color = "112233",
@@ -167,7 +167,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
         };
         await SeedDatabaseAsync(context =>
         {
-            context.Appearances.Add(new DbAppearance
+            context.Appearances.Add(new Appearance
             {
                 Id = new Guid("5888CDB6-57E2-4774-B6E8-7AABE82E2A5F"),
                 Color = "001122",

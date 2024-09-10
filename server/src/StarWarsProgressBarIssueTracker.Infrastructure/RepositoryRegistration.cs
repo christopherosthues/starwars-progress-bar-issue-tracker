@@ -1,4 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using StarWarsProgressBarIssueTracker.Domain;
+using StarWarsProgressBarIssueTracker.Domain.Labels;
+using StarWarsProgressBarIssueTracker.Domain.Milestones;
+using StarWarsProgressBarIssueTracker.Domain.Releases;
 using StarWarsProgressBarIssueTracker.Infrastructure.Models;
 using StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
@@ -9,11 +13,11 @@ public static class RepositoryRegistration
     public static void AddRepositories(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<IAppearanceRepository, AppearanceRepository>();
-        serviceCollection.AddScoped<IRepository<DbLabel>, LabelRepository>();
+        serviceCollection.AddScoped<ILabelRepository, LabelRepository>();
         serviceCollection.AddScoped<IIssueRepository, IssueRepository>();
-        serviceCollection.AddScoped<IRepository<DbMilestone>, MilestoneRepository>();
-        serviceCollection.AddScoped<IRepository<DbRelease>, ReleaseRepository>();
+        serviceCollection.AddScoped<IRepository<Milestone>, MilestoneRepository>();
+        serviceCollection.AddScoped<IRepository<Release>, ReleaseRepository>();
         serviceCollection.AddScoped<ITaskRepository, TaskRepository>();
-        serviceCollection.AddScoped<IRepository<DbJob>, IssueTrackerRepositoryBase<DbJob>>();
+        serviceCollection.AddScoped<IRepository<DbJob>, JobRepository>();
     }
 }

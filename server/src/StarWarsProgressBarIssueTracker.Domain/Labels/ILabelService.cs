@@ -1,8 +1,11 @@
+using HotChocolate.Pagination;
+
 namespace StarWarsProgressBarIssueTracker.Domain.Labels;
 
 public interface ILabelService
 {
-    Task<IEnumerable<Label>> GetAllLabelsAsync(CancellationToken cancellationToken = default);
+    Task<Page<Label>> GetAllLabelsAsync(PagingArguments pagingArguments,
+        CancellationToken cancellationToken = default);
 
     Task<Label?> GetLabelAsync(Guid id, CancellationToken cancellationToken = default);
 

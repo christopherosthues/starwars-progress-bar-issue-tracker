@@ -13,7 +13,7 @@ public class Label : DomainBase
 
     public required string TextColor { get; set; }
 
-    public IList<Issue> Issues { get; set; } = [];
+    public virtual IList<Issue> Issues { get; set; } = [];
 
     public string? GitlabId { get; set; }
 

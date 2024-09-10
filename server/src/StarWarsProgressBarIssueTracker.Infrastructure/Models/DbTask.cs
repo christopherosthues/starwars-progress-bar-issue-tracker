@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using StarWarsProgressBarIssueTracker.Domain.Models;
 using StarWarsProgressBarIssueTracker.Infrastructure.Database.Configurations;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Models;
 
-[EntityTypeConfiguration(typeof(DbTasksConfiguration))]
-public record DbTask : DbEntityBase
+[EntityTypeConfiguration(typeof(DbTaskConfiguration))]
+public class DbTask : DomainBase
 {
     public required DbJob Job { get; set; }
 

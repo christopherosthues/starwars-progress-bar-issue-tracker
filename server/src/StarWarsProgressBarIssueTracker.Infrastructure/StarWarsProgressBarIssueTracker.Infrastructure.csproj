@@ -11,17 +11,13 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper"/>
+    <PackageReference Include="HotChocolate.Pagination.EntityFramework" />
     <PackageReference Include="Microsoft.EntityFrameworkCore"/>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Database\Migrations\20240406010422_InitialDbModel.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="Database\Migrations\IssueTrackerContextModelSnapshot.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
+    <Folder Include="Database\Migrations\" />
   </ItemGroup>
 
   <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0">
