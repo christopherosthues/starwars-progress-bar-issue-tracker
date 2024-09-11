@@ -6,6 +6,7 @@ using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
+using StarWarsProgressBarIssueTracker.App.Extensions;
 
 namespace StarWarsProgressBarIssueTracker.App.Queries;
 
@@ -13,26 +14,14 @@ public partial class IssueTrackerQueries
 {
     [UsePaging(IncludeTotalCount = true)]
     [UseSorting]
-    // [UseFiltering]
     public async Task<Connection<Label>> GetLabels(
         PagingArguments pagingArguments,
         ILabelService labelService,
         CancellationToken cancellationToken)
     {
         Page<Label> page = await labelService.GetAllLabelsAsync(pagingArguments, cancellationToken);
-        Connection<Label> connection = new Connection<Label>(
-            page.Items.Select(t => new Edge<Label>(t, page.CreateCursor)).ToArray(),
-            new ConnectionPageInfo(
-                page.HasNextPage,
-                page.HasPreviousPage,
-                CreateCursor(page.First, page.CreateCursor),
-                CreateCursor(page.Last, page.CreateCursor)),
-            page.TotalCount ?? 0);
-        return connection;
+        return page.ToConnectionWithTotalCount();
     }
-
-    private static string? CreateCursor<T>(T? item, Func<T, string> createCursor) where T : class
-        => item is null ? null : createCursor(item);
 
     [Error<DomainIdNotFoundException>]
     public async Task<Label?> GetLabel(

@@ -11,7 +11,7 @@ public partial class AppearanceService(
     IAppearanceRepository appearanceRepository,
     IAppearanceByIdDataLoader appearanceByIdDataLoader) : IAppearanceService
 {
-    public async Task<IEnumerable<Appearance>> GetAllAppearancesAsync(PagingArguments pagingArguments,
+    public async Task<Page<Appearance>> GetAllAppearancesAsync(PagingArguments pagingArguments,
         CancellationToken cancellationToken = default)
     {
         return await appearanceRepository.GetAllAsync(pagingArguments, cancellationToken);

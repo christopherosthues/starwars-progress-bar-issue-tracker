@@ -1,6 +1,10 @@
 using GreenDonut;
+using HotChocolate.Data;
 using HotChocolate.Pagination;
+using HotChocolate.Types;
+using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
+using StarWarsProgressBarIssueTracker.App.Extensions;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
@@ -8,12 +12,15 @@ namespace StarWarsProgressBarIssueTracker.App.Queries;
 
 public partial class IssueTrackerQueries
 {
-    public async Task<IEnumerable<Appearance>> GetAppearances(
+    [UsePaging(IncludeTotalCount = true)]
+    [UseSorting]
+    public async Task<Connection<Appearance>> GetAppearances(
         PagingArguments pagingArguments,
         IAppearanceService appearanceService,
         CancellationToken cancellationToken)
     {
-        return await appearanceService.GetAllAppearancesAsync(pagingArguments, cancellationToken);
+        Page<Appearance> page = await appearanceService.GetAllAppearancesAsync(pagingArguments, cancellationToken);
+        return page.ToConnectionWithTotalCount();
     }
 
     public async Task<Appearance?> GetAppearance(

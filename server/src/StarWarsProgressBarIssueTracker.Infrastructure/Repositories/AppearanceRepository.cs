@@ -25,6 +25,18 @@ public class AppearanceRepository(IssueTrackerContext context)
             .Where(appearance => appearanceIds.Contains(appearance.Id));
     }
 
+    public override async Task<Appearance> UpdateAsync(Appearance entity, CancellationToken cancellationToken = default)
+    {
+        Appearance dbEntity = (await GetByIdAsync(entity.Id, cancellationToken))!;
+        dbEntity.Title = entity.Title;
+        dbEntity.Description = entity.Description;
+        dbEntity.Color = entity.Color;
+        dbEntity.TextColor = entity.TextColor;
+        await Context.SaveChangesAsync(cancellationToken);
+
+        return (await GetByIdAsync(entity.Id, cancellationToken))!;
+    }
+
     public IQueryable<Appearance> GetAppearancesById(IEnumerable<Guid> appearanceIds)
     {
         return DbSet.Where(dbAppearance => appearanceIds.Any(id => id.Equals(dbAppearance.Id)));

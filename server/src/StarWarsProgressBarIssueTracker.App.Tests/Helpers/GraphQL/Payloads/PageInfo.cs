@@ -1,4 +1,4 @@
-namespace StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Labels;
+namespace StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 
 public class PageInfo
 {

@@ -2,6 +2,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using GraphQL;
 using StarWarsProgressBarIssueTracker.App.Queries;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Appearances;
 using StarWarsProgressBarIssueTracker.Common.Tests;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
@@ -31,7 +32,13 @@ public class AppearanceQueriesTests : IntegrationTestBase
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
             response.Data.Should().NotBeNull();
-            response.Data.Appearances.Should().BeEmpty();
+            response.Data.Appearances.TotalCount.Should().Be(0);
+            response.Data.Appearances.PageInfo.HasNextPage.Should().BeFalse();
+            response.Data.Appearances.PageInfo.HasPreviousPage.Should().BeFalse();
+            response.Data.Appearances.PageInfo.StartCursor.Should().BeNull();
+            response.Data.Appearances.PageInfo.EndCursor.Should().BeNull();
+            response.Data.Appearances.Edges.Should().BeEmpty();
+            response.Data.Appearances.Nodes.Should().BeEmpty();
         }
     }
 
@@ -74,7 +81,13 @@ public class AppearanceQueriesTests : IntegrationTestBase
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
             response.Data.Should().NotBeNull();
-            var appearances = response.Data.Appearances.ToList();
+
+            response.Data.Appearances.TotalCount.Should().Be(2);
+            response.Data.Appearances.PageInfo.HasNextPage.Should().BeFalse();
+            response.Data.Appearances.PageInfo.HasPreviousPage.Should().BeFalse();
+            response.Data.Appearances.PageInfo.StartCursor.Should().NotBeNull();
+            response.Data.Appearances.PageInfo.EndCursor.Should().NotBeNull();
+            List<Appearance> appearances = response.Data.Appearances.Nodes.ToList();
             appearances.Count.Should().Be(2);
 
             var appearance = appearances.Single(entity => entity.Id.Equals(dbAppearance.Id));
@@ -94,6 +107,27 @@ public class AppearanceQueriesTests : IntegrationTestBase
             appearance2.TextColor.Should().Be(dbAppearance2.TextColor);
             appearance2.CreatedAt.Should().BeCloseTo(dbAppearance2.CreatedAt, TimeSpan.FromMilliseconds(300));
             appearance2.LastModifiedAt.Should().Be(dbAppearance2.LastModifiedAt);
+
+            List<Edge<Appearance>> edges = response.Data.Appearances.Edges.ToList();
+            edges.Count.Should().Be(2);
+
+            Appearance edgeAppearance = edges.Single(entity => entity.Node!.Id.Equals(dbAppearance.Id)).Node!;
+            edgeAppearance.Id.Should().Be(dbAppearance.Id);
+            edgeAppearance.Title.Should().Be(dbAppearance.Title);
+            edgeAppearance.Description.Should().Be(dbAppearance.Description);
+            edgeAppearance.Color.Should().Be(dbAppearance.Color);
+            edgeAppearance.TextColor.Should().Be(dbAppearance.TextColor);
+            edgeAppearance.CreatedAt.Should().BeCloseTo(dbAppearance.CreatedAt, TimeSpan.FromMilliseconds(300));
+            edgeAppearance.LastModifiedAt.Should().Be(dbAppearance.LastModifiedAt);
+
+            Appearance edgeAppearance2 = edges.Single(entity => entity.Node!.Id.Equals(dbAppearance2.Id)).Node!;
+            edgeAppearance2.Id.Should().Be(dbAppearance2.Id);
+            edgeAppearance2.Title.Should().Be(dbAppearance2.Title);
+            edgeAppearance2.Description.Should().Be(dbAppearance2.Description);
+            edgeAppearance2.Color.Should().Be(dbAppearance2.Color);
+            edgeAppearance2.TextColor.Should().Be(dbAppearance2.TextColor);
+            edgeAppearance2.CreatedAt.Should().BeCloseTo(dbAppearance2.CreatedAt, TimeSpan.FromMilliseconds(300));
+            edgeAppearance2.LastModifiedAt.Should().Be(dbAppearance2.LastModifiedAt);
         }
     }
 
@@ -122,7 +156,9 @@ public class AppearanceQueriesTests : IntegrationTestBase
         using (new AssertionScope())
         {
             response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
+            response.Errors.Should().NotBeNull();
+            // response.Errors!.First().Extensions!["message"].Should().Be($"No Appearance found with id '{id}'.",
+            //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
             response.Data.Appearance.Should().BeNull();
         }
@@ -146,7 +182,9 @@ public class AppearanceQueriesTests : IntegrationTestBase
         using (new AssertionScope())
         {
             response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
+            response.Errors.Should().NotBeNull();
+            // response.Errors!.First().Extensions!["message"].Should().Be($"No Appearance found with id '{id}'.",
+            //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
             response.Data.Appearance.Should().BeNull();
         }
@@ -208,15 +246,35 @@ public class AppearanceQueriesTests : IntegrationTestBase
             Query = """
                     query appearances
                     {
-                        appearances()
+                        appearances(first: 5)
                         {
-                            id
-                            title
-                            description
-                            color
-                            textColor
-                            createdAt
-                            lastModifiedAt
+                            totalCount
+                            pageInfo {
+                                hasNextPage
+                                hasPreviousPage
+                                startCursor
+                                endCursor
+                            }
+                            edges {
+                                node {
+                                    id
+                                    title
+                                    description
+                                    color
+                                    textColor
+                                    createdAt
+                                    lastModifiedAt
+                                }
+                            }
+                            nodes {
+                                id
+                                title
+                                description
+                                color
+                                textColor
+                                createdAt
+                                lastModifiedAt
+                            }
                         }
                     }
                     """,

@@ -4,7 +4,7 @@ namespace StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 public interface IAppearanceService
 {
-    Task<IEnumerable<Appearance>> GetAllAppearancesAsync(PagingArguments pagingArguments,
+    Task<Page<Appearance>> GetAllAppearancesAsync(PagingArguments pagingArguments,
         CancellationToken cancellationToken = default);
 
     Task<Appearance?> GetAppearanceAsync(Guid id, CancellationToken cancellationToken = default);

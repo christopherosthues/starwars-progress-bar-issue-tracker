@@ -2,6 +2,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using GraphQL;
 using StarWarsProgressBarIssueTracker.App.Queries;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Labels;
 using StarWarsProgressBarIssueTracker.Common.Tests;
 using StarWarsProgressBarIssueTracker.Domain.Issues;

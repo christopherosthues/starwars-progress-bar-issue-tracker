@@ -4,5 +4,5 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.App
 
 public class GetAppearancesResponse
 {
-    public IEnumerable<Appearance> Appearances { get; set; } = [];
+    public Appearances Appearances { get; set; } = default!;
 }
