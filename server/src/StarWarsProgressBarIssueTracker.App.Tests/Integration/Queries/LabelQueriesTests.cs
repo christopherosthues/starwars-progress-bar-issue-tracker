@@ -114,7 +114,7 @@ public class LabelQueriesTests : IntegrationTestBase
             List<Edge<Label>> edges = response.Data.Labels.Edges.ToList();
             edges.Count.Should().Be(2);
 
-            Label edgeLabel = edges.Single(entity => entity.Node!.Id.Equals(dbLabel.Id)).Node!;
+            Label edgeLabel = edges.Single(entity => entity.Node.Id.Equals(dbLabel.Id)).Node;
             edgeLabel.Id.Should().Be(dbLabel.Id);
             edgeLabel.Title.Should().Be(dbLabel.Title);
             edgeLabel.Description.Should().Be(dbLabel.Description);
@@ -123,7 +123,7 @@ public class LabelQueriesTests : IntegrationTestBase
             edgeLabel.CreatedAt.Should().BeCloseTo(dbLabel.CreatedAt, TimeSpan.FromMilliseconds(300));
             edgeLabel.LastModifiedAt.Should().Be(dbLabel.LastModifiedAt);
 
-            Label edgeLabel2 = edges.Single(entity => entity.Node!.Id.Equals(dbLabel2.Id)).Node!;
+            Label edgeLabel2 = edges.Single(entity => entity.Node.Id.Equals(dbLabel2.Id)).Node;
             edgeLabel2.Id.Should().Be(dbLabel2.Id);
             edgeLabel2.Title.Should().Be(dbLabel2.Title);
             edgeLabel2.Description.Should().Be(dbLabel2.Description);

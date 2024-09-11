@@ -1,24 +1,38 @@
+using HotChocolate.Pagination;
+using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
+using StarWarsProgressBarIssueTracker.Domain.Milestones;
+using KeyNotFoundException = GreenDonut.KeyNotFoundException;
 
-namespace StarWarsProgressBarIssueTracker.Domain.Milestones;
+namespace StarWarsProgressBarIssueTracker.App.Milestones;
 
-public class MilestoneService(IDataPort<Milestone> dataPort) : IMilestoneService
+public class MilestoneService(
+    IMilestoneRepository milestoneRepository,
+    IMilestoneByIdDataLoader milestoneByIdDataLoader) : IMilestoneService
 {
-    public async Task<IEnumerable<Milestone>> GetAllMilestonesAsync(CancellationToken cancellationToken = default)
+    public async Task<Page<Milestone>> GetAllMilestonesAsync(PagingArguments pagingArguments,
+        CancellationToken cancellationToken = default)
     {
-        return await dataPort.GetAllAsync(cancellationToken);
+        return await milestoneRepository.GetAllAsync(pagingArguments, cancellationToken);
     }
 
     public async Task<Milestone?> GetMilestoneAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await dataPort.GetByIdAsync(id, cancellationToken);
+        try
+        {
+            return await milestoneByIdDataLoader.LoadAsync(id, cancellationToken);
+        }
+        catch (KeyNotFoundException)
+        {
+            throw new DomainIdNotFoundException(nameof(Milestone), id.ToString());
+        }
     }
 
     public async Task<Milestone> AddMilestoneAsync(Milestone milestone, CancellationToken cancellationToken = default)
     {
         ValidateMilestone(milestone);
 
-        return await dataPort.AddAsync(milestone, cancellationToken);
+        return await milestoneRepository.AddAsync(milestone, cancellationToken);
     }
 
     private static void ValidateMilestone(Milestone milestone)
@@ -58,41 +72,45 @@ public class MilestoneService(IDataPort<Milestone> dataPort) : IMilestoneService
         }
     }
 
-    public async Task<Milestone> UpdateMilestoneAsync(Milestone milestone, CancellationToken cancellationToken = default)
+    public async Task<Milestone> UpdateMilestoneAsync(Milestone milestone,
+        CancellationToken cancellationToken = default)
     {
         ValidateMilestone(milestone);
 
-        if (!(await dataPort.ExistsAsync(milestone.Id, cancellationToken)))
+        if (!(await milestoneRepository.ExistsAsync(milestone.Id, cancellationToken)))
         {
             throw new DomainIdNotFoundException(nameof(Milestone), milestone.Id.ToString());
         }
 
-        return await dataPort.UpdateAsync(milestone, cancellationToken);
+        return await milestoneRepository.UpdateAsync(milestone, cancellationToken);
     }
 
     public async Task<Milestone> DeleteMilestoneAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        if (!(await dataPort.ExistsAsync(id, cancellationToken)))
+        if (!(await milestoneRepository.ExistsAsync(id, cancellationToken)))
         {
             throw new DomainIdNotFoundException(nameof(Milestone), id.ToString());
         }
 
-        return await dataPort.DeleteAsync(id, cancellationToken);
+        return await milestoneRepository.DeleteAsync(id, cancellationToken);
     }
 
-    public async Task SynchronizeFromGitlabAsync(IList<Milestone> milestones, CancellationToken cancellationToken = default)
+    public async Task SynchronizeFromGitlabAsync(IList<Milestone> milestones,
+        CancellationToken cancellationToken = default)
     {
-        var existingMilestones = await dataPort.GetAllAsync(cancellationToken);
+        // var existingMilestones = await milestoneRepository.GetAllAsync(cancellationToken);
+        //
+        // var milestonesToAdd = milestones.Where(milestone =>
+        //     !existingMilestones.Any(existingMilestone => milestone.GitlabId!.Equals(existingMilestone.GitlabId)));
+        //
+        // var milestonesToDelete = existingMilestones.Where(existingMilestone => existingMilestone.GitlabId != null &&
+        //                                                            !milestones.Any(milestone => milestone.GitlabId!.Equals(existingMilestone.GitlabId)));
+        //
+        // await milestoneRepository.AddRangeAsync(milestonesToAdd, cancellationToken);
+        //
+        // await milestoneRepository.DeleteRangeByGitlabIdAsync(milestonesToDelete, cancellationToken);
 
-        var milestonesToAdd = milestones.Where(milestone =>
-            !existingMilestones.Any(existingMilestone => milestone.GitlabId!.Equals(existingMilestone.GitlabId)));
-
-        var milestonesToDelete = existingMilestones.Where(existingMilestone => existingMilestone.GitlabId != null &&
-                                                                   !milestones.Any(milestone => milestone.GitlabId!.Equals(existingMilestone.GitlabId)));
-
-        await dataPort.AddRangeAsync(milestonesToAdd, cancellationToken);
-
-        await dataPort.DeleteRangeByGitlabIdAsync(milestonesToDelete, cancellationToken);
+        await Task.CompletedTask;
 
         // TODO: Update milestone, resolve conflicts
     }

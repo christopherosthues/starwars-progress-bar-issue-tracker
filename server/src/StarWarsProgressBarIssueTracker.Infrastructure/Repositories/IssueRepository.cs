@@ -25,7 +25,7 @@ public class IssueRepository(IssueTrackerContext context) : IssueTrackerReposito
             .ThenInclude(dbVehicle => dbVehicle!.Translations)
             .OrderBy(issue => issue.Title)
             .ThenBy(issue => issue.Id)
-            .ToPageAsync(pagingArguments, cancellationToken);
+            .ToPageAsync(pagingArguments, true, cancellationToken);
     }
 
     protected override IQueryable<Issue> GetIncludingFields()

@@ -111,7 +111,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
             List<Edge<Appearance>> edges = response.Data.Appearances.Edges.ToList();
             edges.Count.Should().Be(2);
 
-            Appearance edgeAppearance = edges.Single(entity => entity.Node!.Id.Equals(dbAppearance.Id)).Node!;
+            Appearance edgeAppearance = edges.Single(entity => entity.Node.Id.Equals(dbAppearance.Id)).Node;
             edgeAppearance.Id.Should().Be(dbAppearance.Id);
             edgeAppearance.Title.Should().Be(dbAppearance.Title);
             edgeAppearance.Description.Should().Be(dbAppearance.Description);
@@ -120,7 +120,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
             edgeAppearance.CreatedAt.Should().BeCloseTo(dbAppearance.CreatedAt, TimeSpan.FromMilliseconds(300));
             edgeAppearance.LastModifiedAt.Should().Be(dbAppearance.LastModifiedAt);
 
-            Appearance edgeAppearance2 = edges.Single(entity => entity.Node!.Id.Equals(dbAppearance2.Id)).Node!;
+            Appearance edgeAppearance2 = edges.Single(entity => entity.Node.Id.Equals(dbAppearance2.Id)).Node;
             edgeAppearance2.Id.Should().Be(dbAppearance2.Id);
             edgeAppearance2.Title.Should().Be(dbAppearance2.Title);
             edgeAppearance2.Description.Should().Be(dbAppearance2.Description);

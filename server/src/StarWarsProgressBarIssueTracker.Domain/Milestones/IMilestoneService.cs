@@ -1,8 +1,11 @@
+using HotChocolate.Pagination;
+
 namespace StarWarsProgressBarIssueTracker.Domain.Milestones;
 
 public interface IMilestoneService
 {
-    Task<IEnumerable<Milestone>> GetAllMilestonesAsync(CancellationToken cancellationToken = default);
+    Task<Page<Milestone>> GetAllMilestonesAsync(PagingArguments pagingArguments,
+        CancellationToken cancellationToken = default);
 
     Task<Milestone?> GetMilestoneAsync(Guid id, CancellationToken cancellationToken = default);
 

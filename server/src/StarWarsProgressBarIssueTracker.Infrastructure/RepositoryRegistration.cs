@@ -16,7 +16,7 @@ public static class RepositoryRegistration
         serviceCollection.AddScoped<IAppearanceRepository, AppearanceRepository>();
         serviceCollection.AddScoped<ILabelRepository, LabelRepository>();
         serviceCollection.AddScoped<IIssueRepository, IssueRepository>();
-        serviceCollection.AddScoped<IRepository<Milestone>, MilestoneRepository>();
+        serviceCollection.AddScoped<IMilestoneRepository, MilestoneRepository>();
         serviceCollection.AddScoped<IReleaseRepository, ReleaseRepository>();
         serviceCollection.AddScoped<ITaskRepository, TaskRepository>();
         serviceCollection.AddScoped<IRepository<DbJob>, JobRepository>();

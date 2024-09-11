@@ -29,8 +29,8 @@ public class RepositoryRegistrationTests
         serviceCollectionMock.VerifyServiceRegistered(typeof(IAppearanceRepository), typeof(AppearanceRepository), ServiceLifetime.Scoped);
         serviceCollectionMock.VerifyServiceRegistered(typeof(ILabelRepository), typeof(LabelRepository), ServiceLifetime.Scoped);
         serviceCollectionMock.VerifyServiceRegistered(typeof(IIssueRepository), typeof(IssueRepository), ServiceLifetime.Scoped);
-        serviceCollectionMock.VerifyServiceRegistered(typeof(IRepository<Milestone>), typeof(MilestoneRepository), ServiceLifetime.Scoped);
-        serviceCollectionMock.VerifyServiceRegistered(typeof(IRepository<Release>), typeof(ReleaseRepository), ServiceLifetime.Scoped);
+        serviceCollectionMock.VerifyServiceRegistered(typeof(IMilestoneRepository), typeof(MilestoneRepository), ServiceLifetime.Scoped);
+        serviceCollectionMock.VerifyServiceRegistered(typeof(IReleaseRepository), typeof(ReleaseRepository), ServiceLifetime.Scoped);
         serviceCollectionMock.VerifyServiceRegistered(typeof(ITaskRepository), typeof(TaskRepository), ServiceLifetime.Scoped);
         serviceCollectionMock.VerifyServiceRegistered(typeof(IRepository<DbJob>), typeof(JobRepository), ServiceLifetime.Scoped);
     }

@@ -148,7 +148,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             List<Edge<Release>> edges = response.Data.Releases.Edges.ToList();
             edges.Count.Should().Be(2);
 
-            Release edgeRelease = edges.Single(entity => entity.Node!.Id.Equals(dbRelease.Id)).Node!;
+            Release edgeRelease = edges.Single(entity => entity.Node.Id.Equals(dbRelease.Id)).Node;
             edgeRelease.Id.Should().Be(dbRelease.Id);
             edgeRelease.Title.Should().Be(dbRelease.Title);
             edgeRelease.Notes.Should().BeNull();
@@ -158,7 +158,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             edgeRelease.LastModifiedAt.Should().Be(dbRelease.LastModifiedAt);
             edgeRelease.Issues.Should().BeEmpty();
 
-            Release edgeRelease2 = edges.Single(entity => entity.Node!.Id.Equals(dbRelease2.Id)).Node!;
+            Release edgeRelease2 = edges.Single(entity => entity.Node.Id.Equals(dbRelease2.Id)).Node;
             edgeRelease2.Id.Should().Be(dbRelease2.Id);
             edgeRelease2.Title.Should().Be(dbRelease2.Title);
             edgeRelease2.Notes.Should().Be(dbRelease2.Notes);

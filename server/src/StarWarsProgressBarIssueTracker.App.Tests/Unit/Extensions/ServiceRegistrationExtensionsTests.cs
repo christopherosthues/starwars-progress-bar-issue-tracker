@@ -3,6 +3,7 @@ using Moq;
 using StarWarsProgressBarIssueTracker.App.Appearances;
 using StarWarsProgressBarIssueTracker.App.Extensions;
 using StarWarsProgressBarIssueTracker.App.Labels;
+using StarWarsProgressBarIssueTracker.App.Milestones;
 using StarWarsProgressBarIssueTracker.App.Mutations;
 using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.App.Releases;
