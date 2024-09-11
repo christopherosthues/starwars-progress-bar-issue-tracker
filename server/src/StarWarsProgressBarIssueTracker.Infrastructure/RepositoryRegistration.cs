@@ -3,6 +3,7 @@ using StarWarsProgressBarIssueTracker.Domain;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
+using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using StarWarsProgressBarIssueTracker.Infrastructure.Models;
 using StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 

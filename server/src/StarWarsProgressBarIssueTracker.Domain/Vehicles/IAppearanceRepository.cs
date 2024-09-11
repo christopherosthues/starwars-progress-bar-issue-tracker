@@ -1,7 +1,4 @@
-using StarWarsProgressBarIssueTracker.Domain;
-using StarWarsProgressBarIssueTracker.Domain.Vehicles;
-
-namespace StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
+namespace StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 public interface IAppearanceRepository : IRepository<Appearance>
 {

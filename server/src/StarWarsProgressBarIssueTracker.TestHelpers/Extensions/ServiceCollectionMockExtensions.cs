@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace StarWarsProgressBarIssueTracker.App.Tests.Helpers.Extensions;
+namespace StarWarsProgressBarIssueTracker.TestHelpers.Extensions;
 
 public static class ServiceCollectionMockExtensions
 {

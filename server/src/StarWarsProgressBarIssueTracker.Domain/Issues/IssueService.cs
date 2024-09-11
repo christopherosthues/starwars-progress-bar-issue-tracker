@@ -84,6 +84,7 @@ public class IssueService(IDataPort<Issue> dataPort) : IIssueService
 
             var hasDuplicatedTranslations = issue.Vehicle.Translations
                 .GroupBy(translation => translation.Country).Any(group => group.Count() > 1);
+            // TODO: validate country min and max length and text max length
             if (hasDuplicatedTranslations)
             {
                 errors.Add(new DuplicatedTranslationsException());
@@ -91,6 +92,7 @@ public class IssueService(IDataPort<Issue> dataPort) : IIssueService
 
             var hasDuplicatedPhotos = issue.Vehicle.Photos
                 .GroupBy(photo => photo.FilePath).Any(group => group.Count() > 1);
+            // TODO: validate max file path length
             if (hasDuplicatedPhotos)
             {
                 errors.Add(new DuplicatedPhotosException());

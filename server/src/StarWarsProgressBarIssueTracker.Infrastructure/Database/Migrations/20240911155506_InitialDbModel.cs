@@ -54,11 +54,12 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Milestones",
+                schema: "issue_tracker",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Title = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     State = table.Column<int>(type: "integer", nullable: false),
                     GitlabId = table.Column<string>(type: "text", nullable: true),
                     GitlabIid = table.Column<string>(type: "text", nullable: true),
@@ -73,11 +74,12 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Releases",
+                schema: "issue_tracker",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "text", nullable: false),
-                    Notes = table.Column<string>(type: "text", nullable: true),
+                    Title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Notes = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
                     State = table.Column<int>(type: "integer", nullable: false),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     GitlabId = table.Column<string>(type: "text", nullable: true),
@@ -93,6 +95,7 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Vehicles",
+                schema: "issue_tracker",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -132,13 +135,14 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Appearances",
+                schema: "issue_tracker",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Color = table.Column<string>(type: "text", nullable: false),
-                    TextColor = table.Column<string>(type: "text", nullable: false),
+                    Title = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Color = table.Column<string>(type: "character varying(7)", maxLength: 7, nullable: false),
+                    TextColor = table.Column<string>(type: "character varying(7)", maxLength: 7, nullable: false),
                     GitlabId = table.Column<string>(type: "text", nullable: true),
                     GitHubId = table.Column<string>(type: "text", nullable: true),
                     VehicleId = table.Column<Guid>(type: "uuid", nullable: true),
@@ -151,17 +155,19 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                     table.ForeignKey(
                         name: "FK_Appearances_Vehicles_VehicleId",
                         column: x => x.VehicleId,
+                        principalSchema: "issue_tracker",
                         principalTable: "Vehicles",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "Issues",
+                schema: "issue_tracker",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Description = table.Column<string>(type: "character varying(1500)", maxLength: 1500, nullable: true),
                     Priority = table.Column<int>(type: "integer", nullable: false),
                     State = table.Column<int>(type: "integer", nullable: false),
                     MilestoneId = table.Column<Guid>(type: "uuid", nullable: true),
@@ -179,26 +185,32 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                     table.ForeignKey(
                         name: "FK_Issues_Milestones_MilestoneId",
                         column: x => x.MilestoneId,
+                        principalSchema: "issue_tracker",
                         principalTable: "Milestones",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Issues_Releases_ReleaseId",
                         column: x => x.ReleaseId,
+                        principalSchema: "issue_tracker",
                         principalTable: "Releases",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Issues_Vehicles_VehicleId",
                         column: x => x.VehicleId,
+                        principalSchema: "issue_tracker",
                         principalTable: "Vehicles",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "Photos",
+                schema: "issue_tracker",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    FilePath = table.Column<string>(type: "text", nullable: false),
+                    FilePath = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     VehicleId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -209,17 +221,19 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                     table.ForeignKey(
                         name: "FK_Photos_Vehicles_VehicleId",
                         column: x => x.VehicleId,
+                        principalSchema: "issue_tracker",
                         principalTable: "Vehicles",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "Translations",
+                schema: "issue_tracker",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Country = table.Column<string>(type: "text", nullable: false),
-                    Text = table.Column<string>(type: "text", nullable: false),
+                    Country = table.Column<string>(type: "character varying(7)", maxLength: 7, nullable: false),
+                    Text = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     VehicleId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -230,12 +244,14 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                     table.ForeignKey(
                         name: "FK_Translations_Vehicles_VehicleId",
                         column: x => x.VehicleId,
+                        principalSchema: "issue_tracker",
                         principalTable: "Vehicles",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "IssueLabel",
+                schema: "issue_tracker",
                 columns: table => new
                 {
                     IssuesId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -247,6 +263,7 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                     table.ForeignKey(
                         name: "FK_IssueLabel_Issues_IssuesId",
                         column: x => x.IssuesId,
+                        principalSchema: "issue_tracker",
                         principalTable: "Issues",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -261,6 +278,7 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
 
             migrationBuilder.CreateTable(
                 name: "IssueLinks",
+                schema: "issue_tracker",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -275,38 +293,80 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                     table.ForeignKey(
                         name: "FK_IssueLinks_Issues_LinkedIssueId",
                         column: x => x.LinkedIssueId,
+                        principalSchema: "issue_tracker",
                         principalTable: "Issues",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Appearances_GitHubId",
+                schema: "issue_tracker",
+                table: "Appearances",
+                column: "GitHubId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appearances_GitlabId",
+                schema: "issue_tracker",
+                table: "Appearances",
+                column: "GitlabId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Appearances_VehicleId",
+                schema: "issue_tracker",
                 table: "Appearances",
                 column: "VehicleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_IssueLabel_LabelsId",
+                schema: "issue_tracker",
                 table: "IssueLabel",
                 column: "LabelsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_IssueLinks_LinkedIssueId",
+                schema: "issue_tracker",
                 table: "IssueLinks",
                 column: "LinkedIssueId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Issues_GitHubId",
+                schema: "issue_tracker",
+                table: "Issues",
+                column: "GitHubId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Issues_GitlabId",
+                schema: "issue_tracker",
+                table: "Issues",
+                column: "GitlabId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Issues_GitlabIid",
+                schema: "issue_tracker",
+                table: "Issues",
+                column: "GitlabIid",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Issues_MilestoneId",
+                schema: "issue_tracker",
                 table: "Issues",
                 column: "MilestoneId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Issues_ReleaseId",
+                schema: "issue_tracker",
                 table: "Issues",
                 column: "ReleaseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Issues_VehicleId",
+                schema: "issue_tracker",
                 table: "Issues",
                 column: "VehicleId");
 
@@ -332,9 +392,52 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Milestones_GitHubId",
+                schema: "issue_tracker",
+                table: "Milestones",
+                column: "GitHubId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Milestones_GitlabId",
+                schema: "issue_tracker",
+                table: "Milestones",
+                column: "GitlabId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Milestones_GitlabIid",
+                schema: "issue_tracker",
+                table: "Milestones",
+                column: "GitlabIid",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Photos_VehicleId",
+                schema: "issue_tracker",
                 table: "Photos",
                 column: "VehicleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Releases_GitHubId",
+                schema: "issue_tracker",
+                table: "Releases",
+                column: "GitHubId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Releases_GitlabId",
+                schema: "issue_tracker",
+                table: "Releases",
+                column: "GitlabId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Releases_GitlabIid",
+                schema: "issue_tracker",
+                table: "Releases",
+                column: "GitlabIid",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tasks_JobId",
@@ -344,6 +447,7 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_Translations_VehicleId",
+                schema: "issue_tracker",
                 table: "Translations",
                 column: "VehicleId");
         }
@@ -352,43 +456,52 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Appearances");
+                name: "Appearances",
+                schema: "issue_tracker");
 
             migrationBuilder.DropTable(
-                name: "IssueLabel");
+                name: "IssueLabel",
+                schema: "issue_tracker");
 
             migrationBuilder.DropTable(
-                name: "IssueLinks");
+                name: "IssueLinks",
+                schema: "issue_tracker");
 
             migrationBuilder.DropTable(
-                name: "Photos");
+                name: "Photos",
+                schema: "issue_tracker");
 
             migrationBuilder.DropTable(
                 name: "Tasks",
                 schema: "issue_tracker");
 
             migrationBuilder.DropTable(
-                name: "Translations");
+                name: "Translations",
+                schema: "issue_tracker");
 
             migrationBuilder.DropTable(
                 name: "Labels",
                 schema: "issue_tracker");
 
             migrationBuilder.DropTable(
-                name: "Issues");
+                name: "Issues",
+                schema: "issue_tracker");
 
             migrationBuilder.DropTable(
                 name: "Jobs",
                 schema: "issue_tracker");
 
             migrationBuilder.DropTable(
-                name: "Milestones");
+                name: "Milestones",
+                schema: "issue_tracker");
 
             migrationBuilder.DropTable(
-                name: "Releases");
+                name: "Releases",
+                schema: "issue_tracker");
 
             migrationBuilder.DropTable(
-                name: "Vehicles");
+                name: "Vehicles",
+                schema: "issue_tracker");
         }
     }
 }

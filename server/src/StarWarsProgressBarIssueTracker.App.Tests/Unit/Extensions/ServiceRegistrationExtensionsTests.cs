@@ -5,12 +5,12 @@ using StarWarsProgressBarIssueTracker.App.Extensions;
 using StarWarsProgressBarIssueTracker.App.Labels;
 using StarWarsProgressBarIssueTracker.App.Mutations;
 using StarWarsProgressBarIssueTracker.App.Queries;
-using StarWarsProgressBarIssueTracker.App.Tests.Helpers.Extensions;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
+using StarWarsProgressBarIssueTracker.TestHelpers.Extensions;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Unit.Extensions;
 

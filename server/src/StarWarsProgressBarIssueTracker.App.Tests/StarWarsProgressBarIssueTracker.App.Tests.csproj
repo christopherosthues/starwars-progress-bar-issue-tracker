@@ -31,6 +31,7 @@
   <ItemGroup>
     <ProjectReference Include="..\StarWarsProgressBarIssueTracker.App\StarWarsProgressBarIssueTracker.App.csproj"/>
     <ProjectReference Include="..\StarWarsProgressBarIssueTracker.Common.Tests\StarWarsProgressBarIssueTracker.Common.Tests.csproj"/>
+    <ProjectReference Include="..\StarWarsProgressBarIssueTracker.TestHelpers\StarWarsProgressBarIssueTracker.TestHelpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>
