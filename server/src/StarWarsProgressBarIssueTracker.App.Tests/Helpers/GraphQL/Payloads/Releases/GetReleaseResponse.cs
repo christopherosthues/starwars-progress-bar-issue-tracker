@@ -4,5 +4,5 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Rel
 
 public class GetReleaseResponse
 {
-    public required Release? Release { get; set; }
+    public Release? Release { get; set; }
 }

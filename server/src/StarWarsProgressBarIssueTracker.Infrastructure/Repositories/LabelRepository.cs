@@ -41,8 +41,8 @@ public class LabelRepository(IssueTrackerContext context) : IssueTrackerReposito
     public async Task DeleteRangeByGitlabIdAsync(IEnumerable<Label> domains, CancellationToken cancellationToken = default)
     {
         // TODO: pasted from data port. Maybe further adjustments needed
-        var labels = await DbSet.ToListAsync(cancellationToken);
-        var toBeDeleted = labels.Where(dbLabel => domains.Any(label => label.GitlabId?.Equals(dbLabel.GitlabId) ?? false));
+        List<Label> labels = await DbSet.ToListAsync(cancellationToken);
+        IEnumerable<Label> toBeDeleted = labels.Where(dbLabel => domains.Any(label => label.GitlabId?.Equals(dbLabel.GitlabId) ?? false));
         await DeleteRangeAsync(toBeDeleted, cancellationToken);
     }
 }

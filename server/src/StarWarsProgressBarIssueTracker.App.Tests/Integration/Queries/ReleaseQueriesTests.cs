@@ -2,6 +2,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using GraphQL;
 using StarWarsProgressBarIssueTracker.App.Queries;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Releases;
 using StarWarsProgressBarIssueTracker.Common.Tests;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
@@ -34,7 +35,13 @@ public class ReleaseQueriesTests : IntegrationTestBase
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
             response.Data.Should().NotBeNull();
-            response.Data.Releases.Should().BeEmpty();
+            response.Data.Releases.TotalCount.Should().Be(0);
+            response.Data.Releases.PageInfo.HasNextPage.Should().BeFalse();
+            response.Data.Releases.PageInfo.HasPreviousPage.Should().BeFalse();
+            response.Data.Releases.PageInfo.StartCursor.Should().BeNull();
+            response.Data.Releases.PageInfo.EndCursor.Should().BeNull();
+            response.Data.Releases.Edges.Should().BeEmpty();
+            response.Data.Releases.Nodes.Should().BeEmpty();
         }
     }
 
@@ -100,10 +107,16 @@ public class ReleaseQueriesTests : IntegrationTestBase
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
             response.Data.Should().NotBeNull();
-            var releases = response.Data.Releases.ToList();
+
+            response.Data.Releases.TotalCount.Should().Be(2);
+            response.Data.Releases.PageInfo.HasNextPage.Should().BeFalse();
+            response.Data.Releases.PageInfo.HasPreviousPage.Should().BeFalse();
+            response.Data.Releases.PageInfo.StartCursor.Should().NotBeNull();
+            response.Data.Releases.PageInfo.EndCursor.Should().NotBeNull();
+            List<Release> releases = response.Data.Releases.Nodes.ToList();
             releases.Count.Should().Be(2);
 
-            var release = releases.Single(entity => entity.Id.Equals(dbRelease.Id));
+            Release release = releases.Single(entity => entity.Id.Equals(dbRelease.Id));
             release.Id.Should().Be(dbRelease.Id);
             release.Title.Should().Be(dbRelease.Title);
             release.Notes.Should().BeNull();
@@ -113,7 +126,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             release.LastModifiedAt.Should().Be(dbRelease.LastModifiedAt);
             release.Issues.Should().BeEmpty();
 
-            var release2 = releases.Single(entity => entity.Id.Equals(dbRelease2.Id));
+            Release release2 = releases.Single(entity => entity.Id.Equals(dbRelease2.Id));
             release2.Id.Should().Be(dbRelease2.Id);
             release2.Title.Should().Be(dbRelease2.Title);
             release2.Notes.Should().Be(dbRelease2.Notes);
@@ -123,7 +136,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             release2.LastModifiedAt.Should().BeCloseTo(dbRelease2.LastModifiedAt!.Value, TimeSpan.FromMilliseconds(300));
             release2.Issues.Should().NotBeEmpty();
             release2.Issues.Count.Should().Be(1);
-            var issue = release2.Issues.First();
+            Issue issue = release2.Issues.First();
             issue.Id.Should().Be(dbIssue.Id);
             issue.Milestone.Should().NotBeNull();
             issue.Milestone!.Id.Should().Be(dbIssue.Milestone.Id);
@@ -131,6 +144,38 @@ public class ReleaseQueriesTests : IntegrationTestBase
             issue.Vehicle!.Id.Should().Be(dbIssue.Vehicle.Id);
             issue.Vehicle!.Translations.Should().BeEmpty();
             issue.Vehicle!.Photos.Should().BeEmpty();
+
+            List<Edge<Release>> edges = response.Data.Releases.Edges.ToList();
+            edges.Count.Should().Be(2);
+
+            Release edgeRelease = edges.Single(entity => entity.Node!.Id.Equals(dbRelease.Id)).Node!;
+            edgeRelease.Id.Should().Be(dbRelease.Id);
+            edgeRelease.Title.Should().Be(dbRelease.Title);
+            edgeRelease.Notes.Should().BeNull();
+            edgeRelease.State.Should().Be(dbRelease.State);
+            edgeRelease.Date.Should().BeNull();
+            edgeRelease.CreatedAt.Should().BeCloseTo(dbRelease.CreatedAt, TimeSpan.FromMilliseconds(300));
+            edgeRelease.LastModifiedAt.Should().Be(dbRelease.LastModifiedAt);
+            edgeRelease.Issues.Should().BeEmpty();
+
+            Release edgeRelease2 = edges.Single(entity => entity.Node!.Id.Equals(dbRelease2.Id)).Node!;
+            edgeRelease2.Id.Should().Be(dbRelease2.Id);
+            edgeRelease2.Title.Should().Be(dbRelease2.Title);
+            edgeRelease2.Notes.Should().Be(dbRelease2.Notes);
+            edgeRelease2.State.Should().Be(dbRelease2.State);
+            edgeRelease2.Date.Should().BeCloseTo(dbRelease2.Date!.Value, TimeSpan.FromMilliseconds(300));
+            edgeRelease2.CreatedAt.Should().BeCloseTo(dbRelease2.CreatedAt, TimeSpan.FromMilliseconds(300));
+            edgeRelease2.LastModifiedAt.Should().BeCloseTo(dbRelease2.LastModifiedAt!.Value, TimeSpan.FromMilliseconds(300));
+            edgeRelease2.Issues.Should().NotBeEmpty();
+            edgeRelease2.Issues.Count.Should().Be(1);
+            Issue edgeIssue = edgeRelease2.Issues.First();
+            edgeIssue.Id.Should().Be(dbIssue.Id);
+            edgeIssue.Milestone.Should().NotBeNull();
+            edgeIssue.Milestone!.Id.Should().Be(dbIssue.Milestone.Id);
+            edgeIssue.Vehicle.Should().NotBeNull();
+            edgeIssue.Vehicle!.Id.Should().Be(dbIssue.Vehicle.Id);
+            edgeIssue.Vehicle!.Translations.Should().BeEmpty();
+            edgeIssue.Vehicle!.Photos.Should().BeEmpty();
         }
     }
 
@@ -160,7 +205,9 @@ public class ReleaseQueriesTests : IntegrationTestBase
         using (new AssertionScope())
         {
             response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
+            response.Errors.Should().NotBeNull();
+            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
+            //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
             response.Data.Release.Should().BeNull();
         }
@@ -184,7 +231,9 @@ public class ReleaseQueriesTests : IntegrationTestBase
         using (new AssertionScope())
         {
             response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
+            response.Errors.Should().NotBeNull();
+            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
+            //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
             response.Data.Release.Should().BeNull();
         }
@@ -271,33 +320,74 @@ public class ReleaseQueriesTests : IntegrationTestBase
             Query = """
                     query releases
                     {
-                        releases()
+                        releases(first: 5)
                         {
-                            id
-                            title
-                            notes
-                            state
-                            date
-                            createdAt
-                            lastModifiedAt
-                            issues
-                            {
-                                id
-                                title
-                                milestone
-                                {
+                            totalCount
+                            pageInfo {
+                                hasNextPage
+                                hasPreviousPage
+                                startCursor
+                                endCursor
+                            }
+                            edges {
+                                node {
                                     id
                                     title
-                                }
-                                vehicle
-                                {
-                                    id
-                                    appearances
+                                    notes
+                                    state
+                                    date
+                                    createdAt
+                                    lastModifiedAt
+                                    issues
                                     {
                                         id
                                         title
-                                        color
-                                        textColor
+                                        milestone
+                                        {
+                                            id
+                                            title
+                                        }
+                                        vehicle
+                                        {
+                                            id
+                                            appearances
+                                            {
+                                                id
+                                                title
+                                                color
+                                                textColor
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            nodes {
+                                id
+                                title
+                                notes
+                                state
+                                date
+                                createdAt
+                                lastModifiedAt
+                                issues
+                                {
+                                    id
+                                    title
+                                    milestone
+                                    {
+                                        id
+                                        title
+                                    }
+                                    vehicle
+                                    {
+                                        id
+                                        appearances
+                                        {
+                                            id
+                                            title
+                                            color
+                                            textColor
+                                        }
                                     }
                                 }
                             }

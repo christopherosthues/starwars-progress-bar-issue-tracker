@@ -1,8 +1,11 @@
+using HotChocolate.Pagination;
+
 namespace StarWarsProgressBarIssueTracker.Domain.Releases;
 
 public interface IReleaseService
 {
-    Task<IEnumerable<Release>> GetAllReleasesAsync(CancellationToken cancellationToken = default);
+    Task<Page<Release>> GetAllReleasesAsync(PagingArguments pagingArguments,
+        CancellationToken cancellationToken = default);
 
     Task<Release?> GetReleaseAsync(Guid id, CancellationToken cancellationToken = default);
 

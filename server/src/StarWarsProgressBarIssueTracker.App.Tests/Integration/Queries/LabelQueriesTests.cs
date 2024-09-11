@@ -186,7 +186,7 @@ public class LabelQueriesTests : IntegrationTestBase
         {
             response.Should().NotBeNull();
             response.Errors.Should().NotBeNull();
-            var firstError = response.Errors!.First();
+            // var firstError = response.Errors!.First();
             // firstError.Extensions.Should().NotBeNull();
             // firstError.Extensions!.GetValueOrDefault("message").Should().Be($"No Label found with id '{id}'.",
             //     StringComparer.InvariantCultureIgnoreCase);

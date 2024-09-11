@@ -1,24 +1,36 @@
+using HotChocolate.Pagination;
+using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
+using StarWarsProgressBarIssueTracker.Domain.Releases;
 
-namespace StarWarsProgressBarIssueTracker.Domain.Releases;
+namespace StarWarsProgressBarIssueTracker.App.Releases;
 
-public class ReleaseService(IDataPort<Release> dataPort) : IReleaseService
+public class ReleaseService(IReleaseRepository releaseRepository, IReleaseByIdDataLoader releaseByIdDataLoader)
+    : IReleaseService
 {
-    public async Task<IEnumerable<Release>> GetAllReleasesAsync(CancellationToken cancellationToken = default)
+    public async Task<Page<Release>> GetAllReleasesAsync(PagingArguments pagingArguments,
+        CancellationToken cancellationToken = default)
     {
-        return await dataPort.GetAllAsync(cancellationToken);
+        return await releaseRepository.GetAllAsync(pagingArguments, cancellationToken);
     }
 
     public async Task<Release?> GetReleaseAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await dataPort.GetByIdAsync(id, cancellationToken);
+        try
+        {
+            return await releaseByIdDataLoader.LoadAsync(id, cancellationToken);
+        }
+        catch (KeyNotFoundException)
+        {
+            throw new DomainIdNotFoundException(nameof(Release), id.ToString());
+        }
     }
 
     public async Task<Release> AddReleaseAsync(Release release, CancellationToken cancellationToken = default)
     {
         ValidateRelease(release);
 
-        return await dataPort.AddAsync(release, cancellationToken);
+        return await releaseRepository.AddAsync(release, cancellationToken);
     }
 
     private static void ValidateRelease(Release release)
@@ -62,37 +74,39 @@ public class ReleaseService(IDataPort<Release> dataPort) : IReleaseService
     {
         ValidateRelease(release);
 
-        if (!(await dataPort.ExistsAsync(release.Id, cancellationToken)))
+        if (!(await releaseRepository.ExistsAsync(release.Id, cancellationToken)))
         {
             throw new DomainIdNotFoundException(nameof(Release), release.Id.ToString());
         }
 
-        return await dataPort.UpdateAsync(release, cancellationToken);
+        return await releaseRepository.UpdateAsync(release, cancellationToken);
     }
 
     public async Task<Release> DeleteReleaseAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        if (!(await dataPort.ExistsAsync(id, cancellationToken)))
+        if (!(await releaseRepository.ExistsAsync(id, cancellationToken)))
         {
             throw new DomainIdNotFoundException(nameof(Release), id.ToString());
         }
 
-        return await dataPort.DeleteAsync(id, cancellationToken);
+        return await releaseRepository.DeleteAsync(id, cancellationToken);
     }
 
     public async Task SynchronizeFromGitlabAsync(IList<Release> releases, CancellationToken cancellationToken = default)
     {
-        var existingReleases = await dataPort.GetAllAsync(cancellationToken);
+        // var existingReleases = await releaseRepository.GetAllAsync(cancellationToken);
+        //
+        // var releasesToAdd = releases.Where(release =>
+        //     !existingReleases.Any(existingRelease => release.GitlabId!.Equals(existingRelease.GitlabId)));
+        //
+        // var releasesToDelete = existingReleases.Where(existingRelease => existingRelease.GitlabId != null &&
+        //                                                                        !releases.Any(release => release.GitlabId!.Equals(existingRelease.GitlabId)));
+        //
+        // await releaseRepository.AddRangeAsync(releasesToAdd, cancellationToken);
+        //
+        // await releaseRepository.DeleteRangeByGitlabIdAsync(releasesToDelete, cancellationToken);
 
-        var releasesToAdd = releases.Where(release =>
-            !existingReleases.Any(existingRelease => release.GitlabId!.Equals(existingRelease.GitlabId)));
-
-        var releasesToDelete = existingReleases.Where(existingRelease => existingRelease.GitlabId != null &&
-                                                                               !releases.Any(release => release.GitlabId!.Equals(existingRelease.GitlabId)));
-
-        await dataPort.AddRangeAsync(releasesToAdd, cancellationToken);
-
-        await dataPort.DeleteRangeByGitlabIdAsync(releasesToDelete, cancellationToken);
+        await Task.CompletedTask;
 
         // TODO: Update milestone, resolve conflicts
     }

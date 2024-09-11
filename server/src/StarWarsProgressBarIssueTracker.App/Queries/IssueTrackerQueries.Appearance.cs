@@ -5,6 +5,7 @@ using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.App.Extensions;
+using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
@@ -23,6 +24,7 @@ public partial class IssueTrackerQueries
         return page.ToConnectionWithTotalCount();
     }
 
+    [Error<DomainIdNotFoundException>]
     public async Task<Appearance?> GetAppearance(
         Guid id,
         IAppearanceService appearanceService,

@@ -4,6 +4,7 @@ using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
+using KeyNotFoundException = GreenDonut.KeyNotFoundException;
 
 namespace StarWarsProgressBarIssueTracker.App.Appearances;
 
@@ -19,7 +20,14 @@ public partial class AppearanceService(
 
     public async Task<Appearance?> GetAppearanceAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await appearanceByIdDataLoader.LoadAsync(id, cancellationToken);
+        try
+        {
+            return await appearanceByIdDataLoader.LoadAsync(id, cancellationToken);
+        }
+        catch (KeyNotFoundException)
+        {
+            throw new DomainIdNotFoundException(nameof(Appearance), id.ToString());
+        }
     }
 
     public async Task<Appearance> AddAppearanceAsync(Appearance appearance,
