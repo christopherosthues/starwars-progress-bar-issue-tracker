@@ -4,6 +4,7 @@ using HotChocolate.Pagination;
 using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
+using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
 
 namespace StarWarsProgressBarIssueTracker.App.Queries;
@@ -33,6 +34,7 @@ public partial class IssueTrackerQueries
     private static string? CreateCursor<T>(T? item, Func<T, string> createCursor) where T : class
         => item is null ? null : createCursor(item);
 
+    [Error<DomainIdNotFoundException>]
     public async Task<Label?> GetLabel(
         ILabelService labelService,
         Guid id, CancellationToken cancellationToken)

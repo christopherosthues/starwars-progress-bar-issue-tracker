@@ -7,7 +7,8 @@ using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 namespace StarWarsProgressBarIssueTracker.App.Labels;
 
-public partial class LabelService(ILabelRepository labelRepository, ILabelByIdDataLoader labelByIdDataLoader) : ILabelService
+public partial class LabelService(ILabelRepository labelRepository, ILabelByIdDataLoader labelByIdDataLoader)
+    : ILabelService
 {
     public async Task<Page<Label>> GetAllLabelsAsync(PagingArguments pagingArguments,
         CancellationToken cancellationToken = default)
@@ -17,7 +18,14 @@ public partial class LabelService(ILabelRepository labelRepository, ILabelByIdDa
 
     public async Task<Label?> GetLabelAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await labelByIdDataLoader.LoadAsync(id, cancellationToken);
+        try
+        {
+            return await labelByIdDataLoader.LoadAsync(id, cancellationToken);
+        }
+        catch (GreenDonut.KeyNotFoundException)
+        {
+            throw new DomainIdNotFoundException(nameof(Label), id.ToString());
+        }
     }
 
     public async Task<Label> AddLabelAsync(Label label, CancellationToken cancellationToken = default)

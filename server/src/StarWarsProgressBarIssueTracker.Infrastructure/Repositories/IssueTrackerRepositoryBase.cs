@@ -41,21 +41,10 @@ public abstract class IssueTrackerRepositoryBase<TDbEntity>(IssueTrackerContext 
 
     public abstract Task<Page<TDbEntity>> GetAllAsync(PagingArguments pagingArguments,
         CancellationToken cancellationToken = default);
-    // {
-    //     return await GetIncludingFields()
-    //         .AsNoTracking()
-    //         .OrderEntities()
-    //         .ToListAsync(cancellationToken);
-    // }
 
     protected virtual IQueryable<TDbEntity> GetIncludingFields()
     {
         return DbSet;
-    }
-
-    protected virtual IQueryable<TDbEntity> OrderEntities(IQueryable<TDbEntity> queryable)
-    {
-        return queryable;
     }
 
     public async Task<TDbEntity> AddAsync(TDbEntity entity, CancellationToken cancellationToken = default)
@@ -71,7 +60,7 @@ public abstract class IssueTrackerRepositoryBase<TDbEntity>(IssueTrackerContext 
         await Context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<TDbEntity> UpdateAsync(TDbEntity entity, CancellationToken cancellationToken = default)
+    public virtual async Task<TDbEntity> UpdateAsync(TDbEntity entity, CancellationToken cancellationToken = default)
     {
         EntityEntry<TDbEntity> entry = Context.Entry(entity);
         entry.State = EntityState.Modified;

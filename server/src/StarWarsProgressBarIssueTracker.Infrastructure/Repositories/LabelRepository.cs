@@ -12,21 +12,35 @@ public class LabelRepository(IssueTrackerContext context) : IssueTrackerReposito
     {
         return await DbSet
             .AsNoTracking()
-            // .Include(dbLabel => dbLabel.Issues)
+            .Include(dbLabel => dbLabel.Issues)
             .OrderBy(label => label.Title)
             .ThenBy(label => label.Id)
-            .ToPageAsync(pagingArguments, cancellationToken);
+            .ToPageAsync(pagingArguments, true, cancellationToken);
     }
 
     public IQueryable<Label> GetLabelByIds(IReadOnlyList<Guid> ids)
     {
-        return Context.Labels
+        return DbSet
             .AsNoTracking()
+            .Include(dbLabel => dbLabel.Issues)
             .Where(label => ids.Contains(label.Id));
+    }
+
+    public override async Task<Label> UpdateAsync(Label entity, CancellationToken cancellationToken = default)
+    {
+        Label dbEntity = (await GetByIdAsync(entity.Id, cancellationToken))!;
+        dbEntity.Title = entity.Title;
+        dbEntity.Description = entity.Description;
+        dbEntity.Color = entity.Color;
+        dbEntity.TextColor = entity.TextColor;
+        await Context.SaveChangesAsync(cancellationToken);
+
+        return (await GetByIdAsync(entity.Id, cancellationToken))!;
     }
 
     public async Task DeleteRangeByGitlabIdAsync(IEnumerable<Label> domains, CancellationToken cancellationToken = default)
     {
+        // TODO: pasted from data port. Maybe further adjustments needed
         var labels = await DbSet.ToListAsync(cancellationToken);
         var toBeDeleted = labels.Where(dbLabel => domains.Any(label => label.GitlabId?.Equals(dbLabel.GitlabId) ?? false));
         await DeleteRangeAsync(toBeDeleted, cancellationToken);

@@ -1,13 +1,7 @@
 using System.Net.Http.Headers;
-using Polly;
-using Quartz;
-using Quartz.AspNetCore;
-using StarWarsProgressBarIssueTracker.App.Errors;
 using StarWarsProgressBarIssueTracker.App.Extensions;
-using StarWarsProgressBarIssueTracker.App.Jobs;
 using StarWarsProgressBarIssueTracker.App.Mutations;
 using StarWarsProgressBarIssueTracker.App.Queries;
-using StarWarsProgressBarIssueTracker.App.ServiceCollectionExtensions;
 using StarWarsProgressBarIssueTracker.Infrastructure;
 using StarWarsProgressBarIssueTracker.Infrastructure.Gitlab;
 
@@ -37,6 +31,7 @@ builder.Services.RegisterDbContext(connectionString);
 
 builder.Services.AddGraphQLServer()
     .AddMutationConventions(applyToAllMutations: true)
+    // .AddQueryConventions()
     .AddQueryType<IssueTrackerQueries>()
     .AddMutationType<IssueTrackerMutations>()
     .AddAppTypes()

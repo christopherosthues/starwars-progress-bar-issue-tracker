@@ -1,7 +1,6 @@
 namespace StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Labels;
 
-public class GetLabelsResponse
+public class Edge<T>
 {
-    public Labels Labels { get; set; } = null!;
-
+    public T Node { get; set; } = default!;
 }

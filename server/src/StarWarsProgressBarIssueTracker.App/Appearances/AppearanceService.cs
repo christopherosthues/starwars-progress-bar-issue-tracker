@@ -1,25 +1,33 @@
 using System.Text.RegularExpressions;
+using HotChocolate.Pagination;
+using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
+using StarWarsProgressBarIssueTracker.Domain.Vehicles;
+using StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
-namespace StarWarsProgressBarIssueTracker.Domain.Vehicles;
+namespace StarWarsProgressBarIssueTracker.App.Appearances;
 
-public partial class AppearanceService(IDataPort<Appearance> dataPort) : IAppearanceService
+public partial class AppearanceService(
+    IAppearanceRepository appearanceRepository,
+    IAppearanceByIdDataLoader appearanceByIdDataLoader) : IAppearanceService
 {
-    public async Task<IEnumerable<Appearance>> GetAllAppearancesAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Appearance>> GetAllAppearancesAsync(PagingArguments pagingArguments,
+        CancellationToken cancellationToken = default)
     {
-        return await dataPort.GetAllAsync(cancellationToken);
+        return await appearanceRepository.GetAllAsync(pagingArguments, cancellationToken);
     }
 
     public async Task<Appearance?> GetAppearanceAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await dataPort.GetByIdAsync(id, cancellationToken);
+        return await appearanceByIdDataLoader.LoadAsync(id, cancellationToken);
     }
 
-    public async Task<Appearance> AddAppearanceAsync(Appearance appearance, CancellationToken cancellationToken = default)
+    public async Task<Appearance> AddAppearanceAsync(Appearance appearance,
+        CancellationToken cancellationToken = default)
     {
         ValidateAppearance(appearance);
 
-        return await dataPort.AddAsync(appearance, cancellationToken);
+        return await appearanceRepository.AddAsync(appearance, cancellationToken);
     }
 
     private static void ValidateAppearance(Appearance appearance)
@@ -42,7 +50,8 @@ public partial class AppearanceService(IDataPort<Appearance> dataPort) : IAppear
                 $"The length of {nameof(Appearance.Title)} has to be between {AppearanceConstants.MinTitleLength} and {AppearanceConstants.MaxTitleLength}."));
         }
 
-        if (appearance.Description is not null && appearance.Description.Length > AppearanceConstants.MaxDescriptionLength)
+        if (appearance.Description is not null &&
+            appearance.Description.Length > AppearanceConstants.MaxDescriptionLength)
         {
             errors.Add(new StringTooLongException(appearance.Description, nameof(Appearance.Description),
                 $"The length of {nameof(Appearance.Description)} has to be less than {AppearanceConstants.MaxDescriptionLength + 1}."));
@@ -75,41 +84,45 @@ public partial class AppearanceService(IDataPort<Appearance> dataPort) : IAppear
         }
     }
 
-    public async Task<Appearance> UpdateAppearanceAsync(Appearance appearance, CancellationToken cancellationToken = default)
+    public async Task<Appearance> UpdateAppearanceAsync(Appearance appearance,
+        CancellationToken cancellationToken = default)
     {
         ValidateAppearance(appearance);
 
-        if (!(await dataPort.ExistsAsync(appearance.Id, cancellationToken)))
+        if (!(await appearanceRepository.ExistsAsync(appearance.Id, cancellationToken)))
         {
             throw new DomainIdNotFoundException(nameof(Appearance), appearance.Id.ToString());
         }
 
-        return await dataPort.UpdateAsync(appearance, cancellationToken);
+        return await appearanceRepository.UpdateAsync(appearance, cancellationToken);
     }
 
     public async Task<Appearance> DeleteAppearanceAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        if (!(await dataPort.ExistsAsync(id, cancellationToken)))
+        if (!(await appearanceRepository.ExistsAsync(id, cancellationToken)))
         {
             throw new DomainIdNotFoundException(nameof(Appearance), id.ToString());
         }
 
-        return await dataPort.DeleteAsync(id, cancellationToken);
+        return await appearanceRepository.DeleteAsync(id, cancellationToken);
     }
 
-    public async Task SynchronizeFromGitlabAsync(IList<Appearance> appearances, CancellationToken cancellationToken = default)
+    public async Task SynchronizeFromGitlabAsync(IList<Appearance> appearances,
+        CancellationToken cancellationToken = default)
     {
-        var existingAppearances = await dataPort.GetAllAsync(cancellationToken);
+        // var existingAppearances = await appearanceRepository.GetAllAsync(cancellationToken);
+        //
+        // var appearancesToAdd = appearances.Where(appearance =>
+        //     !existingAppearances.Any(existingAppearance => appearance.GitlabId!.Equals(existingAppearance.GitlabId)));
+        //
+        // var appearancesToDelete = existingAppearances.Where(existingAppearance => existingAppearance.GitlabId != null &&
+        //     !appearances.Any(appearance => appearance.GitlabId!.Equals(existingAppearance.GitlabId)));
+        //
+        // await appearanceRepository.AddRangeAsync(appearancesToAdd, cancellationToken);
+        //
+        // await appearanceRepository.DeleteRangeByGitlabIdAsync(appearancesToDelete, cancellationToken);
 
-        var appearancesToAdd = appearances.Where(appearance =>
-            !existingAppearances.Any(existingAppearance => appearance.GitlabId!.Equals(existingAppearance.GitlabId)));
-
-        var appearancesToDelete = existingAppearances.Where(existingAppearance => existingAppearance.GitlabId != null &&
-            !appearances.Any(appearance => appearance.GitlabId!.Equals(existingAppearance.GitlabId)));
-
-        await dataPort.AddRangeAsync(appearancesToAdd, cancellationToken);
-
-        await dataPort.DeleteRangeByGitlabIdAsync(appearancesToDelete, cancellationToken);
+        await Task.CompletedTask;
 
         // TODO: Update appearances, resolve conflicts
     }

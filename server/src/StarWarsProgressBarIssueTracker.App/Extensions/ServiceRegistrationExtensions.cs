@@ -1,16 +1,13 @@
-using StarWarsProgressBarIssueTracker.App.Jobs;
+using StarWarsProgressBarIssueTracker.App.Appearances;
 using StarWarsProgressBarIssueTracker.App.Mutations;
 using StarWarsProgressBarIssueTracker.App.Queries;
-using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
-using StarWarsProgressBarIssueTracker.Domain.Milestones;
-using StarWarsProgressBarIssueTracker.Domain.Releases;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using StarWarsProgressBarIssueTracker.Infrastructure.GitHub.Configuration;
 using StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Configuration;
 using LabelService = StarWarsProgressBarIssueTracker.App.Labels.LabelService;
 
-namespace StarWarsProgressBarIssueTracker.App.ServiceCollectionExtensions;
+namespace StarWarsProgressBarIssueTracker.App.Extensions;
 
 public static class ServiceRegistrationExtensions
 {
@@ -35,7 +32,7 @@ public static class ServiceRegistrationExtensions
 
     public static IServiceCollection AddIssueTrackerServices(this IServiceCollection serviceCollection)
     {
-        // serviceCollection.AddScoped<IAppearanceService, AppearanceService>();
+        serviceCollection.AddScoped<IAppearanceService, AppearanceService>();
         // serviceCollection.AddScoped<IIssueService, IssueService>();
         serviceCollection.AddScoped<ILabelService, LabelService>();
         // serviceCollection.AddScoped<IMilestoneService, MilestoneService>();

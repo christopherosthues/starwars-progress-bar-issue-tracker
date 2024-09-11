@@ -15,7 +15,14 @@ public class AppearanceRepository(IssueTrackerContext context)
             .AsNoTracking()
             .OrderBy(appearance => appearance.Title)
             .ThenBy(appearance => appearance.Id)
-            .ToPageAsync(pagingArguments, cancellationToken);
+            .ToPageAsync(pagingArguments, true, cancellationToken);
+    }
+
+    public IQueryable<Appearance> GetAppearanceByIds(IReadOnlyList<Guid> appearanceIds)
+    {
+        return DbSet
+            .AsNoTracking()
+            .Where(appearance => appearanceIds.Contains(appearance.Id));
     }
 
     public IQueryable<Appearance> GetAppearancesById(IEnumerable<Guid> appearanceIds)

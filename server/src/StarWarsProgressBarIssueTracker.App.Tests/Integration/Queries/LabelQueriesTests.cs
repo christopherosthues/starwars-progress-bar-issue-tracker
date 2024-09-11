@@ -1,7 +1,6 @@
 using FluentAssertions;
 using FluentAssertions.Execution;
 using GraphQL;
-using GraphQL.Types.Relay.DataObjects;
 using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Labels;
 using StarWarsProgressBarIssueTracker.Common.Tests;
@@ -35,13 +34,13 @@ public class LabelQueriesTests : IntegrationTestBase
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
             response.Data.Should().NotBeNull();
-            response.Data.TotalCount.Should().Be(0);
-            response.Data.PageInfo.HasNextPage.Should().BeFalse();
-            response.Data.PageInfo.HasPreviousPage.Should().BeFalse();
-            response.Data.PageInfo.StartCursor.Should().BeNull();
-            response.Data.PageInfo.EndCursor.Should().BeNull();
-            response.Data.Edges.Should().BeEmpty();
-            response.Data.Nodes.Should().BeEmpty();
+            response.Data.Labels.TotalCount.Should().Be(0);
+            response.Data.Labels.PageInfo.HasNextPage.Should().BeFalse();
+            response.Data.Labels.PageInfo.HasPreviousPage.Should().BeFalse();
+            response.Data.Labels.PageInfo.StartCursor.Should().BeNull();
+            response.Data.Labels.PageInfo.EndCursor.Should().BeNull();
+            response.Data.Labels.Edges.Should().BeEmpty();
+            response.Data.Labels.Nodes.Should().BeEmpty();
         }
     }
 
@@ -85,12 +84,12 @@ public class LabelQueriesTests : IntegrationTestBase
             response.Errors.Should().BeNullOrEmpty();
             response.Data.Should().NotBeNull();
 
-            response.Data.TotalCount.Should().Be(2);
-            response.Data.PageInfo.HasNextPage.Should().BeFalse();
-            response.Data.PageInfo.HasPreviousPage.Should().BeFalse();
-            response.Data.PageInfo.StartCursor.Should().NotBeNull();
-            response.Data.PageInfo.EndCursor.Should().NotBeNull();
-            List<Label> labels = response.Data.Nodes.ToList();
+            response.Data.Labels.TotalCount.Should().Be(2);
+            response.Data.Labels.PageInfo.HasNextPage.Should().BeFalse();
+            response.Data.Labels.PageInfo.HasPreviousPage.Should().BeFalse();
+            response.Data.Labels.PageInfo.StartCursor.Should().NotBeNull();
+            response.Data.Labels.PageInfo.EndCursor.Should().NotBeNull();
+            List<Label> labels = response.Data.Labels.Nodes.ToList();
             labels.Count.Should().Be(2);
 
             Label label = labels.Single(entity => entity.Id.Equals(dbLabel.Id));
@@ -111,7 +110,7 @@ public class LabelQueriesTests : IntegrationTestBase
             label2.CreatedAt.Should().BeCloseTo(dbLabel2.CreatedAt, TimeSpan.FromMilliseconds(300));
             label2.LastModifiedAt.Should().Be(dbLabel2.LastModifiedAt);
 
-            List<Edge<Label>> edges = response.Data.Edges.ToList();
+            List<Edge<Label>> edges = response.Data.Labels.Edges.ToList();
             edges.Count.Should().Be(2);
 
             Label edgeLabel = edges.Single(entity => entity.Node!.Id.Equals(dbLabel.Id)).Node!;
@@ -159,7 +158,9 @@ public class LabelQueriesTests : IntegrationTestBase
         using (new AssertionScope())
         {
             response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
+            response.Errors.Should().NotBeNull();
+            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
+            //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
             response.Data.Label.Should().BeNull();
         }
@@ -183,7 +184,11 @@ public class LabelQueriesTests : IntegrationTestBase
         using (new AssertionScope())
         {
             response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
+            response.Errors.Should().NotBeNull();
+            var firstError = response.Errors!.First();
+            // firstError.Extensions.Should().NotBeNull();
+            // firstError.Extensions!.GetValueOrDefault("message").Should().Be($"No Label found with id '{id}'.",
+            //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
             response.Data.Label.Should().BeNull();
         }
@@ -194,7 +199,7 @@ public class LabelQueriesTests : IntegrationTestBase
     {
         // Arrange
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var Issue = new Issue
+        var issue = new Issue
         {
             Id = new Guid("CB547CF5-CB28-412E-8DA4-2A7F10E3A5FE"),
             Title = "issue title",
@@ -217,11 +222,11 @@ public class LabelQueriesTests : IntegrationTestBase
             TextColor = "334455",
             Title = "Label 2",
             Description = "Description 2",
-            Issues = [Issue]
+            Issues = [issue]
         };
         await SeedDatabaseAsync(context =>
         {
-            context.Issues.Add(Issue);
+            context.Issues.Add(issue);
             context.Labels.Add(new Label
             {
                 Id = new Guid("5888CDB6-57E2-4774-B6E8-7AABE82E2A5F"),
@@ -251,7 +256,7 @@ public class LabelQueriesTests : IntegrationTestBase
             label.Description.Should().Be(dbLabel.Description);
             label.Color.Should().Be(dbLabel.Color);
             label.TextColor.Should().Be(dbLabel.TextColor);
-            label.Issues.Should().Contain(i => i.Id.Equals(Issue.Id));
+            label.Issues.Should().Contain(i => i.Id.Equals(issue.Id));
             label.CreatedAt.Should().BeCloseTo(dbLabel.CreatedAt, TimeSpan.FromMilliseconds(300));
             label.LastModifiedAt.Should().Be(dbLabel.LastModifiedAt);
         }
