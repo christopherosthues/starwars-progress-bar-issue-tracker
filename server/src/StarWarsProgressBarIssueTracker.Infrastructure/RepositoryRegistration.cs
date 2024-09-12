@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using StarWarsProgressBarIssueTracker.Domain;
+using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Releases;

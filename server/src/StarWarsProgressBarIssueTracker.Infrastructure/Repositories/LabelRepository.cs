@@ -28,14 +28,15 @@ public class LabelRepository(IssueTrackerContext context) : IssueTrackerReposito
 
     public override async Task<Label> UpdateAsync(Label entity, CancellationToken cancellationToken = default)
     {
-        Label dbEntity = (await GetByIdAsync(entity.Id, cancellationToken))!;
+        Label dbEntity = (await DbSet.FindAsync([entity.Id],  cancellationToken))!;
         dbEntity.Title = entity.Title;
         dbEntity.Description = entity.Description;
         dbEntity.Color = entity.Color;
         dbEntity.TextColor = entity.TextColor;
         await Context.SaveChangesAsync(cancellationToken);
 
-        return (await GetByIdAsync(entity.Id, cancellationToken))!;
+        return (await DbSet.Include(label => label.Issues)
+            .FirstAsync(label => label.Id == entity.Id, cancellationToken));
     }
 
     public async Task DeleteRangeByGitlabIdAsync(IEnumerable<Label> domains, CancellationToken cancellationToken = default)

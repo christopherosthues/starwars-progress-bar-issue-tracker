@@ -3,7 +3,6 @@ using HotChocolate.Pagination;
 using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
-using StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 using KeyNotFoundException = GreenDonut.KeyNotFoundException;
 
 namespace StarWarsProgressBarIssueTracker.App.Appearances;

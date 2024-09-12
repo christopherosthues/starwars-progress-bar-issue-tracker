@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using StarWarsProgressBarIssueTracker.App.Appearances;
 using StarWarsProgressBarIssueTracker.App.Extensions;
+using StarWarsProgressBarIssueTracker.App.Issues;
 using StarWarsProgressBarIssueTracker.App.Labels;
 using StarWarsProgressBarIssueTracker.App.Milestones;
 using StarWarsProgressBarIssueTracker.App.Mutations;

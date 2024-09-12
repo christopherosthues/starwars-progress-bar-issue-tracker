@@ -1,25 +1,36 @@
+using HotChocolate.Pagination;
+using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
-using StarWarsProgressBarIssueTracker.Domain.Vehicles;
+using StarWarsProgressBarIssueTracker.Domain.Issues;
+using KeyNotFoundException = GreenDonut.KeyNotFoundException;
 
-namespace StarWarsProgressBarIssueTracker.Domain.Issues;
+namespace StarWarsProgressBarIssueTracker.App.Issues;
 
-public class IssueService(IDataPort<Issue> dataPort) : IIssueService
+public class IssueService(IIssueRepository issueRepository, IIssueByIdDataLoader issueByIdDataLoader) : IIssueService
 {
-    public async Task<IEnumerable<Issue>> GetAllIssuesAsync(CancellationToken cancellationToken = default)
+    public async Task<Page<Issue>> GetAllIssuesAsync(PagingArguments pagingArguments,
+        CancellationToken cancellationToken = default)
     {
-        return await dataPort.GetAllAsync(cancellationToken);
+        return await issueRepository.GetAllAsync(pagingArguments, cancellationToken);
     }
 
     public async Task<Issue?> GetIssueAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await dataPort.GetByIdAsync(id, cancellationToken);
+        try
+        {
+            return await issueByIdDataLoader.LoadAsync(id, cancellationToken);
+        }
+        catch (KeyNotFoundException)
+        {
+            throw new DomainIdNotFoundException(nameof(Issue), id.ToString());
+        }
     }
 
     public async Task<Issue> AddIssueAsync(Issue issue, CancellationToken cancellationToken = default)
     {
         ValidateIssue(issue);
 
-        return await dataPort.AddAsync(issue, cancellationToken);
+        return await issueRepository.AddAsync(issue, cancellationToken);
     }
 
     private static void ValidateIssue(Issue issue)
@@ -104,60 +115,62 @@ public class IssueService(IDataPort<Issue> dataPort) : IIssueService
     {
         ValidateIssue(issue);
 
-        if (!(await dataPort.ExistsAsync(issue.Id, cancellationToken)))
+        if (!(await issueRepository.ExistsAsync(issue.Id, cancellationToken)))
         {
             throw new DomainIdNotFoundException(nameof(Issue), issue.Id.ToString());
         }
 
-        return await dataPort.UpdateAsync(issue, cancellationToken);
+        return await issueRepository.UpdateAsync(issue, cancellationToken);
     }
 
     public async Task<Issue> DeleteIssueAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        if (!(await dataPort.ExistsAsync(id, cancellationToken)))
+        if (!(await issueRepository.ExistsAsync(id, cancellationToken)))
         {
             throw new DomainIdNotFoundException(nameof(Issue), id.ToString());
         }
 
-        return await dataPort.DeleteAsync(id, cancellationToken);
+        return await issueRepository.DeleteAsync(id, cancellationToken);
     }
 
     public async Task SynchronizeFromGitlabAsync(IList<Issue> issues, CancellationToken cancellationToken = default)
     {
-        var existingIssues = await dataPort.GetAllAsync(cancellationToken);
+        // var existingIssues = await issueRepository.GetAllAsync(cancellationToken);
+        //
+        // var issuesToAdd = issues.Where(issue =>
+        //     !existingIssues.Any(existingIssue => issue.GitlabId!.Equals(existingIssue.GitlabId)))
+        //     .ToList();
+        //
+        // var issuesToDelete = existingIssues.Where(existingIssue => existingIssue.GitlabId != null &&
+        //                                                            !issues.Any(issue =>
+        //                                                                issue.GitlabId!.Equals(existingIssue.GitlabId)));
+        //
+        // IList<Issue> newIssues = [];
+        // foreach (var issueToAdd in issuesToAdd)
+        // {
+        //     newIssues.Add(new Issue
+        //     {
+        //         GitlabId = issueToAdd.GitlabId,
+        //         GitlabIid = issueToAdd.GitlabIid,
+        //         Title = issueToAdd.Title,
+        //         Description = issueToAdd.Description,
+        //         Priority = issueToAdd.Priority,
+        //         Vehicle = issueToAdd.Vehicle != null ?
+        //             new Vehicle
+        //             {
+        //                 EngineColor = issueToAdd.Vehicle.EngineColor,
+        //                 Translations = issueToAdd.Vehicle.Translations
+        //             } : null
+        //     });
+        // }
+        //
+        // await issueRepository.AddRangeAsync(newIssues, cancellationToken);
+        //
+        // await issueRepository.UpdateRangeByGitlabIdAsync(issuesToAdd, cancellationToken);
+        //
+        // await issueRepository.DeleteRangeByGitlabIdAsync(issuesToDelete, cancellationToken);
 
-        var issuesToAdd = issues.Where(issue =>
-            !existingIssues.Any(existingIssue => issue.GitlabId!.Equals(existingIssue.GitlabId)))
-            .ToList();
-
-        var issuesToDelete = existingIssues.Where(existingIssue => existingIssue.GitlabId != null &&
-                                                                   !issues.Any(issue =>
-                                                                       issue.GitlabId!.Equals(existingIssue.GitlabId)));
-
-        IList<Issue> newIssues = [];
-        foreach (var issueToAdd in issuesToAdd)
-        {
-            newIssues.Add(new Issue
-            {
-                GitlabId = issueToAdd.GitlabId,
-                GitlabIid = issueToAdd.GitlabIid,
-                Title = issueToAdd.Title,
-                Description = issueToAdd.Description,
-                Priority = issueToAdd.Priority,
-                Vehicle = issueToAdd.Vehicle != null ?
-                    new Vehicle
-                    {
-                        EngineColor = issueToAdd.Vehicle.EngineColor,
-                        Translations = issueToAdd.Vehicle.Translations
-                    } : null
-            });
-        }
-
-        await dataPort.AddRangeAsync(newIssues, cancellationToken);
-
-        await dataPort.UpdateRangeByGitlabIdAsync(issuesToAdd, cancellationToken);
-
-        await dataPort.DeleteRangeByGitlabIdAsync(issuesToDelete, cancellationToken);
+        await Task.CompletedTask;
 
         // TODO: Update issues, resolve conflicts
     }

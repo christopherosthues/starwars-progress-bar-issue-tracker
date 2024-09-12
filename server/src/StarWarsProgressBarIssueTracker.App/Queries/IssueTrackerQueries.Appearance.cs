@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.App.Extensions;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
-using StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
 namespace StarWarsProgressBarIssueTracker.App.Queries;
 

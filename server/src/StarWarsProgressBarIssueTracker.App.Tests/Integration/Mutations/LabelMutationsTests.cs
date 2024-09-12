@@ -121,6 +121,52 @@ public class LabelMutationsTests : IntegrationTestBase
     }
 
     [TestCaseSource(nameof(AddLabelCases))]
+    public async Task UpdateLabelShouldUpdateLabelWithIssues(Label expectedLabel)
+    {
+        // Arrange
+        var dbLabel = new Label
+        {
+            Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
+            Title = "Title",
+            Description = "Desc",
+            Color = "#001122",
+            TextColor = "#334455",
+            LastModifiedAt = DateTime.UtcNow.AddDays(1)
+        };
+        var dbIssue = new Issue { Title = "IssueTitle" };
+        dbLabel.Issues.Add(dbIssue);
+        await SeedDatabaseAsync(context =>
+        {
+            context.Issues.Add(dbIssue);
+            context.Labels.Add(dbLabel);
+        });
+        expectedLabel.Id = dbLabel.Id;
+        expectedLabel.CreatedAt = dbLabel.CreatedAt;
+        CheckDbContent(context =>
+        {
+            var labels = context.Labels.Include(label => label.Issues).ToList();
+            labels.Should().ContainEquivalentOf(dbLabel, config => config.Excluding(label => label.Issues));
+            labels.First().Issues.Should()
+                .ContainEquivalentOf(dbIssue, config => config.Excluding(issue => issue.Labels));
+        });
+        var mutationRequest = CreateUpdateRequest(expectedLabel);
+
+        var startTime = DateTime.UtcNow;
+
+        // Act
+        var response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
+
+        // Assert
+        AssertUpdatedLabel(response, expectedLabel, startTime, emptyIssues: false);
+        CheckDbContent(context =>
+        {
+            Label resultLabel = context.Labels.Include(label => label.Issues).First(label => label.Id == dbLabel.Id);
+            resultLabel.Issues.Should().NotBeEmpty();
+            resultLabel.Issues.Should().ContainEquivalentOf(dbIssue, config => config.Excluding(issue => issue.Labels));
+        });
+    }
+
+    [TestCaseSource(nameof(AddLabelCases))]
     public async Task UpdateLabelShouldUpdateLabelIfLabelsAreNotEmpty(Label expectedLabel)
     {
         // Arrange
@@ -494,6 +540,10 @@ public class LabelMutationsTests : IntegrationTestBase
                                   textColor
                                   createdAt
                                   lastModifiedAt
+                                  issues {
+                                      id
+                                      title
+                                  }
                               },
                               errors
                               {
@@ -511,7 +561,7 @@ public class LabelMutationsTests : IntegrationTestBase
     }
 
     private void AssertUpdatedLabel(GraphQLResponse<UpdateLabelResponse> response, Label expectedLabel,
-        DateTime startTime, Label? dbLabel = null, Label? notUpdatedLabel = null)
+        DateTime startTime, Label? dbLabel = null, Label? notUpdatedLabel = null, bool emptyIssues = true)
     {
         DateTime endTime = DateTime.UtcNow;
         Label? updatedLabel;
@@ -528,6 +578,14 @@ public class LabelMutationsTests : IntegrationTestBase
             updatedLabel.CreatedAt.Should().BeCloseTo(expectedLabel.CreatedAt, TimeSpan.FromSeconds(1));
             updatedLabel.LastModifiedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
                 .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
+            if (emptyIssues)
+            {
+                updatedLabel.Issues.Should().BeEmpty();
+            }
+            else
+            {
+                updatedLabel.Issues.Should().NotBeEmpty();
+            }
         }
 
         CheckDbContent(context =>
@@ -538,7 +596,8 @@ public class LabelMutationsTests : IntegrationTestBase
                 {
                     context.Labels.Any(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id)).Should().BeTrue();
                 }
-                var updatedDbLabel = context.Labels.First(dbLabel1 => dbLabel1.Id.Equals(updatedLabel.Id));
+                Label updatedDbLabel = context.Labels.Include(label => label.Issues)
+                    .First(dbLabel1 => dbLabel1.Id.Equals(updatedLabel.Id));
                 updatedDbLabel.Should().NotBeNull();
                 updatedDbLabel.Id.Should().NotBeEmpty().And.Be(updatedLabel.Id);
                 updatedDbLabel.Title.Should().Be(expectedLabel.Title);
@@ -548,11 +607,20 @@ public class LabelMutationsTests : IntegrationTestBase
                 updatedDbLabel.CreatedAt.Should().BeCloseTo(expectedLabel.CreatedAt, TimeSpan.FromSeconds(1));
                 updatedDbLabel.LastModifiedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
                     .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
+                if (emptyIssues)
+                {
+                    updatedDbLabel.Issues.Should().BeEmpty();
+                }
+                else
+                {
+                    updatedDbLabel.Issues.Should().NotBeEmpty();
+                }
 
                 if (notUpdatedLabel is not null)
                 {
-                    var secondLabel =
-                        context.Labels.FirstOrDefault(label => label.Id.Equals(notUpdatedLabel.Id));
+                    Label? secondLabel =
+                        context.Labels.Include(label => label.Issues)
+                            .FirstOrDefault(label => label.Id.Equals(notUpdatedLabel.Id));
                     secondLabel.Should().NotBeNull();
                     secondLabel!.Id.Should().NotBeEmpty().And.Be(notUpdatedLabel.Id);
                     secondLabel.Title.Should().Be(notUpdatedLabel.Title);
@@ -561,6 +629,14 @@ public class LabelMutationsTests : IntegrationTestBase
                     secondLabel.TextColor.Should().Be(notUpdatedLabel.TextColor);
                     secondLabel.CreatedAt.Should().BeCloseTo(notUpdatedLabel.CreatedAt, TimeSpan.FromSeconds(1));
                     secondLabel.LastModifiedAt.Should().BeCloseTo(notUpdatedLabel.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
+                    if (emptyIssues)
+                    {
+                        secondLabel.Issues.Should().BeEmpty();
+                    }
+                    else
+                    {
+                        secondLabel.Issues.Should().NotBeEmpty();
+                    }
                 }
             }
         });
@@ -574,7 +650,7 @@ public class LabelMutationsTests : IntegrationTestBase
             response.Data.UpdateLabel.Errors.Should().NotBeNullOrEmpty();
             response.Data.UpdateLabel.Label.Should().BeNull();
 
-            var resultErrors = response.Data.UpdateLabel.Errors.Select(error => error.Message);
+            IEnumerable<string> resultErrors = response.Data.UpdateLabel.Errors.Select(error => error.Message);
             resultErrors.Should().BeEquivalentTo(errors);
         }
 
@@ -624,7 +700,7 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
-            var deletedLabel = response.Data.DeleteLabel.Label;
+            Label deletedLabel = response.Data.DeleteLabel.Label;
             deletedLabel.Id.Should().NotBeEmpty();
             deletedLabel.Title.Should().Be(expectedLabel.Title);
             deletedLabel.Description.Should().Be(expectedLabel.Description);
@@ -656,7 +732,7 @@ public class LabelMutationsTests : IntegrationTestBase
             response.Data.DeleteLabel.Errors.Should().NotBeNullOrEmpty();
             response.Data.DeleteLabel.Label.Should().BeNull();
 
-            var resultErrors = response.Data.DeleteLabel.Errors.Select(error => error.Message);
+            IEnumerable<string> resultErrors = response.Data.DeleteLabel.Errors.Select(error => error.Message);
             resultErrors.Should().BeEquivalentTo(errors);
         }
 
