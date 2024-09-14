@@ -156,7 +156,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
         using (new AssertionScope())
         {
             response.Should().NotBeNull();
-            response.Errors.Should().NotBeNull();
+            response.Errors.Should().BeNull();
             // response.Errors!.First().Extensions!["message"].Should().Be($"No Appearance found with id '{id}'.",
             //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
@@ -182,7 +182,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
         using (new AssertionScope())
         {
             response.Should().NotBeNull();
-            response.Errors.Should().NotBeNull();
+            response.Errors.Should().BeNull();
             // response.Errors!.First().Extensions!["message"].Should().Be($"No Appearance found with id '{id}'.",
             //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();

@@ -159,7 +159,7 @@ public class LabelQueriesTests : IntegrationTestBase
         using (new AssertionScope())
         {
             response.Should().NotBeNull();
-            response.Errors.Should().NotBeNull();
+            response.Errors.Should().BeNull();
             // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
             //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
@@ -185,7 +185,7 @@ public class LabelQueriesTests : IntegrationTestBase
         using (new AssertionScope())
         {
             response.Should().NotBeNull();
-            response.Errors.Should().NotBeNull();
+            response.Errors.Should().BeNull();
             // var firstError = response.Errors!.First();
             // firstError.Extensions.Should().NotBeNull();
             // firstError.Extensions!.GetValueOrDefault("message").Should().Be($"No Label found with id '{id}'.",

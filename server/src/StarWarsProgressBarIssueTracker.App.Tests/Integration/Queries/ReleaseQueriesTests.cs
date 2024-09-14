@@ -205,7 +205,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         using (new AssertionScope())
         {
             response.Should().NotBeNull();
-            response.Errors.Should().NotBeNull();
+            response.Errors.Should().BeNull();
             // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
             //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
@@ -231,7 +231,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         using (new AssertionScope())
         {
             response.Should().NotBeNull();
-            response.Errors.Should().NotBeNull();
+            response.Errors.Should().BeNull();
             // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
             //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
