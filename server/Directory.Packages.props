@@ -35,8 +35,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="Polly" Version="8.4.1" />
-    <PackageVersion Include="Polly.Extensions" Version="8.4.1" />
+    <PackageVersion Include="Polly" Version="8.4.2" />
+    <PackageVersion Include="Polly.Extensions" Version="8.4.2" />
     <PackageVersion Include="Quartz" Version="3.13.0" />
     <PackageVersion Include="Quartz.AspNetCore" Version="3.13.0" />
     <PackageVersion Include="Quartz.Extensions.DependencyInjection" Version="3.13.0" />
