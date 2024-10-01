@@ -40,9 +40,9 @@
     <PackageVersion Include="Quartz" Version="3.13.0" />
     <PackageVersion Include="Quartz.AspNetCore" Version="3.13.0" />
     <PackageVersion Include="Quartz.Extensions.DependencyInjection" Version="3.13.0" />
-    <PackageVersion Include="StrawberryShake.Server" Version="13.9.12" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.8.0" />
+    <PackageVersion Include="StrawberryShake.Server" Version="13.9.14" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.8.1" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="3.10.0" />
-    <PackageVersion Include="WireMock.Net.FluentAssertions" Version="1.6.4" />
+    <PackageVersion Include="WireMock.Net.FluentAssertions" Version="1.6.5" />
   </ItemGroup>
 </Project>
