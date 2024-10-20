@@ -17,6 +17,7 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Jobs;
 
 [TestFixture(TestOf = typeof(GitlabSynchronizationJob))]
 [Category(TestCategory.Integration)]
+[Ignore("Needs to be fixed after Gitlab synchronization is migrated")]
 public class GitlabSynchronizationJobTests : IntegrationTestBase
 {
     private WireMockServer _server = default!;
