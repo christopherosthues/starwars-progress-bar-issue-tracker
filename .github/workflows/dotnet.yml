@@ -28,7 +28,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.x
+        dotnet-version: 9.x
 
     - name: Restore dependencies
       run: dotnet restore server/src/StarWarsProgressBarIssueTracker.App.Tests/StarWarsProgressBarIssueTracker.App.Tests.csproj
@@ -63,7 +63,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.x
+        dotnet-version: 9.x
 
     - name: Restore dependencies
       run: dotnet restore server/src/StarWarsProgressBarIssueTracker.Domain.Tests/StarWarsProgressBarIssueTracker.Domain.Tests.csproj
@@ -92,7 +92,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.x
+        dotnet-version: 9.x
 
     - name: Restore dependencies
       run: dotnet restore server/src/StarWarsProgressBarIssueTracker.Infrastructure.Tests/StarWarsProgressBarIssueTracker.Infrastructure.Tests.csproj
@@ -121,7 +121,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.x
+        dotnet-version: 9.x
 
     - name: Restore dependencies
       run: dotnet restore server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests.csproj
