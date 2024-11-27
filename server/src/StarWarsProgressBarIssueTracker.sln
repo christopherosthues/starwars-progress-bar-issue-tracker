@@ -1,15 +1,13 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTracker.App", "StarWarsProgressBarIssueTracker.App\StarWarsProgressBarIssueTracker.App.csproj", "{D4221981-65C0-487A-96F3-F4A673FE8206}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.App", "StarWarsProgressBarIssueTracker.App\StarWarsProgressBarIssueTracker.App.csproj", "{D4221981-65C0-487A-96F3-F4A673FE8206}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".meta", ".meta", "{86AE95DA-23E3-4778-BA05-A8AA47509F09}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = ..\.editorconfig
 		.gitignore = ..\.gitignore
-		.config\dotnet-tools.json = ..\.config\dotnet-tools.json
 		..\.env = ..\.env
 		..\.dockerignore = ..\.dockerignore
-		..\..\.config\dotnet-tools.json = ..\..\.config\dotnet-tools.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{705452CE-6D9D-468E-9148-51BB8279812D}"
@@ -18,11 +16,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{705452CE
 		Directory.Build.targets = ..\Directory.Build.targets
 		global.json = ..\global.json
 		Directory.Packages.props = ..\Directory.Packages.props
+		..\..\.config\dotnet-tools.json = ..\..\.config\dotnet-tools.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTracker.Domain", "StarWarsProgressBarIssueTracker.Domain\StarWarsProgressBarIssueTracker.Domain.csproj", "{69A87A6D-A232-4F4A-B01A-B5072D2F7BDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.Domain", "StarWarsProgressBarIssueTracker.Domain\StarWarsProgressBarIssueTracker.Domain.csproj", "{69A87A6D-A232-4F4A-B01A-B5072D2F7BDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTracker.Domain.Tests", "StarWarsProgressBarIssueTracker.Domain.Tests\StarWarsProgressBarIssueTracker.Domain.Tests.csproj", "{8CDFCA54-445E-4B5D-B32D-8E6B3E629417}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.Domain.Tests", "StarWarsProgressBarIssueTracker.Domain.Tests\StarWarsProgressBarIssueTracker.Domain.Tests.csproj", "{8CDFCA54-445E-4B5D-B32D-8E6B3E629417}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git hooks", "git hooks", "{A854F50E-9FA0-420C-B764-E56137D66B62}"
 	ProjectSection(SolutionItems) = preProject
@@ -39,39 +38,37 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git hooks", "git hooks", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{5D23A55C-DFFE-40D8-9168-6AE8CC9DDFFD}"
 	ProjectSection(SolutionItems) = preProject
-		LICENSE = ..\LICENSE
-		README.md = ..\README.md
-		CHANGELOG.md = ..\CHANGELOG.md
+		..\CHANGELOG.md = ..\CHANGELOG.md
+		..\README.md = ..\README.md
 		..\..\CODE_OF_CONDUCT.md = ..\..\CODE_OF_CONDUCT.md
 		..\..\LICENSE = ..\..\LICENSE
+		..\..\README.md = ..\..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTracker.Infrastructure", "StarWarsProgressBarIssueTracker.Infrastructure\StarWarsProgressBarIssueTracker.Infrastructure.csproj", "{DE7C2874-1C2C-4F74-B1DC-F09868D2224F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.Infrastructure", "StarWarsProgressBarIssueTracker.Infrastructure\StarWarsProgressBarIssueTracker.Infrastructure.csproj", "{DE7C2874-1C2C-4F74-B1DC-F09868D2224F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTracker.App.Tests", "StarWarsProgressBarIssueTracker.App.Tests\StarWarsProgressBarIssueTracker.App.Tests.csproj", "{735AF988-6C10-41BC-B517-95321ADAC2C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.App.Tests", "StarWarsProgressBarIssueTracker.App.Tests\StarWarsProgressBarIssueTracker.App.Tests.csproj", "{735AF988-6C10-41BC-B517-95321ADAC2C7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "docker-compose", "docker-compose.dcproj", "{572A772B-BDFC-4CA5-B3F2-C1CB8EA866F4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", "{E401EFCA-A58F-43C4-A3B0-189ADD6D9B85}"
 	ProjectSection(SolutionItems) = preProject
-		.github\dependabot.yml = ..\.github\dependabot.yml
-		.github\workflows\test.yml = ..\.github\workflows\test.yml
-		.github\workflows\update-dotnet-sdk.yml = ..\.github\workflows\update-dotnet-sdk.yml
-		.github\workflows\update-nuget-packages.yml = ..\.github\workflows\update-nuget-packages.yml
 		..\..\.github\dependabot.yml = ..\..\.github\dependabot.yml
 		..\..\.github\workflows\dotnet.yml = ..\..\.github\workflows\dotnet.yml
 		..\..\.github\workflows\update-dotnet-sdk.yml = ..\..\.github\workflows\update-dotnet-sdk.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTracker.Infrastructure.GitHub", "StarWarsProgressBarIssueTracker.Infrastructure.GitHub\StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj", "{6820DDF7-48EC-4C94-9267-F2B9A4B14A8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.Infrastructure.GitHub", "StarWarsProgressBarIssueTracker.Infrastructure.GitHub\StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj", "{6820DDF7-48EC-4C94-9267-F2B9A4B14A8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab", "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab\StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj", "{811E2611-6C6C-4862-BD62-DD733277EF7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab", "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab\StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj", "{811E2611-6C6C-4862-BD62-DD733277EF7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTracker.Common.Tests", "StarWarsProgressBarIssueTracker.Common.Tests\StarWarsProgressBarIssueTracker.Common.Tests.csproj", "{F1A09103-0542-467F-A201-3710B2693D9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.Common.Tests", "StarWarsProgressBarIssueTracker.Common.Tests\StarWarsProgressBarIssueTracker.Common.Tests.csproj", "{F1A09103-0542-467F-A201-3710B2693D9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests", "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests\StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests.csproj", "{0CDDB87C-374B-46E9-AC0F-1DD07305D321}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests", "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests\StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests.csproj", "{0CDDB87C-374B-46E9-AC0F-1DD07305D321}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarWarsProgressBarIssueTracker.Infrastructure.Tests", "StarWarsProgressBarIssueTracker.Infrastructure.Tests\StarWarsProgressBarIssueTracker.Infrastructure.Tests.csproj", "{CB1804F6-98F6-4581-B751-1C313D968BB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.Infrastructure.Tests", "StarWarsProgressBarIssueTracker.Infrastructure.Tests\StarWarsProgressBarIssueTracker.Infrastructure.Tests.csproj", "{CB1804F6-98F6-4581-B751-1C313D968BB2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.TestHelpers", "StarWarsProgressBarIssueTracker.TestHelpers\StarWarsProgressBarIssueTracker.TestHelpers.csproj", "{2E16732A-BAE0-4683-88DB-A1A1CCC60988}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +120,10 @@ Global
 		{CB1804F6-98F6-4581-B751-1C313D968BB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CB1804F6-98F6-4581-B751-1C313D968BB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CB1804F6-98F6-4581-B751-1C313D968BB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E16732A-BAE0-4683-88DB-A1A1CCC60988}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E16732A-BAE0-4683-88DB-A1A1CCC60988}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E16732A-BAE0-4683-88DB-A1A1CCC60988}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E16732A-BAE0-4683-88DB-A1A1CCC60988}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{705452CE-6D9D-468E-9148-51BB8279812D} = {86AE95DA-23E3-4778-BA05-A8AA47509F09}

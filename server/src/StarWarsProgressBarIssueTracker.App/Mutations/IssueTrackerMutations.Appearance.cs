@@ -11,15 +11,12 @@ public partial class IssueTrackerMutations
     [Error<StringTooShortException>]
     [Error<StringTooLongException>]
     [Error<ColorFormatException>]
-    public async Task<Appearance> AddAppearance(string title, string color, string textColor, string? description, CancellationToken cancellationToken)
+    public async Task<Appearance> AddAppearance(string title, string color, string textColor, string? description,
+        CancellationToken cancellationToken)
     {
-        return await appearanceService.AddAppearanceAsync(new()
-        {
-            Title = title,
-            Description = description,
-            Color = color,
-            TextColor = textColor
-        }, cancellationToken);
+        return await appearanceService.AddAppearanceAsync(
+            new() { Title = title, Description = description, Color = color, TextColor = textColor },
+            cancellationToken);
     }
 
     [Error<ValueNotSetException>]
@@ -27,16 +24,18 @@ public partial class IssueTrackerMutations
     [Error<StringTooLongException>]
     [Error<ColorFormatException>]
     [Error<DomainIdNotFoundException>]
-    public async Task<Appearance> UpdateAppearance([ID] Guid id, string title, string color, string textColor, string? description, CancellationToken cancellationToken)
+    public async Task<Appearance> UpdateAppearance([ID] Guid id, string title, string color, string textColor,
+        string? description, CancellationToken cancellationToken)
     {
-        return await appearanceService.UpdateAppearanceAsync(new()
-        {
-            Id = id,
-            Title = title,
-            Description = description,
-            Color = color,
-            TextColor = textColor
-        }, cancellationToken);
+        return await appearanceService.UpdateAppearanceAsync(
+            new()
+            {
+                Id = id,
+                Title = title,
+                Description = description,
+                Color = color,
+                TextColor = textColor
+            }, cancellationToken);
     }
 
     [Error<DomainIdNotFoundException>]

@@ -1,31 +1,35 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using HotChocolate.Pagination;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using StarWarsProgressBarIssueTracker.Domain;
+using StarWarsProgressBarIssueTracker.Domain.Models;
 using StarWarsProgressBarIssueTracker.Infrastructure.Database;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
-public class IssueTrackerRepositoryBase<TDbEntity> : IRepository<TDbEntity> where TDbEntity : DbEntityBase
+public abstract class IssueTrackerRepositoryBase<TDomain>(IssueTrackerContext context)
+    : IRepository<TDomain> where TDomain : DomainBase
 {
-    protected DbSet<TDbEntity> DbSet => Context.Set<TDbEntity>();
+    protected readonly IssueTrackerContext Context = context;
 
-    private IssueTrackerContext? _context;
+    protected DbSet<TDomain> DbSet => Context.Set<TDomain>();
 
-    public IssueTrackerContext Context
-    {
-        get => _context ?? throw new InvalidOperationException("The DB context is not initialized.");
-        set
-        {
+    // private IssueTrackerContext? _context;
+
+    // {
+        // get => _context ?? throw new InvalidOperationException("The DB context is not initialized.");
+        // set
+        // {
             // if (_context != null)
             // {
             // throw new InvalidOperationException("THe DB context is already initialized.");
             // }
 
-            _context = value;
-        }
-    }
+            // _context = value;
+        // }
+    // }
 
-    public async Task<TDbEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<TDomain?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await GetIncludingFields().FirstOrDefaultAsync(dbEntity => dbEntity.Id.Equals(id), cancellationToken);
     }
@@ -35,47 +39,45 @@ public class IssueTrackerRepositoryBase<TDbEntity> : IRepository<TDbEntity> wher
         return await DbSet.AnyAsync(entity => entity.Id.Equals(id), cancellationToken);
     }
 
-    public IQueryable<TDbEntity> GetAll()
-    {
-        return GetIncludingFields();
-    }
+    public abstract Task<Page<TDomain>> GetAllAsync(PagingArguments pagingArguments,
+        CancellationToken cancellationToken = default);
 
-    protected virtual IQueryable<TDbEntity> GetIncludingFields()
+    protected virtual IQueryable<TDomain> GetIncludingFields()
     {
         return DbSet;
     }
 
-    public async Task<TDbEntity> AddAsync(TDbEntity entity, CancellationToken cancellationToken = default)
+    public async Task<TDomain> AddAsync(TDomain entity, CancellationToken cancellationToken = default)
     {
-        EntityEntry<TDbEntity> resultEntry = await DbSet.AddAsync(entity, cancellationToken);
+        EntityEntry<TDomain> resultEntry = await DbSet.AddAsync(entity, cancellationToken);
         await Context.SaveChangesAsync(cancellationToken);
         return resultEntry.Entity;
     }
 
-    public async Task AddRangeAsync(IEnumerable<TDbEntity> entities, CancellationToken cancellationToken = default)
+    public async Task AddRangeAsync(IEnumerable<TDomain> entities, CancellationToken cancellationToken = default)
     {
         await DbSet.AddRangeAsync(entities, cancellationToken);
         await Context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<TDbEntity> UpdateAsync(TDbEntity entity, CancellationToken cancellationToken = default)
+    public virtual async Task<TDomain> UpdateAsync(TDomain entity, CancellationToken cancellationToken = default)
     {
-        EntityEntry<TDbEntity> entry = Context.Entry(entity);
+        EntityEntry<TDomain> entry = Context.Entry(entity);
         entry.State = EntityState.Modified;
         await Context.SaveChangesAsync(cancellationToken);
 
         return (await GetByIdAsync(entity.Id, cancellationToken))!;
     }
 
-    public async Task<TDbEntity> DeleteAsync(TDbEntity entity, CancellationToken cancellationToken = default)
+    public async Task<TDomain> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        TDbEntity deletedEntity = (await GetByIdAsync(entity.Id, cancellationToken))!;
-        DbSet.Remove(entity);
+        TDomain deletedEntity = (await GetByIdAsync(id, cancellationToken))!;
+        DbSet.Remove(deletedEntity);
         await Context.SaveChangesAsync(cancellationToken);
         return deletedEntity;
     }
 
-    public async Task DeleteRangeAsync(IEnumerable<TDbEntity> entities, CancellationToken cancellationToken = default)
+    public async Task DeleteRangeAsync(IEnumerable<TDomain> entities, CancellationToken cancellationToken = default)
     {
         DbSet.RemoveRange(entities);
         await Context.SaveChangesAsync(cancellationToken);

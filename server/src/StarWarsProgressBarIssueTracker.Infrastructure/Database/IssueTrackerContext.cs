@@ -1,21 +1,32 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using StarWarsProgressBarIssueTracker.Domain.Issues;
+using StarWarsProgressBarIssueTracker.Domain.Labels;
+using StarWarsProgressBarIssueTracker.Domain.Milestones;
+using StarWarsProgressBarIssueTracker.Domain.Models;
+using StarWarsProgressBarIssueTracker.Domain.Releases;
+using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using StarWarsProgressBarIssueTracker.Infrastructure.Models;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Database;
 
 public class IssueTrackerContext(DbContextOptions<IssueTrackerContext> options) : DbContext(options)
 {
-    public DbSet<DbAppearance> Appearances { get; init; } = default!;
-    public DbSet<DbIssue> Issues { get; init; } = default!;
-    public DbSet<DbIssueLink> IssueLinks { get; init; } = default!;
-    public DbSet<DbLabel> Labels { get; init; } = default!;
-    public DbSet<DbMilestone> Milestones { get; init; } = default!;
-    public DbSet<DbRelease> Releases { get; init; } = default!;
-    public DbSet<DbVehicle> Vehicles { get; init; } = default!;
-    public DbSet<DbPhoto> Photos { get; init; } = default!;
-    public DbSet<DbTranslation> Translations { get; init; } = default!;
+    public DbSet<Appearance> Appearances { get; init; } = default!;
+    public DbSet<Issue> Issues { get; init; } = default!;
+    public DbSet<IssueLink> IssueLinks { get; init; } = default!;
+    public DbSet<Label> Labels { get; init; } = default!;
+    public DbSet<Milestone> Milestones { get; init; } = default!;
+    public DbSet<Release> Releases { get; init; } = default!;
+    public DbSet<Vehicle> Vehicles { get; init; } = default!;
+    public DbSet<Photo> Photos { get; init; } = default!;
+    public DbSet<Translation> Translations { get; init; } = default!;
     public DbSet<DbJob> Jobs { get; init; } = default!;
     public DbSet<DbTask> Tasks { get; init; } = default!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(IssueTrackerContext).Assembly);
+    }
 
     public override int SaveChanges()
     {
@@ -31,7 +42,7 @@ public class IssueTrackerContext(DbContextOptions<IssueTrackerContext> options) 
 
     private void UpdateAuditProperties()
     {
-        var entries = ChangeTracker.Entries<DbEntityBase>();
+        var entries = ChangeTracker.Entries<DomainBase>();
         foreach (var entry in entries)
         {
             DateTime utcNow = DateTime.UtcNow;

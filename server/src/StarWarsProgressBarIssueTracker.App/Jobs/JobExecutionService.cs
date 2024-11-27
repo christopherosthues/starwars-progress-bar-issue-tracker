@@ -15,7 +15,7 @@ public class JobExecutionService
         ResiliencePipelineProvider<string> pipelineProvider, IssueTrackerContext dbContext)
     {
         _taskRepository = taskRepository;
-        _taskRepository.Context = dbContext;
+        // _taskRepository.Context = dbContext;
         _jobFactory = jobFactory;
         _pipelineProvider = pipelineProvider;
     }

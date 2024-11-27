@@ -1,8 +1,15 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using StarWarsProgressBarIssueTracker.Common.Tests;
+using StarWarsProgressBarIssueTracker.Domain;
+using StarWarsProgressBarIssueTracker.Domain.Issues;
+using StarWarsProgressBarIssueTracker.Domain.Labels;
+using StarWarsProgressBarIssueTracker.Domain.Milestones;
+using StarWarsProgressBarIssueTracker.Domain.Releases;
+using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using StarWarsProgressBarIssueTracker.Infrastructure.Models;
 using StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
+using StarWarsProgressBarIssueTracker.TestHelpers.Extensions;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Tests;
 
@@ -20,33 +27,12 @@ public class RepositoryRegistrationTests
         serviceCollectionMock.Object.AddRepositories();
 
         // Assert
-        serviceCollectionMock.Verify(
-            mock => mock.Add(It.Is<ServiceDescriptor>(sd =>
-                sd.ServiceType == typeof(IAppearanceRepository) && sd.ImplementationType == typeof(AppearanceRepository) &&
-                sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
-        serviceCollectionMock.Verify(
-            mock => mock.Add(It.Is<ServiceDescriptor>(sd =>
-                sd.ServiceType == typeof(IRepository<DbLabel>) && sd.ImplementationType == typeof(LabelRepository) &&
-                sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
-        serviceCollectionMock.Verify(
-            mock => mock.Add(It.Is<ServiceDescriptor>(sd =>
-                sd.ServiceType == typeof(IIssueRepository) && sd.ImplementationType == typeof(IssueRepository) &&
-                sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
-        serviceCollectionMock.Verify(
-            mock => mock.Add(It.Is<ServiceDescriptor>(sd =>
-                sd.ServiceType == typeof(IRepository<DbMilestone>) && sd.ImplementationType == typeof(MilestoneRepository) &&
-                sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
-        serviceCollectionMock.Verify(
-            mock => mock.Add(It.Is<ServiceDescriptor>(sd =>
-                sd.ServiceType == typeof(IRepository<DbRelease>) && sd.ImplementationType == typeof(ReleaseRepository) &&
-                sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
-        serviceCollectionMock.Verify(
-            mock => mock.Add(It.Is<ServiceDescriptor>(sd =>
-                sd.ServiceType == typeof(ITaskRepository) && sd.ImplementationType == typeof(TaskRepository) &&
-                sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
-        serviceCollectionMock.Verify(
-            mock => mock.Add(It.Is<ServiceDescriptor>(sd =>
-                sd.ServiceType == typeof(IRepository<DbJob>) && sd.ImplementationType == typeof(IssueTrackerRepositoryBase<DbJob>) &&
-                sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
+        serviceCollectionMock.VerifyServiceRegistered(typeof(IAppearanceRepository), typeof(AppearanceRepository), ServiceLifetime.Scoped);
+        serviceCollectionMock.VerifyServiceRegistered(typeof(ILabelRepository), typeof(LabelRepository), ServiceLifetime.Scoped);
+        serviceCollectionMock.VerifyServiceRegistered(typeof(IIssueRepository), typeof(IssueRepository), ServiceLifetime.Scoped);
+        serviceCollectionMock.VerifyServiceRegistered(typeof(IMilestoneRepository), typeof(MilestoneRepository), ServiceLifetime.Scoped);
+        serviceCollectionMock.VerifyServiceRegistered(typeof(IReleaseRepository), typeof(ReleaseRepository), ServiceLifetime.Scoped);
+        serviceCollectionMock.VerifyServiceRegistered(typeof(ITaskRepository), typeof(TaskRepository), ServiceLifetime.Scoped);
+        serviceCollectionMock.VerifyServiceRegistered(typeof(IRepository<DbJob>), typeof(JobRepository), ServiceLifetime.Scoped);
     }
 }

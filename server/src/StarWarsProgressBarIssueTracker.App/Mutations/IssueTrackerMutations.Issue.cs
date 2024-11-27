@@ -1,4 +1,6 @@
+using HotChocolate.Types;
 using HotChocolate.Types.Relay;
+using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
@@ -8,6 +10,12 @@ namespace StarWarsProgressBarIssueTracker.App.Mutations;
 
 public partial class IssueTrackerMutations
 {
+    [Error<ValueNotSetException>]
+    [Error<StringTooShortException>]
+    [Error<StringTooLongException>]
+    [Error<DuplicatedAppearanceException>]
+    [Error<DuplicatedTranslationsException>]
+    [Error<DuplicatedPhotosException>]
     public async Task<Issue> AddIssue(string title, string? description, Priority priority,
         Guid? milestoneId, Guid? releaseId, Vehicle? vehicle, CancellationToken cancellationToken)
     {
@@ -34,6 +42,13 @@ public partial class IssueTrackerMutations
         }, cancellationToken);
     }
 
+    [Error<ValueNotSetException>]
+    [Error<StringTooShortException>]
+    [Error<StringTooLongException>]
+    [Error<DomainIdNotFoundException>]
+    [Error<DuplicatedAppearanceException>]
+    [Error<DuplicatedTranslationsException>]
+    [Error<DuplicatedPhotosException>]
     public async Task<Issue> UpdateIssue([ID] Guid id, string title, string? description, Priority priority,
         Guid? milestoneId, Guid? releaseId, Vehicle? vehicle, CancellationToken cancellationToken)
     {
@@ -61,6 +76,7 @@ public partial class IssueTrackerMutations
         }, cancellationToken);
     }
 
+    [Error<DomainIdNotFoundException>]
     public async Task<Issue> DeleteIssue([ID] Guid id, CancellationToken cancellationToken)
     {
         return await issueService.DeleteIssueAsync(id, cancellationToken);

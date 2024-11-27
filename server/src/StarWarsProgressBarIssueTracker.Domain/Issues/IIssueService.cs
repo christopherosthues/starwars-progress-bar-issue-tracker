@@ -1,8 +1,11 @@
+using HotChocolate.Pagination;
+
 namespace StarWarsProgressBarIssueTracker.Domain.Issues;
 
 public interface IIssueService
 {
-    Task<IEnumerable<Issue>> GetAllIssuesAsync(CancellationToken cancellationToken = default);
+    Task<Page<Issue>> GetAllIssuesAsync(PagingArguments pagingArguments,
+        CancellationToken cancellationToken = default);
 
     Task<Issue?> GetIssueAsync(Guid id, CancellationToken cancellationToken = default);
 

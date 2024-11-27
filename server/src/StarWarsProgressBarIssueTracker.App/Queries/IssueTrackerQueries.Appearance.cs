@@ -1,16 +1,44 @@
+using GreenDonut;
+using HotChocolate.Data;
+using HotChocolate.Pagination;
+using HotChocolate.Types;
+using HotChocolate.Types.Pagination;
+using Microsoft.EntityFrameworkCore;
+using StarWarsProgressBarIssueTracker.App.Extensions;
+using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 namespace StarWarsProgressBarIssueTracker.App.Queries;
 
 public partial class IssueTrackerQueries
 {
-    public async Task<IEnumerable<Appearance>> GetAppearances(CancellationToken cancellationToken)
+    [UsePaging(IncludeTotalCount = true)]
+    [UseSorting]
+    public async Task<Connection<Appearance>> GetAppearances(
+        PagingArguments pagingArguments,
+        IAppearanceService appearanceService,
+        CancellationToken cancellationToken)
     {
-        return await appearanceService.GetAllAppearancesAsync(cancellationToken);
+        Page<Appearance> page = await appearanceService.GetAllAppearancesAsync(pagingArguments, cancellationToken);
+        return page.ToConnectionWithTotalCount();
     }
 
-    public async Task<Appearance?> GetAppearance(Guid id, CancellationToken cancellationToken)
+    [Error<DomainIdNotFoundException>]
+    public async Task<Appearance?> GetAppearance(
+        Guid id,
+        IAppearanceService appearanceService,
+        CancellationToken cancellationToken)
     {
         return await appearanceService.GetAppearanceAsync(id, cancellationToken);
+    }
+
+    [DataLoader]
+    public static async Task<IReadOnlyDictionary<Guid, Appearance>> GetAppearanceByIdAsync(
+        IReadOnlyList<Guid> ids,
+        IAppearanceRepository appearanceRepository,
+        CancellationToken cancellationToken = default)
+    {
+        return await appearanceRepository.GetAppearanceByIds(ids)
+            .ToDictionaryAsync(t => t.Id, cancellationToken);
     }
 }

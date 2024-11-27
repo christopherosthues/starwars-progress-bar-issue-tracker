@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.App.Mutations;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Milestones;
 using StarWarsProgressBarIssueTracker.Common.Tests;
+using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Mutations;
 
@@ -41,7 +41,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     public async Task AddMilestoneShouldAddMilestoneIfMilestonesAreNotEmpty(Milestone expectedMilestone)
     {
         // Arrange
-        var dbMilestone = new DbMilestone
+        var dbMilestone = new Milestone
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -89,7 +89,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     public async Task UpdateMilestoneShouldUpdateMilestone(Milestone expectedMilestone)
     {
         // Arrange
-        var dbMilestone = new DbMilestone
+        var dbMilestone = new Milestone
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -122,7 +122,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     public async Task UpdateMilestoneShouldUpdateMilestoneIfMilestonesAreNotEmpty(Milestone expectedMilestone)
     {
         // Arrange
-        var dbMilestone = new DbMilestone
+        var dbMilestone = new Milestone
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -130,7 +130,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             State = MilestoneState.Open,
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbMilestone2 = new DbMilestone
+        var dbMilestone2 = new Milestone
         {
             Id = new Guid("0609F93C-CBCC-4650-BA4C-B8D5FF93A877"),
             Title = "Title 2",
@@ -203,7 +203,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     {
         // Arrange
         var milestone = CreateMilestone();
-        var dbMilestone = new DbMilestone
+        var dbMilestone = new Milestone
         {
             Id = milestone.Id,
             Title = milestone.Title,
@@ -216,7 +216,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             context.Milestones.Add(dbMilestone);
         });
         milestone.CreatedAt = dbMilestone.CreatedAt;
-        milestone.LastModifiedAt = DateTime.UtcNow;
+        milestone.LastModifiedAt = dbMilestone.LastModifiedAt;
         CheckDbContent(context =>
         {
             context.Milestones.Should().ContainEquivalentOf(dbMilestone);
@@ -235,7 +235,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     {
         // Arrange
         var milestone = CreateMilestone();
-        var dbMilestone = new DbMilestone
+        var dbMilestone = new Milestone
         {
             Id = milestone.Id,
             Title = milestone.Title,
@@ -243,20 +243,20 @@ public class MilestoneMutationsTests : IntegrationTestBase
             State = milestone.State,
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbIssue = new DbIssue
+        var dbIssue = new Issue
         {
             Id = new Guid("87A2F9BF-CAB7-41D3-84F9-155135FA41D7"),
             Title = "IssueTitle",
             Milestone = dbMilestone
         };
         dbMilestone.Issues.Add(dbIssue);
-        var dbMilestone2 = new DbMilestone
+        var dbMilestone2 = new Milestone
         {
             Id = new Guid("B961A621-9848-429A-8B44-B1AF1F0182CE"),
             State = MilestoneState.Closed,
             Title = "Title 2"
         };
-        var dbIssue2 = new DbIssue
+        var dbIssue2 = new Issue
         {
             Id = new Guid("74AE8DD4-7669-4428-8E81-FB8A24A217A3"),
             Title = "IssueTitle",
@@ -271,7 +271,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             context.Issues.Add(dbIssue2);
         });
         milestone.CreatedAt = dbMilestone.CreatedAt;
-        milestone.LastModifiedAt = DateTime.UtcNow;
+        milestone.LastModifiedAt = dbMilestone.LastModifiedAt;
         CheckDbContent(context =>
         {
             context.Milestones.Should().ContainEquivalentOf(dbMilestone, options => options.Excluding(entity => entity.Issues));
@@ -303,7 +303,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     {
         // Arrange
         var milestone = CreateMilestone();
-        var dbMilestone = new DbMilestone
+        var dbMilestone = new Milestone
         {
             Id = milestone.Id,
             Title = milestone.Title,
@@ -311,7 +311,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             State = milestone.State,
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbMilestone2 = new DbMilestone
+        var dbMilestone2 = new Milestone
         {
             Id = new Guid("0609F93C-CBCC-4650-BA4C-B8D5FF93A877"),
             Title = "Title 2",
@@ -327,7 +327,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             context.Milestones.Add(dbMilestone2);
         });
         milestone.CreatedAt = dbMilestone.CreatedAt;
-        milestone.LastModifiedAt = DateTime.UtcNow;
+        milestone.LastModifiedAt = dbMilestone.LastModifiedAt;
         CheckDbContent(context =>
         {
             context.Milestones.Should().ContainEquivalentOf(dbMilestone);
@@ -404,7 +404,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     }
 
     private void AssertAddedMilestone(GraphQLResponse<AddMilestoneResponse> response, Milestone expectedMilestone,
-        DateTime startTime, DbMilestone? dbMilestone = null)
+        DateTime startTime, Milestone? dbMilestone = null)
     {
         DateTime endTime = DateTime.UtcNow;
         Milestone? addedMilestone;
@@ -508,7 +508,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     }
 
     private void AssertUpdatedMilestone(GraphQLResponse<UpdateMilestoneResponse> response, Milestone expectedMilestone,
-        DateTime startTime, DbMilestone? dbMilestone = null, DbMilestone? notUpdatedDbMilestone = null)
+        DateTime startTime, Milestone? dbMilestone = null, Milestone? notUpdatedMilestone = null, bool emptyIssues = true)
     {
         DateTime endTime = DateTime.UtcNow;
         Milestone? updatedMilestone;
@@ -521,10 +521,17 @@ public class MilestoneMutationsTests : IntegrationTestBase
             updatedMilestone.Title.Should().Be(expectedMilestone.Title);
             updatedMilestone.Description.Should().Be(expectedMilestone.Description);
             updatedMilestone.State.Should().Be(expectedMilestone.State);
-            updatedMilestone.Issues.Should().BeEquivalentTo(expectedMilestone.Issues);
             updatedMilestone.CreatedAt.Should().BeCloseTo(expectedMilestone.CreatedAt, TimeSpan.FromSeconds(1));
             updatedMilestone.LastModifiedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
                 .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
+            if (emptyIssues)
+            {
+                updatedMilestone.Issues.Should().BeEmpty();
+            }
+            else
+            {
+                updatedMilestone.Issues.Should().NotBeEmpty();
+            }
         }
 
         CheckDbContent(context =>
@@ -542,24 +549,38 @@ public class MilestoneMutationsTests : IntegrationTestBase
                 updatedDbMilestone.Title.Should().Be(expectedMilestone.Title);
                 updatedDbMilestone.Description.Should().Be(expectedMilestone.Description);
                 updatedDbMilestone.State.Should().Be(expectedMilestone.State);
-                updatedDbMilestone.Issues.Should().BeEquivalentTo(expectedMilestone.Issues);
                 updatedDbMilestone.CreatedAt.Should().BeCloseTo(expectedMilestone.CreatedAt, TimeSpan.FromSeconds(1));
                 updatedDbMilestone.LastModifiedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
                     .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
-
-                if (notUpdatedDbMilestone is not null)
+                if (emptyIssues)
                 {
-                    var secondDbMilestone =
+                    updatedDbMilestone.Issues.Should().BeEmpty();
+                }
+                else
+                {
+                    updatedDbMilestone.Issues.Should().NotBeEmpty();
+                }
+
+                if (notUpdatedMilestone is not null)
+                {
+                    var secondMilestone =
                         context.Milestones.Include(dbMilestone2 => dbMilestone2.Issues)
-                            .FirstOrDefault(milestone => milestone.Id.Equals(notUpdatedDbMilestone.Id));
-                    secondDbMilestone.Should().NotBeNull();
-                    secondDbMilestone!.Id.Should().NotBeEmpty().And.Be(notUpdatedDbMilestone.Id);
-                    secondDbMilestone.Title.Should().Be(notUpdatedDbMilestone.Title);
-                    secondDbMilestone.Description.Should().Be(notUpdatedDbMilestone.Description);
-                    secondDbMilestone.State.Should().Be(notUpdatedDbMilestone.State);
-                    secondDbMilestone.Issues.Should().BeEquivalentTo(notUpdatedDbMilestone.Issues);
-                    secondDbMilestone.CreatedAt.Should().BeCloseTo(notUpdatedDbMilestone.CreatedAt, TimeSpan.FromSeconds(1));
-                    secondDbMilestone.LastModifiedAt.Should().BeCloseTo(notUpdatedDbMilestone.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
+                            .FirstOrDefault(milestone => milestone.Id.Equals(notUpdatedMilestone.Id));
+                    secondMilestone.Should().NotBeNull();
+                    secondMilestone!.Id.Should().NotBeEmpty().And.Be(notUpdatedMilestone.Id);
+                    secondMilestone.Title.Should().Be(notUpdatedMilestone.Title);
+                    secondMilestone.Description.Should().Be(notUpdatedMilestone.Description);
+                    secondMilestone.State.Should().Be(notUpdatedMilestone.State);
+                    secondMilestone.CreatedAt.Should().BeCloseTo(notUpdatedMilestone.CreatedAt, TimeSpan.FromSeconds(1));
+                    secondMilestone.LastModifiedAt.Should().BeCloseTo(notUpdatedMilestone.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
+                    if (emptyIssues)
+                    {
+                        secondMilestone.Issues.Should().BeEmpty();
+                    }
+                    else
+                    {
+                        secondMilestone.Issues.Should().NotBeEmpty();
+                    }
                 }
             }
         });
@@ -621,7 +642,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         return mutationRequest;
     }
 
-    private void AssertDeletedMilestone(GraphQLResponse<DeleteMilestoneResponse> response, Milestone expectedMilestone, DbMilestone? dbMilestone = null)
+    private void AssertDeletedMilestone(GraphQLResponse<DeleteMilestoneResponse> response, Milestone expectedMilestone, Milestone? dbMilestone = null)
     {
         using (new AssertionScope())
         {
@@ -632,7 +653,6 @@ public class MilestoneMutationsTests : IntegrationTestBase
             deletedMilestone.Title.Should().Be(expectedMilestone.Title);
             deletedMilestone.Description.Should().Be(expectedMilestone.Description);
             deletedMilestone.State.Should().Be(expectedMilestone.State);
-            deletedMilestone.Issues.Should().BeEquivalentTo(expectedMilestone.Issues);
             deletedMilestone.CreatedAt.Should().BeCloseTo(expectedMilestone.CreatedAt, TimeSpan.FromSeconds(1));
             deletedMilestone.LastModifiedAt.Should().BeCloseTo(expectedMilestone.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
         }

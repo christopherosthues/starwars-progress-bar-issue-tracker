@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using StarWarsProgressBarIssueTracker.Domain.Models;
 using StarWarsProgressBarIssueTracker.Infrastructure.Database.Configurations;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Models;
 
 [EntityTypeConfiguration(typeof(DbJobConfiguration))]
-public record DbJob : DbEntityBase
+public class DbJob : DomainBase
 {
     public required string CronInterval { get; set; }
 

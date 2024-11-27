@@ -1,8 +1,11 @@
+using HotChocolate.Pagination;
+
 namespace StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 public interface IAppearanceService
 {
-    Task<IEnumerable<Appearance>> GetAllAppearancesAsync(CancellationToken cancellationToken = default);
+    Task<Page<Appearance>> GetAllAppearancesAsync(PagingArguments pagingArguments,
+        CancellationToken cancellationToken = default);
 
     Task<Appearance?> GetAppearanceAsync(Guid id, CancellationToken cancellationToken = default);
 

@@ -1,0 +1,50 @@
+﻿<Solution>
+  <Folder Name="/.meta/">
+    <File Path="..\.editorconfig" />
+    <File Path="..\.gitignore" />
+    <File Path="..\.env" />
+    <File Path="..\.dockerignore" />
+  </Folder>
+  <Folder Name="/.meta/.workflows/">
+    <File Path="..\..\.github\dependabot.yml" />
+    <File Path="..\..\.github\workflows\dotnet.yml" />
+    <File Path="..\..\.github\workflows\update-dotnet-sdk.yml" />
+  </Folder>
+  <Folder Name="/.meta/Build/">
+    <File Path="..\Directory.Build.props" />
+    <File Path="..\Directory.Build.targets" />
+    <File Path="..\global.json" />
+    <File Path="..\Directory.Packages.props" />
+    <File Path="..\..\.config\dotnet-tools.json" />
+  </Folder>
+  <Folder Name="/.meta/Docs/">
+    <File Path="..\CHANGELOG.md" />
+    <File Path="..\README.md" />
+    <File Path="..\..\CODE_OF_CONDUCT.md" />
+    <File Path="..\..\LICENSE" />
+    <File Path="..\..\README.md" />
+  </Folder>
+  <Folder Name="/.meta/git hooks/">
+    <File Path="..\..\.husky\task-runner.json" />
+    <File Path="..\..\.husky\_\husky.sh" />
+    <File Path="..\..\.husky\post-checkout" />
+    <File Path="..\..\.husky\post-commit" />
+    <File Path="..\..\.husky\post-merge" />
+    <File Path="..\..\.husky\pre-push" />
+    <File Path="..\..\.husky\csx\commit-lint.csx" />
+    <File Path="..\..\.husky\commit-msg" />
+    <File Path="..\..\.husky\pre-commit" />
+  </Folder>
+  <Project Path="docker-compose.dcproj" Type="Classic C#" />
+  <Project Path="StarWarsProgressBarIssueTracker.App.Tests\StarWarsProgressBarIssueTracker.App.Tests.csproj" />
+  <Project Path="StarWarsProgressBarIssueTracker.App\StarWarsProgressBarIssueTracker.App.csproj" />
+  <Project Path="StarWarsProgressBarIssueTracker.Common.Tests\StarWarsProgressBarIssueTracker.Common.Tests.csproj" />
+  <Project Path="StarWarsProgressBarIssueTracker.Domain.Tests\StarWarsProgressBarIssueTracker.Domain.Tests.csproj" />
+  <Project Path="StarWarsProgressBarIssueTracker.Domain\StarWarsProgressBarIssueTracker.Domain.csproj" />
+  <Project Path="StarWarsProgressBarIssueTracker.Infrastructure.GitHub\StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj" />
+  <Project Path="StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests\StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests.csproj" />
+  <Project Path="StarWarsProgressBarIssueTracker.Infrastructure.Gitlab\StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj" />
+  <Project Path="StarWarsProgressBarIssueTracker.Infrastructure.Tests\StarWarsProgressBarIssueTracker.Infrastructure.Tests.csproj" />
+  <Project Path="StarWarsProgressBarIssueTracker.Infrastructure\StarWarsProgressBarIssueTracker.Infrastructure.csproj" />
+  <Project Path="StarWarsProgressBarIssueTracker.TestHelpers\StarWarsProgressBarIssueTracker.TestHelpers.csproj" />
+</Solution>

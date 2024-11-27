@@ -2,11 +2,13 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using GraphQL;
 using StarWarsProgressBarIssueTracker.App.Queries;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Labels;
 using StarWarsProgressBarIssueTracker.Common.Tests;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
+using StarWarsProgressBarIssueTracker.Domain.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
@@ -33,7 +35,13 @@ public class LabelQueriesTests : IntegrationTestBase
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
             response.Data.Should().NotBeNull();
-            response.Data.Labels.Should().BeEmpty();
+            response.Data.Labels.TotalCount.Should().Be(0);
+            response.Data.Labels.PageInfo.HasNextPage.Should().BeFalse();
+            response.Data.Labels.PageInfo.HasPreviousPage.Should().BeFalse();
+            response.Data.Labels.PageInfo.StartCursor.Should().BeNull();
+            response.Data.Labels.PageInfo.EndCursor.Should().BeNull();
+            response.Data.Labels.Edges.Should().BeEmpty();
+            response.Data.Labels.Nodes.Should().BeEmpty();
         }
     }
 
@@ -41,14 +49,14 @@ public class LabelQueriesTests : IntegrationTestBase
     public async Task GetLabelsShouldReturnAllLabels()
     {
         // Arrange
-        var dbLabel = new DbLabel
+        var dbLabel = new Label
         {
             Color = "001122",
             TextColor = "223344",
             Title = "Label 1",
             Description = "Description 1"
         };
-        var dbLabel2 = new DbLabel
+        var dbLabel2 = new Label
         {
             Color = "112233",
             TextColor = "334455",
@@ -76,10 +84,16 @@ public class LabelQueriesTests : IntegrationTestBase
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
             response.Data.Should().NotBeNull();
-            var labels = response.Data.Labels.ToList();
+
+            response.Data.Labels.TotalCount.Should().Be(2);
+            response.Data.Labels.PageInfo.HasNextPage.Should().BeFalse();
+            response.Data.Labels.PageInfo.HasPreviousPage.Should().BeFalse();
+            response.Data.Labels.PageInfo.StartCursor.Should().NotBeNull();
+            response.Data.Labels.PageInfo.EndCursor.Should().NotBeNull();
+            List<Label> labels = response.Data.Labels.Nodes.ToList();
             labels.Count.Should().Be(2);
 
-            var label = labels.Single(entity => entity.Id.Equals(dbLabel.Id));
+            Label label = labels.Single(entity => entity.Id.Equals(dbLabel.Id));
             label.Id.Should().Be(dbLabel.Id);
             label.Title.Should().Be(dbLabel.Title);
             label.Description.Should().Be(dbLabel.Description);
@@ -88,7 +102,7 @@ public class LabelQueriesTests : IntegrationTestBase
             label.CreatedAt.Should().BeCloseTo(dbLabel.CreatedAt, TimeSpan.FromMilliseconds(300));
             label.LastModifiedAt.Should().Be(dbLabel.LastModifiedAt);
 
-            var label2 = labels.Single(entity => entity.Id.Equals(dbLabel2.Id));
+            Label label2 = labels.Single(entity => entity.Id.Equals(dbLabel2.Id));
             label2.Id.Should().Be(dbLabel2.Id);
             label2.Title.Should().Be(dbLabel2.Title);
             label2.Description.Should().Be(dbLabel2.Description);
@@ -96,6 +110,27 @@ public class LabelQueriesTests : IntegrationTestBase
             label2.TextColor.Should().Be(dbLabel2.TextColor);
             label2.CreatedAt.Should().BeCloseTo(dbLabel2.CreatedAt, TimeSpan.FromMilliseconds(300));
             label2.LastModifiedAt.Should().Be(dbLabel2.LastModifiedAt);
+
+            List<Edge<Label>> edges = response.Data.Labels.Edges.ToList();
+            edges.Count.Should().Be(2);
+
+            Label edgeLabel = edges.Single(entity => entity.Node.Id.Equals(dbLabel.Id)).Node;
+            edgeLabel.Id.Should().Be(dbLabel.Id);
+            edgeLabel.Title.Should().Be(dbLabel.Title);
+            edgeLabel.Description.Should().Be(dbLabel.Description);
+            edgeLabel.Color.Should().Be(dbLabel.Color);
+            edgeLabel.TextColor.Should().Be(dbLabel.TextColor);
+            edgeLabel.CreatedAt.Should().BeCloseTo(dbLabel.CreatedAt, TimeSpan.FromMilliseconds(300));
+            edgeLabel.LastModifiedAt.Should().Be(dbLabel.LastModifiedAt);
+
+            Label edgeLabel2 = edges.Single(entity => entity.Node.Id.Equals(dbLabel2.Id)).Node;
+            edgeLabel2.Id.Should().Be(dbLabel2.Id);
+            edgeLabel2.Title.Should().Be(dbLabel2.Title);
+            edgeLabel2.Description.Should().Be(dbLabel2.Description);
+            edgeLabel2.Color.Should().Be(dbLabel2.Color);
+            edgeLabel2.TextColor.Should().Be(dbLabel2.TextColor);
+            edgeLabel2.CreatedAt.Should().BeCloseTo(dbLabel2.CreatedAt, TimeSpan.FromMilliseconds(300));
+            edgeLabel2.LastModifiedAt.Should().Be(dbLabel2.LastModifiedAt);
         }
     }
 
@@ -105,7 +140,7 @@ public class LabelQueriesTests : IntegrationTestBase
         // Arrange
         await SeedDatabaseAsync(context =>
         {
-            context.Labels.Add(new DbLabel
+            context.Labels.Add(new Label
             {
                 Id = new Guid("5888CDB6-57E2-4774-B6E8-7AABE82E2A5F"),
                 Color = "001122",
@@ -125,6 +160,8 @@ public class LabelQueriesTests : IntegrationTestBase
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNull();
+            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
+            //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
             response.Data.Label.Should().BeNull();
         }
@@ -149,6 +186,10 @@ public class LabelQueriesTests : IntegrationTestBase
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNull();
+            // var firstError = response.Errors!.First();
+            // firstError.Extensions.Should().NotBeNull();
+            // firstError.Extensions!.GetValueOrDefault("message").Should().Be($"No Label found with id '{id}'.",
+            //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
             response.Data.Label.Should().BeNull();
         }
@@ -159,35 +200,35 @@ public class LabelQueriesTests : IntegrationTestBase
     {
         // Arrange
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var dbIssue = new DbIssue
+        var issue = new Issue
         {
             Id = new Guid("CB547CF5-CB28-412E-8DA4-2A7F10E3A5FE"),
             Title = "issue title",
             State = IssueState.Closed,
-            Release = new DbRelease { Title = "milestone title", State = ReleaseState.Planned },
-            Vehicle = new DbVehicle
+            Release = new Release { Title = "milestone title", State = ReleaseState.Planned },
+            Vehicle = new Vehicle
             {
                 Appearances =
                 [
-                    new DbAppearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
+                    new Appearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
                 ],
-                Translations = [new DbTranslation { Country = "en", Text = "translation" }],
-                Photos = [new DbPhoto { FilePath = string.Empty }]
+                Translations = [new Translation { Country = "en", Text = "translation" }],
+                Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbLabel = new DbLabel
+        var dbLabel = new Label
         {
             Id = new Guid(id),
             Color = "112233",
             TextColor = "334455",
             Title = "Label 2",
             Description = "Description 2",
-            Issues = [dbIssue]
+            Issues = [issue]
         };
         await SeedDatabaseAsync(context =>
         {
-            context.Issues.Add(dbIssue);
-            context.Labels.Add(new DbLabel
+            context.Issues.Add(issue);
+            context.Labels.Add(new Label
             {
                 Id = new Guid("5888CDB6-57E2-4774-B6E8-7AABE82E2A5F"),
                 Color = "001122",
@@ -216,7 +257,7 @@ public class LabelQueriesTests : IntegrationTestBase
             label.Description.Should().Be(dbLabel.Description);
             label.Color.Should().Be(dbLabel.Color);
             label.TextColor.Should().Be(dbLabel.TextColor);
-            label.Issues.Should().Contain(i => i.Id.Equals(dbIssue.Id));
+            label.Issues.Should().Contain(i => i.Id.Equals(issue.Id));
             label.CreatedAt.Should().BeCloseTo(dbLabel.CreatedAt, TimeSpan.FromMilliseconds(300));
             label.LastModifiedAt.Should().Be(dbLabel.LastModifiedAt);
         }
@@ -229,18 +270,42 @@ public class LabelQueriesTests : IntegrationTestBase
             Query = """
                     query labels
                     {
-                        labels()
+                        labels(first: 5)
                         {
-                            id
-                            title
-                            description
-                            color
-                            textColor
-                            createdAt
-                            lastModifiedAt
-                            issues {
+                            totalCount
+                            pageInfo {
+                                hasNextPage
+                                hasPreviousPage
+                                startCursor
+                                endCursor
+                            }
+                            edges {
+                                node {
+                                    id
+                                    title
+                                    description
+                                    color
+                                    textColor
+                                    createdAt
+                                    lastModifiedAt
+                                    issues {
+                                        id
+                                        title
+                                    }
+                                }
+                            }
+                            nodes {
                                 id
                                 title
+                                description
+                                color
+                                textColor
+                                createdAt
+                                lastModifiedAt
+                                issues {
+                                    id
+                                    title
+                                }
                             }
                         }
                     }

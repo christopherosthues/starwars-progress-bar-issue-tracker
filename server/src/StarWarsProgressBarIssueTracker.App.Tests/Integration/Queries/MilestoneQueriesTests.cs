@@ -2,12 +2,13 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using GraphQL;
 using StarWarsProgressBarIssueTracker.App.Queries;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Milestones;
 using StarWarsProgressBarIssueTracker.Common.Tests;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
@@ -34,7 +35,13 @@ public class MilestoneQueriesTests : IntegrationTestBase
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
             response.Data.Should().NotBeNull();
-            response.Data.Milestones.Should().BeEmpty();
+            response.Data.Milestones.TotalCount.Should().Be(0);
+            response.Data.Milestones.PageInfo.HasNextPage.Should().BeFalse();
+            response.Data.Milestones.PageInfo.HasPreviousPage.Should().BeFalse();
+            response.Data.Milestones.PageInfo.StartCursor.Should().BeNull();
+            response.Data.Milestones.PageInfo.EndCursor.Should().BeNull();
+            response.Data.Milestones.Edges.Should().BeEmpty();
+            response.Data.Milestones.Nodes.Should().BeEmpty();
         }
     }
 
@@ -42,28 +49,28 @@ public class MilestoneQueriesTests : IntegrationTestBase
     public async Task GetMilestonesShouldReturnAllMilestones()
     {
         // Arrange
-        var dbMilestone = new DbMilestone
+        var dbMilestone = new Milestone
         {
             Title = "Milestone 1",
             State = MilestoneState.Open
         };
 
-        var dbIssue = new DbIssue
+        var dbIssue = new Issue
         {
             Title = "issue title",
             State = IssueState.Closed,
-            Release = new DbRelease { Title = "milestone title", State = ReleaseState.Planned },
-            Vehicle = new DbVehicle
+            Release = new Release { Title = "milestone title", State = ReleaseState.Planned },
+            Vehicle = new Vehicle
             {
                 Appearances =
                 [
-                    new DbAppearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
+                    new Appearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
                 ],
-                Translations = [new DbTranslation { Country = "en", Text = "translation" }],
-                Photos = [new DbPhoto { FilePath = string.Empty }]
+                Translations = [new Translation { Country = "en", Text = "translation" }],
+                Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbMilestone2 = new DbMilestone
+        var dbMilestone2 = new Milestone
         {
             Title = "Milestone 2",
             Description = "Notes 2",
@@ -99,28 +106,34 @@ public class MilestoneQueriesTests : IntegrationTestBase
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
             response.Data.Should().NotBeNull();
-            var releases = response.Data.Milestones.ToList();
-            releases.Count.Should().Be(2);
+            response.Data.Milestones.TotalCount.Should().Be(2);
+            response.Data.Milestones.PageInfo.HasNextPage.Should().BeFalse();
+            response.Data.Milestones.PageInfo.HasPreviousPage.Should().BeFalse();
+            response.Data.Milestones.PageInfo.StartCursor.Should().NotBeNull();
+            response.Data.Milestones.PageInfo.EndCursor.Should().NotBeNull();
 
-            var release = releases.Single(entity => entity.Id.Equals(dbMilestone.Id));
-            release.Id.Should().Be(dbMilestone.Id);
-            release.Title.Should().Be(dbMilestone.Title);
-            release.Description.Should().BeNull();
-            release.State.Should().Be(dbMilestone.State);
-            release.CreatedAt.Should().BeCloseTo(dbMilestone.CreatedAt, TimeSpan.FromMilliseconds(300));
-            release.LastModifiedAt.Should().Be(dbMilestone.LastModifiedAt);
-            release.Issues.Should().BeEmpty();
+            List<Milestone> milestones = response.Data.Milestones.Nodes.ToList();
+            milestones.Count.Should().Be(2);
 
-            var release2 = releases.Single(entity => entity.Id.Equals(dbMilestone2.Id));
-            release2.Id.Should().Be(dbMilestone2.Id);
-            release2.Title.Should().Be(dbMilestone2.Title);
-            release2.Description.Should().Be(dbMilestone2.Description);
-            release2.State.Should().Be(dbMilestone2.State);
-            release2.CreatedAt.Should().BeCloseTo(dbMilestone2.CreatedAt, TimeSpan.FromMilliseconds(300));
-            release2.LastModifiedAt.Should().BeCloseTo(dbMilestone2.LastModifiedAt!.Value, TimeSpan.FromMilliseconds(300));
-            release2.Issues.Should().NotBeEmpty();
-            release2.Issues.Count.Should().Be(1);
-            var issue = release2.Issues.First();
+            Milestone milestone = milestones.Single(entity => entity.Id.Equals(dbMilestone.Id));
+            milestone.Id.Should().Be(dbMilestone.Id);
+            milestone.Title.Should().Be(dbMilestone.Title);
+            milestone.Description.Should().BeNull();
+            milestone.State.Should().Be(dbMilestone.State);
+            milestone.CreatedAt.Should().BeCloseTo(dbMilestone.CreatedAt, TimeSpan.FromMilliseconds(300));
+            milestone.LastModifiedAt.Should().Be(dbMilestone.LastModifiedAt);
+            milestone.Issues.Should().BeEmpty();
+
+            Milestone milestone2 = milestones.Single(entity => entity.Id.Equals(dbMilestone2.Id));
+            milestone2.Id.Should().Be(dbMilestone2.Id);
+            milestone2.Title.Should().Be(dbMilestone2.Title);
+            milestone2.Description.Should().Be(dbMilestone2.Description);
+            milestone2.State.Should().Be(dbMilestone2.State);
+            milestone2.CreatedAt.Should().BeCloseTo(dbMilestone2.CreatedAt, TimeSpan.FromMilliseconds(300));
+            milestone2.LastModifiedAt.Should().BeCloseTo(dbMilestone2.LastModifiedAt!.Value, TimeSpan.FromMilliseconds(300));
+            milestone2.Issues.Should().NotBeEmpty();
+            milestone2.Issues.Count.Should().Be(1);
+            Issue issue = milestone2.Issues.First();
             issue.Id.Should().Be(dbIssue.Id);
             issue.Release.Should().NotBeNull();
             issue.Release!.Id.Should().Be(dbIssue.Release.Id);
@@ -128,6 +141,36 @@ public class MilestoneQueriesTests : IntegrationTestBase
             issue.Vehicle!.Id.Should().Be(dbIssue.Vehicle.Id);
             issue.Vehicle!.Translations.Should().BeEmpty();
             issue.Vehicle!.Photos.Should().BeEmpty();
+
+            List<Edge<Milestone>> edges = response.Data.Milestones.Edges.ToList();
+            edges.Count.Should().Be(2);
+
+            Milestone edgeMilestone = edges.Single(entity => entity.Node.Id.Equals(dbMilestone.Id)).Node;
+            edgeMilestone.Id.Should().Be(dbMilestone.Id);
+            edgeMilestone.Title.Should().Be(dbMilestone.Title);
+            edgeMilestone.Description.Should().BeNull();
+            edgeMilestone.State.Should().Be(dbMilestone.State);
+            edgeMilestone.CreatedAt.Should().BeCloseTo(dbMilestone.CreatedAt, TimeSpan.FromMilliseconds(300));
+            edgeMilestone.LastModifiedAt.Should().Be(dbMilestone.LastModifiedAt);
+            edgeMilestone.Issues.Should().BeEmpty();
+
+            Milestone edgeMilestone2 = edges.Single(entity => entity.Node.Id.Equals(dbMilestone2.Id)).Node;
+            edgeMilestone2.Id.Should().Be(dbMilestone2.Id);
+            edgeMilestone2.Title.Should().Be(dbMilestone2.Title);
+            edgeMilestone2.Description.Should().Be(dbMilestone2.Description);
+            edgeMilestone2.State.Should().Be(dbMilestone2.State);
+            edgeMilestone2.CreatedAt.Should().BeCloseTo(dbMilestone2.CreatedAt, TimeSpan.FromMilliseconds(300));
+            edgeMilestone2.LastModifiedAt.Should().BeCloseTo(dbMilestone2.LastModifiedAt!.Value, TimeSpan.FromMilliseconds(300));
+            edgeMilestone2.Issues.Should().NotBeEmpty();
+            edgeMilestone2.Issues.Count.Should().Be(1);
+            Issue edgeIssue = edgeMilestone2.Issues.First();
+            edgeIssue.Id.Should().Be(dbIssue.Id);
+            edgeIssue.Release.Should().NotBeNull();
+            edgeIssue.Release!.Id.Should().Be(dbIssue.Release.Id);
+            edgeIssue.Vehicle.Should().NotBeNull();
+            edgeIssue.Vehicle!.Id.Should().Be(dbIssue.Vehicle.Id);
+            edgeIssue.Vehicle!.Translations.Should().BeEmpty();
+            edgeIssue.Vehicle!.Photos.Should().BeEmpty();
         }
     }
 
@@ -137,7 +180,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
         // Arrange
         await SeedDatabaseAsync(context =>
         {
-            context.Milestones.Add(new DbMilestone
+            context.Milestones.Add(new Milestone
             {
                 Id = new Guid("5888CDB6-57E2-4774-B6E8-7AABE82E2A5F"),
                 Title = "Milestone 1",
@@ -157,6 +200,8 @@ public class MilestoneQueriesTests : IntegrationTestBase
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNull();
+            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
+            //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
             response.Data.Milestone.Should().BeNull();
         }
@@ -181,6 +226,8 @@ public class MilestoneQueriesTests : IntegrationTestBase
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNull();
+            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
+            //     StringComparer.InvariantCultureIgnoreCase);
             response.Data.Should().NotBeNull();
             response.Data.Milestone.Should().BeNull();
         }
@@ -191,23 +238,23 @@ public class MilestoneQueriesTests : IntegrationTestBase
     {
         // Arrange
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var dbIssue = new DbIssue
+        var dbIssue = new Issue
         {
             Id = new Guid("CB547CF5-CB28-412E-8DA4-2A7F10E3A5FE"),
             Title = "issue title",
             State = IssueState.Closed,
-            Release = new DbRelease { Title = "milestone title", State = ReleaseState.Planned },
-            Vehicle = new DbVehicle
+            Release = new Release { Title = "milestone title", State = ReleaseState.Planned },
+            Vehicle = new Vehicle
             {
                 Appearances =
                 [
-                    new DbAppearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
+                    new Appearance { Title = "Appearance title", Color = "112233", TextColor = "334455" }
                 ],
-                Translations = [new DbTranslation { Country = "en", Text = "translation" }],
-                Photos = [new DbPhoto { FilePath = string.Empty }]
+                Translations = [new Translation { Country = "en", Text = "translation" }],
+                Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbMilestone = new DbMilestone
+        var dbMilestone = new Milestone
         {
             Id = new Guid(id),
             Title = "Milestone 2",
@@ -218,7 +265,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
         };
         await SeedDatabaseAsync(context =>
         {
-            context.Milestones.Add(new DbMilestone
+            context.Milestones.Add(new Milestone
             {
                 Id = new Guid("5888CDB6-57E2-4774-B6E8-7AABE82E2A5F"),
                 Title = "Milestone 1",
@@ -266,32 +313,72 @@ public class MilestoneQueriesTests : IntegrationTestBase
             Query = """
                     query milestones
                     {
-                        milestones()
+                        milestones(first: 5)
                         {
-                            id
-                            title
-                            description
-                            state
-                            createdAt
-                            lastModifiedAt
-                            issues
-                            {
-                                id
-                                title
-                                release
-                                {
+                            totalCount
+                            pageInfo {
+                                hasNextPage
+                                hasPreviousPage
+                                startCursor
+                                endCursor
+                            }
+                            edges {
+                                node {
                                     id
                                     title
-                                }
-                                vehicle
-                                {
-                                    id
-                                    appearances
+                                    description
+                                    state
+                                    createdAt
+                                    lastModifiedAt
+                                    issues
                                     {
                                         id
                                         title
-                                        color
-                                        textColor
+                                        release
+                                        {
+                                            id
+                                            title
+                                        }
+                                        vehicle
+                                        {
+                                            id
+                                            appearances
+                                            {
+                                                id
+                                                title
+                                                color
+                                                textColor
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            nodes {
+                                id
+                                title
+                                description
+                                state
+                                createdAt
+                                lastModifiedAt
+                                issues
+                                {
+                                    id
+                                    title
+                                    release
+                                    {
+                                        id
+                                        title
+                                    }
+                                    vehicle
+                                    {
+                                        id
+                                        appearances
+                                        {
+                                            id
+                                            title
+                                            color
+                                            textColor
+                                        }
                                     }
                                 }
                             }

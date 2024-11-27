@@ -7,7 +7,6 @@ using StarWarsProgressBarIssueTracker.App.Mutations;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Appearances;
 using StarWarsProgressBarIssueTracker.Common.Tests;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Mutations;
 
@@ -41,7 +40,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task AddAppearanceShouldAddAppearanceIfAppearancesAreNotEmpty(Appearance expectedAppearance)
     {
         // Arrange
-        var dbAppearance = new DbAppearance
+        var dbAppearance = new Appearance
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -90,7 +89,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task UpdateAppearanceShouldUpdateAppearance(Appearance expectedAppearance)
     {
         // Arrange
-        var dbAppearance = new DbAppearance
+        var dbAppearance = new Appearance
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -124,7 +123,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task UpdateAppearanceShouldUpdateAppearanceIfAppearancesAreNotEmpty(Appearance expectedAppearance)
     {
         // Arrange
-        var dbAppearance = new DbAppearance
+        var dbAppearance = new Appearance
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -133,7 +132,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             TextColor = "#334455",
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbAppearance2 = new DbAppearance
+        var dbAppearance2 = new Appearance
         {
             Id = new Guid("0609F93C-CBCC-4650-BA4C-B8D5FF93A877"),
             Title = "Title 2",
@@ -207,7 +206,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     {
         // Arrange
         var appearance = CreateAppearance();
-        var dbAppearance = new DbAppearance
+        var dbAppearance = new Appearance
         {
             Id = appearance.Id,
             Title = appearance.Title,
@@ -240,7 +239,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     {
         // Arrange
         var appearance = CreateAppearance();
-        var dbAppearance = new DbAppearance
+        var dbAppearance = new Appearance
         {
             Id = appearance.Id,
             Title = appearance.Title,
@@ -249,14 +248,14 @@ public class AppearanceMutationsTests : IntegrationTestBase
             TextColor = appearance.TextColor,
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbAppearance2 = new DbAppearance
+        var dbAppearance2 = new Appearance
         {
             Id = new Guid("B961A621-9848-429A-8B44-B1AF1F0182CE"),
             Color = "#778899",
             TextColor = "#665544",
             Title = "Title 2"
         };
-        var dbVehicle2 = new DbVehicle
+        var dbVehicle2 = new Vehicle
         {
             Id = new Guid("74AE8DD4-7669-4428-8E81-FB8A24A217A3"),
             EngineColor = EngineColor.Green,
@@ -268,7 +267,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         };
         await SeedDatabaseAsync(context =>
         {
-            var dbVehicle = new DbVehicle
+            var dbVehicle = new Vehicle
             {
                 Id = new Guid("87A2F9BF-CAB7-41D3-84F9-155135FA41D7"),
                 EngineColor = EngineColor.Blue,
@@ -308,7 +307,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     {
         // Arrange
         var appearance = CreateAppearance();
-        var dbAppearance = new DbAppearance
+        var dbAppearance = new Appearance
         {
             Id = appearance.Id,
             Title = appearance.Title,
@@ -317,7 +316,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             TextColor = appearance.TextColor,
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbAppearance2 = new DbAppearance
+        var dbAppearance2 = new Appearance
         {
             Id = new Guid("0609F93C-CBCC-4650-BA4C-B8D5FF93A877"),
             Title = "Title 2",
@@ -408,7 +407,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     }
 
     private void AssertAddedAppearance(GraphQLResponse<AddAppearanceResponse> response, Appearance expectedAppearance,
-        DateTime startTime, DbAppearance? dbAppearance = null)
+        DateTime startTime, Appearance? dbAppearance = null)
     {
         DateTime endTime = DateTime.UtcNow;
         Appearance? addedAppearance;
@@ -507,7 +506,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     }
 
     private void AssertUpdatedAppearance(GraphQLResponse<UpdateAppearanceResponse> response, Appearance expectedAppearance,
-        DateTime startTime, DbAppearance? dbAppearance = null, DbAppearance? notUpdatedDbAppearance = null)
+        DateTime startTime, Appearance? dbAppearance = null, Appearance? notUpdatedAppearance = null)
     {
         DateTime endTime = DateTime.UtcNow;
         Appearance? updatedAppearance;
@@ -545,18 +544,18 @@ public class AppearanceMutationsTests : IntegrationTestBase
                 updatedDbAppearance.LastModifiedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
                     .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
 
-                if (notUpdatedDbAppearance is not null)
+                if (notUpdatedAppearance is not null)
                 {
-                    var secondDbAppearance =
-                        context.Appearances.FirstOrDefault(appearance => appearance.Id.Equals(notUpdatedDbAppearance.Id));
-                    secondDbAppearance.Should().NotBeNull();
-                    secondDbAppearance!.Id.Should().NotBeEmpty().And.Be(notUpdatedDbAppearance.Id);
-                    secondDbAppearance.Title.Should().Be(notUpdatedDbAppearance.Title);
-                    secondDbAppearance.Description.Should().Be(notUpdatedDbAppearance.Description);
-                    secondDbAppearance.Color.Should().Be(notUpdatedDbAppearance.Color);
-                    secondDbAppearance.TextColor.Should().Be(notUpdatedDbAppearance.TextColor);
-                    secondDbAppearance.CreatedAt.Should().BeCloseTo(notUpdatedDbAppearance.CreatedAt, TimeSpan.FromSeconds(1));
-                    secondDbAppearance.LastModifiedAt.Should().BeCloseTo(notUpdatedDbAppearance.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
+                    var secondAppearance =
+                        context.Appearances.FirstOrDefault(appearance => appearance.Id.Equals(notUpdatedAppearance.Id));
+                    secondAppearance.Should().NotBeNull();
+                    secondAppearance!.Id.Should().NotBeEmpty().And.Be(notUpdatedAppearance.Id);
+                    secondAppearance.Title.Should().Be(notUpdatedAppearance.Title);
+                    secondAppearance.Description.Should().Be(notUpdatedAppearance.Description);
+                    secondAppearance.Color.Should().Be(notUpdatedAppearance.Color);
+                    secondAppearance.TextColor.Should().Be(notUpdatedAppearance.TextColor);
+                    secondAppearance.CreatedAt.Should().BeCloseTo(notUpdatedAppearance.CreatedAt, TimeSpan.FromSeconds(1));
+                    secondAppearance.LastModifiedAt.Should().BeCloseTo(notUpdatedAppearance.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
                 }
             }
         });
@@ -614,7 +613,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         return mutationRequest;
     }
 
-    private void AssertDeletedAppearance(GraphQLResponse<DeleteAppearanceResponse> response, Appearance expectedAppearance, DbAppearance? dbAppearance = null)
+    private void AssertDeletedAppearance(GraphQLResponse<DeleteAppearanceResponse> response, Appearance expectedAppearance, Appearance? dbAppearance = null)
     {
         Appearance? deletedAppearance;
         using (new AssertionScope())
