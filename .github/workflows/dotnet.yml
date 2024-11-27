@@ -8,10 +8,12 @@ on:
     branches: [ "main" ]
     paths:
       - 'server/**'
+      - '.github\workflows\dotnet.yml'
   pull_request:
     branches: [ "main" ]
     paths:
       - 'server/**'
+      - '.github\workflows\dotnet.yml'
 
 env:
   HUSKY: 0
