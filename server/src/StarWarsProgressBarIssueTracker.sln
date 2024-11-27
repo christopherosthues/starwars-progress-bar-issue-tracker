@@ -62,8 +62,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab", "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab\StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj", "{811E2611-6C6C-4862-BD62-DD733277EF7B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.Common.Tests", "StarWarsProgressBarIssueTracker.Common.Tests\StarWarsProgressBarIssueTracker.Common.Tests.csproj", "{F1A09103-0542-467F-A201-3710B2693D9C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests", "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests\StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests.csproj", "{0CDDB87C-374B-46E9-AC0F-1DD07305D321}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWarsProgressBarIssueTracker.Infrastructure.Tests", "StarWarsProgressBarIssueTracker.Infrastructure.Tests\StarWarsProgressBarIssueTracker.Infrastructure.Tests.csproj", "{CB1804F6-98F6-4581-B751-1C313D968BB2}"
@@ -108,10 +106,6 @@ Global
 		{811E2611-6C6C-4862-BD62-DD733277EF7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{811E2611-6C6C-4862-BD62-DD733277EF7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{811E2611-6C6C-4862-BD62-DD733277EF7B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F1A09103-0542-467F-A201-3710B2693D9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F1A09103-0542-467F-A201-3710B2693D9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F1A09103-0542-467F-A201-3710B2693D9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F1A09103-0542-467F-A201-3710B2693D9C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0CDDB87C-374B-46E9-AC0F-1DD07305D321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0CDDB87C-374B-46E9-AC0F-1DD07305D321}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CDDB87C-374B-46E9-AC0F-1DD07305D321}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,5 +1,5 @@
 using StarWarsProgressBarIssueTracker.App.Mutations;
-using StarWarsProgressBarIssueTracker.Common.Tests;
+using StarWarsProgressBarIssueTracker.TestHelpers;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Mutations;
 

@@ -19,7 +19,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\StarWarsProgressBarIssueTracker.Common.Tests\StarWarsProgressBarIssueTracker.Common.Tests.csproj" />
     <ProjectReference Include="..\StarWarsProgressBarIssueTracker.Infrastructure\StarWarsProgressBarIssueTracker.Infrastructure.csproj" />
     <ProjectReference Include="..\StarWarsProgressBarIssueTracker.TestHelpers\StarWarsProgressBarIssueTracker.TestHelpers.csproj" />
   </ItemGroup>

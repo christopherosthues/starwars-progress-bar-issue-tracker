@@ -38,7 +38,6 @@
   <Project Path="docker-compose.dcproj" Type="Classic C#" />
   <Project Path="StarWarsProgressBarIssueTracker.App.Tests\StarWarsProgressBarIssueTracker.App.Tests.csproj" />
   <Project Path="StarWarsProgressBarIssueTracker.App\StarWarsProgressBarIssueTracker.App.csproj" />
-  <Project Path="StarWarsProgressBarIssueTracker.Common.Tests\StarWarsProgressBarIssueTracker.Common.Tests.csproj" />
   <Project Path="StarWarsProgressBarIssueTracker.Domain.Tests\StarWarsProgressBarIssueTracker.Domain.Tests.csproj" />
   <Project Path="StarWarsProgressBarIssueTracker.Domain\StarWarsProgressBarIssueTracker.Domain.csproj" />
   <Project Path="StarWarsProgressBarIssueTracker.Infrastructure.GitHub\StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj" />
