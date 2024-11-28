@@ -90,6 +90,35 @@ jobs:
         path: TestResults/*.trx
         reporter: dotnet-trx
 
+  strykerApp:
+    name: Stryker.NET App
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+
+    - name: Restore dependencies
+      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
+
+    - name: Restore tools
+      run: dotnet tool restore
+
+    - name: Execute Stryker.NET
+      run: dotnet stryker
+      working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.App.Tests
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: Stryker.NET App results
+        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.App.Tests/StrykerOutput/**/*.html
+      if: ${{ always() }}
+
   strykerDomain:
     name: Stryker.NET Domain
     needs: [ build ]
@@ -145,7 +174,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Stryker.NET Infrastructure results
-        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Domain.Tests/StrykerOutput/**/*.html
+        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Tests/StrykerOutput/**/*.html
       if: ${{ always() }}
 
   strykerInfrastructureGitlab:
@@ -174,5 +203,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Stryker.NET Infrastructure Gitlab results
-        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Domain.Tests/StrykerOutput/**/*.html
+        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests/StrykerOutput/**/*.html
       if: ${{ always() }}
