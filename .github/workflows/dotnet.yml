@@ -105,6 +105,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
 
+    - name: Restore tools
+      run: dotnet tool restore
+
     - name: Execute Stryker.NET
       run: dotnet stryker
       working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Domain.Tests
@@ -131,6 +134,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
 
+    - name: Restore tools
+      run: dotnet tool restore
+
     - name: Execute Stryker.NET
       run: dotnet stryker
       working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Tests
@@ -156,6 +162,9 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
+
+    - name: Restore tools
+      run: dotnet tool restore
 
     - name: Execute Stryker.NET
       run: dotnet stryker
