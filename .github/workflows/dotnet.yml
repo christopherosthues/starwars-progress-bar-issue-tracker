@@ -60,6 +60,18 @@ jobs:
       with:
         dotnet-version: 9.x
 
+    - name: Restore dependencies
+      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
+
+    - name: Generate GitHub GraphQL client
+      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj
+
+    - name: Generate Gitlab GraphQL client
+      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj
+
+    - name: Build
+      run: dotnet build server/src/StarWarsProgressBarIssueTracker.sln --no-restore
+
     - name: Test
       run: dotnet test server/src/StarWarsProgressBarIssueTracker.sln --no-build --verbosity q --logger "trx" --results-directory "TestResults" --filter "TestCategory!=Error"
 
@@ -90,6 +102,9 @@ jobs:
       with:
         dotnet-version: 9.x
 
+    - name: Restore dependencies
+      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
+
     - name: Execute Stryker.NET
       run: dotnet stryker
       working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Domain.Tests
@@ -113,6 +128,9 @@ jobs:
       with:
         dotnet-version: 9.x
 
+    - name: Restore dependencies
+      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
+
     - name: Execute Stryker.NET
       run: dotnet stryker
       working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Tests
@@ -135,6 +153,9 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.x
+
+    - name: Restore dependencies
+      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
 
     - name: Execute Stryker.NET
       run: dotnet stryker
