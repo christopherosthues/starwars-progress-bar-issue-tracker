@@ -19,17 +19,10 @@ on:
 env:
   HUSKY: 0.
 
-permissions:
-  contents: read
-  actions: read
-  checks: write
-
 jobs:
-  tests:
-    name: Tests
-
+  build:
+    name: Build
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
 
@@ -50,6 +43,23 @@ jobs:
     - name: Build
       run: dotnet build server/src/StarWarsProgressBarIssueTracker.sln --no-restore
 
+  tests:
+    name: Tests
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      checks: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+
     - name: Test
       run: dotnet test server/src/StarWarsProgressBarIssueTracker.sln --no-build --verbosity q --logger "trx" --results-directory "TestResults" --filter "TestCategory!=Error"
 
@@ -67,4 +77,72 @@ jobs:
         name: .NET Tests
         path: TestResults/*.trx
         reporter: dotnet-trx
-        
+
+  strykerDomain:
+    name: Stryker.NET Domain
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+
+    - name: Execute Stryker.NET
+      run: dotnet stryker
+      working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Domain.Tests
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: Stryker.NET Domain results
+        path: ${{ github.workspace }}/StrykerOutput/**/*.html
+      if: ${{ always() }}
+
+  strykerInfrastructure:
+    name: Stryker.NET Infrastructure
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+
+    - name: Execute Stryker.NET
+      run: dotnet stryker
+      working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Tests
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: Stryker.NET Infrastructure results
+        path: ${{ github.workspace }}/StrykerOutput/**/*.html
+      if: ${{ always() }}
+
+  strykerInfrastructureGitlab:
+    name: Stryker.NET Infrastructure Gitlab
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+
+    - name: Execute Stryker.NET
+      run: dotnet stryker
+      working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: Stryker.NET Infrastructure Gitlab results
+        path: ${{ github.workspace }}/StrykerOutput/**/*.html
+      if: ${{ always() }}
