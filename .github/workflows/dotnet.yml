@@ -116,7 +116,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Stryker.NET Domain results
-        path: ${{ github.workspace }}/StrykerOutput/**/*.html
+        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Domain.Tests/StrykerOutput/**/*.html
       if: ${{ always() }}
 
   strykerInfrastructure:
@@ -145,7 +145,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Stryker.NET Infrastructure results
-        path: ${{ github.workspace }}/StrykerOutput/**/*.html
+        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Domain.Tests/StrykerOutput/**/*.html
       if: ${{ always() }}
 
   strykerInfrastructureGitlab:
@@ -174,5 +174,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Stryker.NET Infrastructure Gitlab results
-        path: ${{ github.workspace }}/StrykerOutput/**/*.html
+        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Domain.Tests/StrykerOutput/**/*.html
       if: ${{ always() }}
