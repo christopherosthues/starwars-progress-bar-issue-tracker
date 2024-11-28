@@ -17,7 +17,12 @@ on:
   workflow_dispatch:
 
 env:
-  HUSKY: 0
+  HUSKY: 0.
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
 
 jobs:
   tests:
@@ -54,3 +59,12 @@ jobs:
         name: Test results
         path: TestResults
       if: ${{ always() }}
+
+    - name: Test Report
+      uses: dorny/test-reporter@v1.9.1
+      if: success() || failure()
+      with:
+        name: .NET Tests
+        path: TestResults/*.trx
+        reporter: dotnet-trx
+        
