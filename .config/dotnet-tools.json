@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "dotnet-stryker": {
-      "version": "4.2.0",
+      "version": "4.4.1",
       "commands": [
         "dotnet-stryker"
       ]
@@ -21,7 +21,7 @@
       ]
     },
     "strawberryshake.tools": {
-      "version": "14.0.0-rc.2",
+      "version": "14.1.0",
       "commands": [
         "dotnet-graphql"
       ]

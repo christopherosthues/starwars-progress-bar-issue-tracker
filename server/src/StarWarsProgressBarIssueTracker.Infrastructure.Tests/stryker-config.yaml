@@ -1,0 +1,5 @@
+stryker-config:
+  solution: '../StarWarsProgressBarIssueTracker.sln'
+  project: 'StarWarsProgressBarIssueTracker.Infrastructure.csproj'
+  mutation-level: 'Complete'
+  additional-timeout: 3000
