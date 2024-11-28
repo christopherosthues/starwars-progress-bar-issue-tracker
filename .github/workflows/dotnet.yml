@@ -51,7 +51,7 @@ jobs:
       run: dotnet build server/src/StarWarsProgressBarIssueTracker.sln --no-restore
 
     - name: Test
-      run: dotnet test server/src/StarWarsProgressBarIssueTracker.sln --no-build --verbosity q --logger "trx;LogFileName=Tests.trx" --results-directory "TestResults" --filter "TestCategory!=Error"
+      run: dotnet test server/src/StarWarsProgressBarIssueTracker.sln --no-build --verbosity q --logger "trx" --results-directory "TestResults" --filter "TestCategory!=Error"
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
