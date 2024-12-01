@@ -3,3 +3,7 @@ stryker-config:
   project: 'StarWarsProgressBarIssueTracker.Infrastructure.csproj'
   mutation-level: 'Complete'
   additional-timeout: 3000
+  thresholds:
+    high: 85
+    low: 60
+    break: 50
