@@ -1,7 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
@@ -17,6 +17,7 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.apollographql)
+    alias(libs.plugins.sonarqube)
 }
 
 kotlin {
@@ -136,6 +137,14 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
 }
 tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
     this.jvmTarget = "17"
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "christopherosthues_starwars-progress-bar-issue-tracker-server")
+        property("sonar.organization", "christopherosthues")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 }
 
 android {
