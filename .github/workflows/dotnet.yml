@@ -21,7 +21,7 @@ env:
 
 jobs:
   build:
-    name: Build
+    name: Build .NET
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -44,7 +44,7 @@ jobs:
       run: dotnet build server/src/StarWarsProgressBarIssueTracker.sln --no-restore
 
   tests:
-    name: Tests
+    name: Run .NET Tests
     needs: [ build ]
     runs-on: ubuntu-latest
     permissions:
@@ -86,7 +86,7 @@ jobs:
       uses: dorny/test-reporter@v1.9.1
       if: success() || failure()
       with:
-        name: .NET Tests
+        name: .NET Test results
         path: TestResults/*.trx
         reporter: dotnet-trx
 
@@ -205,3 +205,7 @@ jobs:
         name: Stryker.NET Infrastructure Gitlab results
         path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests/StrykerOutput/**/*.html
       if: ${{ always() }}
+
+    - name: Attach Stryker.NET HTML report to GitHub Actions summary
+      run: |
+        echo "Test Report: [Download HTML Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)" >> $GITHUB_STEP_SUMMARY
