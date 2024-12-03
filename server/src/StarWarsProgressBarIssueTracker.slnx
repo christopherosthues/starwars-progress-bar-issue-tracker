@@ -11,11 +11,11 @@
     <File Path="..\..\.github\workflows\update-dotnet-sdk.yml" />
   </Folder>
   <Folder Name="/.meta/Build/">
-    <File Path="..\Directory.Build.props" />
-    <File Path="..\Directory.Build.targets" />
     <File Path="..\global.json" />
-    <File Path="..\Directory.Packages.props" />
     <File Path="..\..\.config\dotnet-tools.json" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
   </Folder>
   <Folder Name="/.meta/Docs/">
     <File Path="..\CHANGELOG.md" />

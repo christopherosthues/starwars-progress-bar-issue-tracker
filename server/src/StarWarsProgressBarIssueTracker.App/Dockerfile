@@ -6,11 +6,15 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["Directory.Build.props", "."]
+COPY ["Directory.Build.targets", "."]
+COPY ["Directory.Packages.props", "."]
 COPY ["StarWarsProgressBarIssueTracker.App/StarWarsProgressBarIssueTracker.App.csproj", "StarWarsProgressBarIssueTracker.App/"]
 COPY ["StarWarsProgressBarIssueTracker.Domain/StarWarsProgressBarIssueTracker.Domain.csproj", "StarWarsProgressBarIssueTracker.Domain/"]
 COPY ["StarWarsProgressBarIssueTracker.Infrastructure/StarWarsProgressBarIssueTracker.Infrastructure.csproj", "StarWarsProgressBarIssueTracker.Infrastructure/"]
 COPY ["StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj", "StarWarsProgressBarIssueTracker.Infrastructure.GitHub/"]
 COPY ["StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj", "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/"]
+ENV HUSKY=0
 RUN dotnet restore "StarWarsProgressBarIssueTracker.App/StarWarsProgressBarIssueTracker.App.csproj"
 COPY . .
 WORKDIR "/src/StarWarsProgressBarIssueTracker.App"

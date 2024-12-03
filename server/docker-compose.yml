@@ -34,14 +34,20 @@ services:
 
   issuetracker:
     build:
-      context: ./src/StarWarsProgressBarIssueTracker.App
-      dockerfile: Dockerfile
+      context: ./src
+      dockerfile: StarWarsProgressBarIssueTracker.App/Dockerfile
     hostname: issuetrackerserver
     container_name: issue_tracker_server
     ports:
       - "8080:8080"
     environment:
       - ASPNETCORE_URLS=http://+:8080
+      - HUSKY=0
+      - ConnectionStrings__IssueTrackerContext=${SERVER_CONNECTION_STRING}
+      - Gitlab__ProjectPath=${GITLAB_PROJECT_PATH}
+      - Gitlab__Token=${GITLAB_TOKEN}
+      - GitHub__ProjectPath=${GITHUB_PROJECT_PATH}
+      - GitHub__Token=${GITHUB_TOKEN}
     restart: unless-stopped
     depends_on:
       - postgres
