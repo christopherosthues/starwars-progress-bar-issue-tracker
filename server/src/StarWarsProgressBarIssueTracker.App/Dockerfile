@@ -5,6 +5,12 @@ EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
+ARG SERVER_CONNECTION_STRING
+ARG GITLAB_PROJECT_PATH
+ARG GITLAB_TOKEN
+ARG GITHUB_PROJECT_PATH
+ARG GITHUB_TOKEN
+ARG HUSKY
 WORKDIR /src
 COPY ["Directory.Build.props", "."]
 COPY ["Directory.Build.targets", "."]
@@ -14,7 +20,12 @@ COPY ["StarWarsProgressBarIssueTracker.Domain/StarWarsProgressBarIssueTracker.Do
 COPY ["StarWarsProgressBarIssueTracker.Infrastructure/StarWarsProgressBarIssueTracker.Infrastructure.csproj", "StarWarsProgressBarIssueTracker.Infrastructure/"]
 COPY ["StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj", "StarWarsProgressBarIssueTracker.Infrastructure.GitHub/"]
 COPY ["StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj", "StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/"]
-ENV HUSKY=0
+ENV ConnectionStrings__IssueTrackerContext=${SERVER_CONNECTION_STRING}
+ENV Gitlab__ProjectPath=${GITLAB_PROJECT_PATH}
+ENV Gitlab__Token=${GITLAB_TOKEN}
+ENV GitHub__ProjectPath=${GITHUB_PROJECT_PATH}
+ENV GitHub__Token=${GITHUB_TOKEN}
+ENV HUSKY=${HUSKY}
 RUN dotnet restore "StarWarsProgressBarIssueTracker.App/StarWarsProgressBarIssueTracker.App.csproj"
 COPY . .
 WORKDIR "/src/StarWarsProgressBarIssueTracker.App"
