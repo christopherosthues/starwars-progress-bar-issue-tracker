@@ -52,7 +52,7 @@ jobs:
       uses: gradle/actions/setup-gradle@v4
 
     - name: Build with Gradle Wrapper
-      run: ./app/gradlew build
+      run: ./app/gradlew composeApp:build
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
@@ -113,4 +113,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_APP }}
-        run: ./app/gradlew build sonar --info
+        run: ./app/gradlew composeApp:build sonar --info
