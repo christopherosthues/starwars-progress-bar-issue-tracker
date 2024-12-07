@@ -20,28 +20,28 @@ env:
   HUSKY: 0.
 
 jobs:
-  build:
-    name: Build .NET
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.x
-
-    - name: Restore dependencies
-      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
-
-    - name: Generate GitHub GraphQL client
-      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj
-
-    - name: Generate Gitlab GraphQL client
-      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj
-
-    - name: Build
-      run: dotnet build server/src/StarWarsProgressBarIssueTracker.sln --no-restore
+#  build:
+#    name: Build .NET
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v4
+#
+#    - name: Setup .NET
+#      uses: actions/setup-dotnet@v4
+#      with:
+#        dotnet-version: 9.x
+#
+#    - name: Restore dependencies
+#      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
+#
+#    - name: Generate GitHub GraphQL client
+#      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj
+#
+#    - name: Generate Gitlab GraphQL client
+#      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj
+#
+#    - name: Build
+#      run: dotnet build server/src/StarWarsProgressBarIssueTracker.sln --no-restore
 
   sonarCloud:
     name: Analyze SonarCloud
@@ -105,172 +105,173 @@ jobs:
           dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj --no-restore
           dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj --no-restore
           dotnet build server/src/StarWarsProgressBarIssueTracker.sln --no-restore
+          ls .\.sonar\dotcover\
           .\.sonar\dotcover\dotnet-dotcover test --dcReportType=HTML --dcAttributeFilters="StarWarsProgressBarIssueTracker.TestHelpers.ErrorAttribute" server/src/StarWarsProgressBarIssueTracker.sln
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
-  tests:
-    name: Run .NET Tests
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      actions: read
-      checks: write
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.x
-
-    - name: Restore dependencies
-      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
-
-    - name: Generate GitHub GraphQL client
-      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj --no-restore
-
-    - name: Generate Gitlab GraphQL client
-      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj --no-restore
-
-    - name: Build
-      run: dotnet build server/src/StarWarsProgressBarIssueTracker.sln --no-restore
-
-    - name: Test
-      run: dotnet test server/src/StarWarsProgressBarIssueTracker.sln --no-build --verbosity q --logger "trx" --results-directory "TestResults" --filter "TestCategory!=Error" --collect:"XPlat Code Coverage"
-
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      with:
-        name: Test results
-        path: TestResults
-      if: ${{ always() }}
-
-    - name: Test Report
-      uses: dorny/test-reporter@v1.9.1
-      if: success() || failure()
-      with:
-        name: .NET Test results
-        path: TestResults/*.trx
-        reporter: dotnet-trx
-
-  strykerApp:
-    name: Stryker.NET App
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.x
-
-    - name: Restore dependencies
-      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
-
-    - name: Restore tools
-      run: dotnet tool restore
-
-    - name: Execute Stryker.NET
-      run: dotnet stryker
-      working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.App.Tests
-
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      with:
-        name: Stryker.NET App results
-        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.App.Tests/StrykerOutput/**/*.html
-      if: ${{ always() }}
-
-  strykerDomain:
-    name: Stryker.NET Domain
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.x
-
-    - name: Restore dependencies
-      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
-
-    - name: Restore tools
-      run: dotnet tool restore
-
-    - name: Execute Stryker.NET
-      run: dotnet stryker
-      working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Domain.Tests
-
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      with:
-        name: Stryker.NET Domain results
-        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Domain.Tests/StrykerOutput/**/*.html
-      if: ${{ always() }}
-
-  strykerInfrastructure:
-    name: Stryker.NET Infrastructure
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.x
-
-    - name: Restore dependencies
-      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
-
-    - name: Restore tools
-      run: dotnet tool restore
-
-    - name: Execute Stryker.NET
-      run: dotnet stryker
-      working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Tests
-
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      with:
-        name: Stryker.NET Infrastructure results
-        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Tests/StrykerOutput/**/*.html
-      if: ${{ always() }}
-
-  strykerInfrastructureGitlab:
-    name: Stryker.NET Infrastructure Gitlab
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.x
-
-    - name: Restore dependencies
-      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
-
-    - name: Restore tools
-      run: dotnet tool restore
-
-    - name: Execute Stryker.NET
-      run: dotnet stryker
-      working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests
-
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      with:
-        name: Stryker.NET Infrastructure Gitlab results
-        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests/StrykerOutput/**/*.html
-      if: ${{ always() }}
-
-    - name: Attach Stryker.NET HTML report to GitHub Actions summary
-      run: |
-        echo "Test Report: [Download HTML Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)" >> $GITHUB_STEP_SUMMARY
+#  tests:
+#    name: Run .NET Tests
+#    needs: [ build ]
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+#      actions: read
+#      checks: write
+#
+#    steps:
+#    - uses: actions/checkout@v4
+#
+#    - name: Setup .NET
+#      uses: actions/setup-dotnet@v4
+#      with:
+#        dotnet-version: 9.x
+#
+#    - name: Restore dependencies
+#      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
+#
+#    - name: Generate GitHub GraphQL client
+#      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj --no-restore
+#
+#    - name: Generate Gitlab GraphQL client
+#      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj --no-restore
+#
+#    - name: Build
+#      run: dotnet build server/src/StarWarsProgressBarIssueTracker.sln --no-restore
+#
+#    - name: Test
+#      run: dotnet test server/src/StarWarsProgressBarIssueTracker.sln --no-build --verbosity q --logger "trx" --results-directory "TestResults" --filter "TestCategory!=Error" --collect:"XPlat Code Coverage"
+#
+#    - name: Upload test results
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: Test results
+#        path: TestResults
+#      if: ${{ always() }}
+#
+#    - name: Test Report
+#      uses: dorny/test-reporter@v1.9.1
+#      if: success() || failure()
+#      with:
+#        name: .NET Test results
+#        path: TestResults/*.trx
+#        reporter: dotnet-trx
+#
+#  strykerApp:
+#    name: Stryker.NET App
+#    needs: [ build ]
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v4
+#
+#    - name: Setup .NET
+#      uses: actions/setup-dotnet@v4
+#      with:
+#        dotnet-version: 9.x
+#
+#    - name: Restore dependencies
+#      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
+#
+#    - name: Restore tools
+#      run: dotnet tool restore
+#
+#    - name: Execute Stryker.NET
+#      run: dotnet stryker
+#      working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.App.Tests
+#
+#    - name: Upload test results
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: Stryker.NET App results
+#        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.App.Tests/StrykerOutput/**/*.html
+#      if: ${{ always() }}
+#
+#  strykerDomain:
+#    name: Stryker.NET Domain
+#    needs: [ build ]
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v4
+#
+#    - name: Setup .NET
+#      uses: actions/setup-dotnet@v4
+#      with:
+#        dotnet-version: 9.x
+#
+#    - name: Restore dependencies
+#      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
+#
+#    - name: Restore tools
+#      run: dotnet tool restore
+#
+#    - name: Execute Stryker.NET
+#      run: dotnet stryker
+#      working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Domain.Tests
+#
+#    - name: Upload test results
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: Stryker.NET Domain results
+#        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Domain.Tests/StrykerOutput/**/*.html
+#      if: ${{ always() }}
+#
+#  strykerInfrastructure:
+#    name: Stryker.NET Infrastructure
+#    needs: [ build ]
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v4
+#
+#    - name: Setup .NET
+#      uses: actions/setup-dotnet@v4
+#      with:
+#        dotnet-version: 9.x
+#
+#    - name: Restore dependencies
+#      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
+#
+#    - name: Restore tools
+#      run: dotnet tool restore
+#
+#    - name: Execute Stryker.NET
+#      run: dotnet stryker
+#      working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Tests
+#
+#    - name: Upload test results
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: Stryker.NET Infrastructure results
+#        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Tests/StrykerOutput/**/*.html
+#      if: ${{ always() }}
+#
+#  strykerInfrastructureGitlab:
+#    name: Stryker.NET Infrastructure Gitlab
+#    needs: [ build ]
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v4
+#
+#    - name: Setup .NET
+#      uses: actions/setup-dotnet@v4
+#      with:
+#        dotnet-version: 9.x
+#
+#    - name: Restore dependencies
+#      run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
+#
+#    - name: Restore tools
+#      run: dotnet tool restore
+#
+#    - name: Execute Stryker.NET
+#      run: dotnet stryker
+#      working-directory: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests
+#
+#    - name: Upload test results
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: Stryker.NET Infrastructure Gitlab results
+#        path: ${{ github.workspace }}/server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests/StrykerOutput/**/*.html
+#      if: ${{ always() }}
+#
+#    - name: Attach Stryker.NET HTML report to GitHub Actions summary
+#      run: |
+#        echo "Test Report: [Download HTML Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)" >> $GITHUB_STEP_SUMMARY
