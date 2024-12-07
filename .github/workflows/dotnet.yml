@@ -105,7 +105,7 @@ jobs:
           dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj --no-restore
           dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj --no-restore
           dotnet build server/src/StarWarsProgressBarIssueTracker.sln --no-restore
-          dotnet dotcover test --dcReportType=HTML --dcAttributeFilters="StarWarsProgressBarIssueTracker.TestHelpers.ErrorAttribute" server/src/StarWarsProgressBarIssueTracker.sln
+          .\.sonar\dotcover\dotnet-dotcover test --dcReportType=HTML --dcAttributeFilters="StarWarsProgressBarIssueTracker.TestHelpers.ErrorAttribute" server/src/StarWarsProgressBarIssueTracker.sln
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
   tests:
