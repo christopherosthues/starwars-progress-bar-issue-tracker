@@ -53,10 +53,11 @@ jobs:
         with:
           java-version: 17
           distribution: 'zulu' # Alternative distribution options are available.
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-          
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -64,13 +65,14 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
-      
+
       - name: Cache SonarQube Cloud packages
         uses: actions/cache@v4
         with:
           path: ~\sonar\cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
+
       - name: Cache SonarQube Cloud scanner
         id: cache-sonar-scanner
         uses: actions/cache@v4
@@ -78,23 +80,32 @@ jobs:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
+
       - name: Install SonarQube Cloud scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
         shell: powershell
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+
+      - name: Install SonarQube Cloud scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          New-Item -Path .\.sonar\dotcover -ItemType Directory
+          dotnet tool update JetBrains.dotCover.GlobalTool --tool-path .\.sonar\dotcover
+
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"christopherosthues_starwars-progress-bar-issue-tracker-server" /o:"christopherosthues" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths=**/coverage.cobertura.xml
-          dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj
-          dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"christopherosthues_starwars-progress-bar-issue-tracker-server" /o:"christopherosthues" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.dotcover.reportsPaths=dotCover.Output.html
+          dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj --no-restore
+          dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj --no-restore
           dotnet build server/src/StarWarsProgressBarIssueTracker.sln --no-restore
-          dotnet test server/src/StarWarsProgressBarIssueTracker.sln --no-build --verbosity q --logger "trx" --results-directory "TestResults" --filter "TestCategory!=Error" --collect:"XPlat Code Coverage"
+          dotnet dotcover test --dcReportType=HTML --dcAttributeFilters="StarWarsProgressBarIssueTracker.TestHelpers.ErrorAttribute" server/src/StarWarsProgressBarIssueTracker.sln
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
   tests:
@@ -118,10 +129,10 @@ jobs:
       run: dotnet restore server/src/StarWarsProgressBarIssueTracker.sln
 
     - name: Generate GitHub GraphQL client
-      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj
+      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj --no-restore
 
     - name: Generate Gitlab GraphQL client
-      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj
+      run: dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj --no-restore
 
     - name: Build
       run: dotnet build server/src/StarWarsProgressBarIssueTracker.sln --no-restore
