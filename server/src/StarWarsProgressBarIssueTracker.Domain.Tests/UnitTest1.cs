@@ -1,3 +1,5 @@
+using StarWarsProgressBarIssueTracker.TestHelpers;
+
 namespace StarWarsProgressBarIssueTracker.Domain.Tests;
 
 public class Tests
@@ -8,6 +10,7 @@ public class Tests
     }
 
     [Test]
+    [Error("Error")]
     public void Test1()
     {
         Assert.Pass();
