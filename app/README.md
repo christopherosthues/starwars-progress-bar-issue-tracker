@@ -1,5 +1,7 @@
 # Star Wars Progress Bar Issue Tracker App
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=christopherosthues_starwars-progress-bar-issue-tracker-app&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=christopherosthues_starwars-progress-bar-issue-tracker-app)
+
 This is the client for the Star Wars Progress Bar Issue Tracker.
 
 
