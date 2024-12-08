@@ -92,13 +92,13 @@ jobs:
       - name: Install SonarQube Cloud scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
         run: |
-          mkdir .sonar/scanner
+          mkdir -p .sonar/scanner
           dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
 
       - name: Install SonarQube Cloud dotCover
         if: steps.cache-sonar-dotcover.outputs.cache-hit != 'true'
         run: |
-          mkdir .sonar/dotcover
+          mkdir -p .sonar/dotcover
           dotnet tool update JetBrains.dotCover.GlobalTool --tool-path ./.sonar/dotcover
 
       - name: Build and analyze
