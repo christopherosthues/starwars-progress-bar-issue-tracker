@@ -4,6 +4,7 @@
     <File Path="..\.gitignore" />
     <File Path="..\.env" />
     <File Path="..\.dockerignore" />
+    <File Path="..\sonar-project.properties" />
   </Folder>
   <Folder Name="/.meta/.workflows/">
     <File Path="..\..\.github\dependabot.yml" />
