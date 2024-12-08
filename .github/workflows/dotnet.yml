@@ -81,6 +81,14 @@ jobs:
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
 
+      - name: Cache SonarQube Cloud dotCover
+        id: cache-sonar-dotcover
+        uses: actions/cache@v4
+        with:
+          path: .\.sonar\dotcover
+          key: ${{ runner.os }}-sonar-dotcover
+          restore-keys: ${{ runner.os }}-sonar-dotcover
+
       - name: Install SonarQube Cloud scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
         shell: powershell
@@ -89,7 +97,7 @@ jobs:
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
 
       - name: Install SonarQube Cloud dotCover
-        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        if: steps.cache-sonar-dotcover.outputs.cache-hit != 'true'
         shell: powershell
         run: |
           New-Item -Path .\.sonar\dotcover -ItemType Directory
