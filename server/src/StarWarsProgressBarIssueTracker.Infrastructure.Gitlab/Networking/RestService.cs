@@ -9,7 +9,7 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Networking;
 public class RestService
 {
     private readonly HttpClient _client;
-    private JsonSerializerOptions _jsonSerializerOptions;
+    private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     public RestService(HttpClient client, IOptions<GitlabConfiguration> configuration)
     {
