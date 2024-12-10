@@ -699,7 +699,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         return faker.Generate();
     }
 
-    public static IEnumerable<Milestone> AddMilestoneCases()
+    private static IEnumerable<Milestone> AddMilestoneCases()
     {
         var faker = new Faker<Milestone>()
             .RuleFor(milestone => milestone.Title, f => f.Random.String2(1, 50, AllowedChars))
@@ -708,7 +708,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         return faker.Generate(20);
     }
 
-    public static IEnumerable<(Milestone, IEnumerable<string>)> InvalidAddMilestoneCases()
+    private static IEnumerable<(Milestone, IEnumerable<string>)> InvalidAddMilestoneCases()
     {
         yield return (new Milestone { Title = null!, Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set.", $"The value '' for {nameof(Milestone.Title)} is too short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
         yield return (new Milestone { Title = "", Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set.", $"The value '' for {nameof(Milestone.Title)} is too short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
@@ -717,7 +717,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         yield return (new Milestone { Title = "Valid", Description = new string('a', 256), State = MilestoneState.Open }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Milestone.Description)} is long short. The length of {nameof(Milestone.Description)} has to be less than 256." });
     }
 
-    public static IEnumerable<(Milestone, IEnumerable<string>)> InvalidUpdateMilestoneCases()
+    private static IEnumerable<(Milestone, IEnumerable<string>)> InvalidUpdateMilestoneCases()
     {
         yield return (new Milestone { Title = null!, Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set.", $"The value '' for {nameof(Milestone.Title)} is too short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
         yield return (new Milestone { Title = "", Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set.", $"The value '' for {nameof(Milestone.Title)} is too short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });

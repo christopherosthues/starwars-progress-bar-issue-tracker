@@ -1,6 +1,6 @@
 namespace StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
-public class TranslationConstants
+public static class TranslationConstants
 {
     public const int MaxCountryLength = 7;
     public const int MinCountryLength = 2;

@@ -29,11 +29,13 @@ ENV HUSKY=${HUSKY}
 RUN dotnet restore "StarWarsProgressBarIssueTracker.App/StarWarsProgressBarIssueTracker.App.csproj"
 COPY . .
 WORKDIR "/src/StarWarsProgressBarIssueTracker.App"
-RUN dotnet build "StarWarsProgressBarIssueTracker.App.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "StarWarsProgressBarIssueTracker.App.csproj" -c "$BUILD_CONFIGURATION" -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "StarWarsProgressBarIssueTracker.App.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "StarWarsProgressBarIssueTracker.App.csproj" \
+    -c "$BUILD_CONFIGURATION" \
+    -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

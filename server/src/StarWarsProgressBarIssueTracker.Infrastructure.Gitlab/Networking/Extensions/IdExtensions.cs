@@ -4,6 +4,6 @@ public static class IdExtensions
 {
     public static string ToId(this string id)
     {
-        return id.Split("/").Last();
+        return id.Split("/")[^1];
     }
 }

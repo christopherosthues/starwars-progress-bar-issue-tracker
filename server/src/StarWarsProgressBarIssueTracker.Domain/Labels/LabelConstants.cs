@@ -1,6 +1,6 @@
 namespace StarWarsProgressBarIssueTracker.Domain.Labels;
 
-public class LabelConstants
+public static class LabelConstants
 {
     public const int MaxTitleLength = 50;
     public const int MinTitleLength = 1;

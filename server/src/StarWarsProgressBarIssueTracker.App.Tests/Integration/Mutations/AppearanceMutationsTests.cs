@@ -673,7 +673,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         return faker.Generate();
     }
 
-    public static IEnumerable<Appearance> AddAppearanceCases()
+    private static IEnumerable<Appearance> AddAppearanceCases()
     {
         var faker = new Faker<Appearance>()
             .RuleFor(appearance => appearance.Title, f => f.Random.String2(1, 50, AllowedChars))
@@ -683,7 +683,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         return faker.Generate(20);
     }
 
-    public static IEnumerable<(Appearance, IEnumerable<string>)> InvalidAddAppearanceCases()
+    private static IEnumerable<(Appearance, IEnumerable<string>)> InvalidAddAppearanceCases()
     {
         yield return (new Appearance { Title = null!, Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Title)} is not set.", $"The value '' for {nameof(Appearance.Title)} is too short. The length of {nameof(Appearance.Title)} has to be between 1 and 50." });
         yield return (new Appearance { Title = "", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Title)} is not set.", $"The value '' for {nameof(Appearance.Title)} is too short. The length of {nameof(Appearance.Title)} has to be between 1 and 50." });

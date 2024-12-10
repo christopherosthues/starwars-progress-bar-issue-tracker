@@ -1,6 +1,6 @@
 namespace StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
-public class AppearanceConstants
+public static class AppearanceConstants
 {
     public const int MaxTitleLength = 50;
     public const int MinTitleLength = 1;

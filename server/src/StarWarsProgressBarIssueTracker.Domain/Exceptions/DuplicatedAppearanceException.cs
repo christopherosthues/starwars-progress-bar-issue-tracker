@@ -1,3 +1,3 @@
 namespace StarWarsProgressBarIssueTracker.Domain.Exceptions;
 
-public class DuplicatedAppearanceException() : IssueTrackerExceptionBase("Found duplicated appearances for vehicle.");
+public class DuplicatedAppearanceException() : IssueTrackerBaseException("Found duplicated appearances for vehicle.");

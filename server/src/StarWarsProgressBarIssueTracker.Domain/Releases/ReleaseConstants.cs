@@ -1,6 +1,6 @@
 namespace StarWarsProgressBarIssueTracker.Domain.Releases;
 
-public class ReleaseConstants
+public static class ReleaseConstants
 {
     public const int MaxTitleLength = 255;
     public const int MinTitleLength = 1;

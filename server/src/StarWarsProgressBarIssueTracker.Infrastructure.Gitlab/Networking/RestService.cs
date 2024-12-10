@@ -9,6 +9,7 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Networking;
 public class RestService
 {
     private readonly HttpClient _client;
+    private JsonSerializerOptions _jsonSerializerOptions;
 
     public RestService(HttpClient client, IOptions<GitlabConfiguration> configuration)
     {
@@ -17,6 +18,11 @@ public class RestService
         _client = client;
         _client.BaseAddress = new Uri(restUri);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.TrimEnd());
+
+        _jsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
     }
 
     // public async Task UpdateLabel(Label label)
@@ -52,10 +58,7 @@ public class RestService
 
         var responseContent = await response.Content.ReadAsStreamAsync();
 
-        var issueLinks = await JsonSerializer.DeserializeAsync<IList<LinkIssue>>(responseContent, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var issueLinks = await JsonSerializer.DeserializeAsync<IList<LinkIssue>>(responseContent, _jsonSerializerOptions);
 
         return issueLinks;
     }

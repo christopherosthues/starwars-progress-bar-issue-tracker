@@ -753,7 +753,7 @@ public class LabelMutationsTests : IntegrationTestBase
         return faker.Generate();
     }
 
-    public static IEnumerable<Label> AddLabelCases()
+    private static IEnumerable<Label> AddLabelCases()
     {
         var faker = new Faker<Label>()
             .RuleFor(label => label.Title, f => f.Random.String2(1, 50, AllowedChars))
@@ -763,7 +763,7 @@ public class LabelMutationsTests : IntegrationTestBase
         return faker.Generate(20);
     }
 
-    public static IEnumerable<(Label, IEnumerable<string>)> InvalidAddLabelCases()
+    private static IEnumerable<(Label, IEnumerable<string>)> InvalidAddLabelCases()
     {
         yield return (new Label { Title = null!, Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set.", $"The value '' for {nameof(Label.Title)} is too short. The length of {nameof(Label.Title)} has to be between 1 and 50." });
         yield return (new Label { Title = "", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set.", $"The value '' for {nameof(Label.Title)} is too short. The length of {nameof(Label.Title)} has to be between 1 and 50." });

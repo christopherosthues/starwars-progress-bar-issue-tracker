@@ -1,6 +1,6 @@
 namespace StarWarsProgressBarIssueTracker.Domain.Issues;
 
-public class IssueConstants
+public static class IssueConstants
 {
     public const int MaxTitleLength = 255;
     public const int MinTitleLength = 1;
