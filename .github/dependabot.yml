@@ -5,6 +5,13 @@
 
 version: 2
 updates:
+  # Maintain .NET SDK updates
+  - package-ecosystem: "dotnet-sdk"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+
   # Maintain dependencies for .NET dependencies
   - package-ecosystem: "nuget"
     directory: "/server/src/"
@@ -18,7 +25,7 @@ updates:
       dev-dependencies:
         patterns:
           - "*"
-          
+
   # Maintain dependencies for Docker dependencies
   - package-ecosystem: "docker"
     directory: "/server/src/StarWarsProgressBarIssueTracker.App"
@@ -46,7 +53,7 @@ updates:
       dev-dependencies:
         patterns:
           - "*"
-          
+
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
