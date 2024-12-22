@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
 using StarWarsProgressBarIssueTracker.App.Extensions;
+using StarWarsProgressBarIssueTracker.App.Labels;
 
 namespace StarWarsProgressBarIssueTracker.App.Queries;
 
@@ -14,21 +15,26 @@ public partial class IssueTrackerQueries
 {
     [UsePaging(IncludeTotalCount = true)]
     [UseSorting]
-    public async Task<Connection<Label>> GetLabels(
+    public async Task<Connection<GetLabelDto>> GetLabels(
         PagingArguments pagingArguments,
         ILabelService labelService,
+        LabelMapper labelMapper,
         CancellationToken cancellationToken)
     {
         Page<Label> page = await labelService.GetAllLabelsAsync(pagingArguments, cancellationToken);
-        return page.ToConnectionWithTotalCount();
+        Page<GetLabelDto> dtoPage = new Page<GetLabelDto>(
+            [..page.Items.Select(label => labelMapper.MapToGetLabelDto(label)!)], page.HasNextPage,
+            page.HasPreviousPage, label => page.CreateCursor(labelMapper.MapToLabel(label)), page.TotalCount);
+        return dtoPage.ToConnectionWithTotalCount();
     }
 
     [Error<DomainIdNotFoundException>]
-    public async Task<Label?> GetLabel(
+    public async Task<GetLabelDto?> GetLabel(
         ILabelService labelService,
+        LabelMapper labelMapper,
         Guid id, CancellationToken cancellationToken)
     {
-        return await labelService.GetLabelAsync(id, cancellationToken);
+        return labelMapper.MapToGetLabelDto(await labelService.GetLabelAsync(id, cancellationToken));
     }
 
     [DataLoader]

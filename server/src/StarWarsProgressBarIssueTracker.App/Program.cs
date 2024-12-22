@@ -86,6 +86,7 @@ builder.Services.AddRepositories();
 builder.Services.AddDataPorts();
 builder.Services.AddIssueTrackerConfigurations(builder.Configuration);
 builder.Services.AddIssueTrackerServices();
+builder.Services.AddMappers();
 builder.Services.AddGraphQlQueries();
 builder.Services.AddGraphQlMutations();
 builder.Services.AddGitlabServices();

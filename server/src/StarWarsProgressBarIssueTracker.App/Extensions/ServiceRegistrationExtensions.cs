@@ -1,5 +1,6 @@
 using StarWarsProgressBarIssueTracker.App.Appearances;
 using StarWarsProgressBarIssueTracker.App.Issues;
+using StarWarsProgressBarIssueTracker.App.Labels;
 using StarWarsProgressBarIssueTracker.App.Milestones;
 using StarWarsProgressBarIssueTracker.App.Mutations;
 using StarWarsProgressBarIssueTracker.App.Queries;
@@ -48,6 +49,13 @@ public static class ServiceRegistrationExtensions
         // serviceCollection.AddScoped<JobSchedulingService>();
         // serviceCollection.AddScoped<JobExecutionService>();
         // serviceCollection.AddScoped<JobFactory>();
+
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddMappers(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddScoped<LabelMapper>();
 
         return serviceCollection;
     }
