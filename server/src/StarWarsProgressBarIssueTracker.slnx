@@ -9,7 +9,6 @@
   <Folder Name="/.meta/.workflows/">
     <File Path="..\..\.github\dependabot.yml" />
     <File Path="..\..\.github\workflows\dotnet.yml" />
-    <File Path="..\..\.github\workflows\update-dotnet-sdk.yml" />
   </Folder>
   <Folder Name="/.meta/Build/">
     <File Path="..\global.json" />
