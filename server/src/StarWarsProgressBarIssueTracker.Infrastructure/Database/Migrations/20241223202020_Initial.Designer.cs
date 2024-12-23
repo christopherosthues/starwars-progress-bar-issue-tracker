@@ -12,15 +12,15 @@ using StarWarsProgressBarIssueTracker.Infrastructure.Database;
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(IssueTrackerContext))]
-    [Migration("20240911155506_InitialDbModel")]
-    partial class InitialDbModel
+    [Migration("20241223202020_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);

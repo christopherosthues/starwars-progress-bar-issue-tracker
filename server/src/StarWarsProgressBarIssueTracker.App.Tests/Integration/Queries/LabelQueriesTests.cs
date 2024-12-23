@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FluentAssertions.Execution;
 using GraphQL;
+using StarWarsProgressBarIssueTracker.App.Labels;
 using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Labels;
@@ -24,10 +25,10 @@ public class LabelQueriesTests : IntegrationTestBase
         {
             context.Labels.Should().BeEmpty();
         });
-        var request = CreateGetLabelsRequest();
+        GraphQLRequest request = CreateGetLabelsRequest();
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetLabelsResponse>(request);
+        GraphQLResponse<GetLabelsResponse> response = await GraphQLClient.SendQueryAsync<GetLabelsResponse>(request);
 
         // Assert
         using (new AssertionScope())
@@ -49,14 +50,14 @@ public class LabelQueriesTests : IntegrationTestBase
     public async Task GetLabelsShouldReturnAllLabels()
     {
         // Arrange
-        var dbLabel = new Label
+        Label dbLabel = new Label
         {
             Color = "001122",
             TextColor = "223344",
             Title = "Label 1",
             Description = "Description 1"
         };
-        var dbLabel2 = new Label
+        Label dbLabel2 = new Label
         {
             Color = "112233",
             TextColor = "334455",
@@ -73,10 +74,10 @@ public class LabelQueriesTests : IntegrationTestBase
             context.Labels.Should().ContainEquivalentOf(dbLabel);
             context.Labels.Should().ContainEquivalentOf(dbLabel2);
         });
-        var request = CreateGetLabelsRequest();
+        GraphQLRequest request = CreateGetLabelsRequest();
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetLabelsResponse>(request);
+        GraphQLResponse<GetLabelsResponse> response = await GraphQLClient.SendQueryAsync<GetLabelsResponse>(request);
 
         // Assert
         using (new AssertionScope())
@@ -90,10 +91,10 @@ public class LabelQueriesTests : IntegrationTestBase
             response.Data.Labels.PageInfo.HasPreviousPage.Should().BeFalse();
             response.Data.Labels.PageInfo.StartCursor.Should().NotBeNull();
             response.Data.Labels.PageInfo.EndCursor.Should().NotBeNull();
-            List<Label> labels = response.Data.Labels.Nodes.ToList();
+            List<GetLabelDto> labels = response.Data.Labels.Nodes.ToList();
             labels.Count.Should().Be(2);
 
-            Label label = labels.Single(entity => entity.Id.Equals(dbLabel.Id));
+            GetLabelDto label = labels.Single(entity => entity.Id.Equals(dbLabel.Id));
             label.Id.Should().Be(dbLabel.Id);
             label.Title.Should().Be(dbLabel.Title);
             label.Description.Should().Be(dbLabel.Description);
@@ -102,7 +103,7 @@ public class LabelQueriesTests : IntegrationTestBase
             label.CreatedAt.Should().BeCloseTo(dbLabel.CreatedAt, TimeSpan.FromMilliseconds(300));
             label.LastModifiedAt.Should().Be(dbLabel.LastModifiedAt);
 
-            Label label2 = labels.Single(entity => entity.Id.Equals(dbLabel2.Id));
+            GetLabelDto label2 = labels.Single(entity => entity.Id.Equals(dbLabel2.Id));
             label2.Id.Should().Be(dbLabel2.Id);
             label2.Title.Should().Be(dbLabel2.Title);
             label2.Description.Should().Be(dbLabel2.Description);
@@ -111,10 +112,10 @@ public class LabelQueriesTests : IntegrationTestBase
             label2.CreatedAt.Should().BeCloseTo(dbLabel2.CreatedAt, TimeSpan.FromMilliseconds(300));
             label2.LastModifiedAt.Should().Be(dbLabel2.LastModifiedAt);
 
-            List<Edge<Label>> edges = response.Data.Labels.Edges.ToList();
+            List<Edge<GetLabelDto>> edges = response.Data.Labels.Edges.ToList();
             edges.Count.Should().Be(2);
 
-            Label edgeLabel = edges.Single(entity => entity.Node.Id.Equals(dbLabel.Id)).Node;
+            GetLabelDto edgeLabel = edges.Single(entity => entity.Node.Id.Equals(dbLabel.Id)).Node;
             edgeLabel.Id.Should().Be(dbLabel.Id);
             edgeLabel.Title.Should().Be(dbLabel.Title);
             edgeLabel.Description.Should().Be(dbLabel.Description);
@@ -123,7 +124,7 @@ public class LabelQueriesTests : IntegrationTestBase
             edgeLabel.CreatedAt.Should().BeCloseTo(dbLabel.CreatedAt, TimeSpan.FromMilliseconds(300));
             edgeLabel.LastModifiedAt.Should().Be(dbLabel.LastModifiedAt);
 
-            Label edgeLabel2 = edges.Single(entity => entity.Node.Id.Equals(dbLabel2.Id)).Node;
+            GetLabelDto edgeLabel2 = edges.Single(entity => entity.Node.Id.Equals(dbLabel2.Id)).Node;
             edgeLabel2.Id.Should().Be(dbLabel2.Id);
             edgeLabel2.Title.Should().Be(dbLabel2.Title);
             edgeLabel2.Description.Should().Be(dbLabel2.Description);
@@ -150,10 +151,10 @@ public class LabelQueriesTests : IntegrationTestBase
             });
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var request = CreateGetLabelRequest(id);
+        GraphQLRequest request = CreateGetLabelRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
+        GraphQLResponse<GetLabelResponse> response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
         using (new AssertionScope())
@@ -176,10 +177,10 @@ public class LabelQueriesTests : IntegrationTestBase
             context.Labels.Should().BeEmpty();
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var request = CreateGetLabelRequest(id);
+        GraphQLRequest request = CreateGetLabelRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
+        GraphQLResponse<GetLabelResponse> response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
         using (new AssertionScope())
@@ -200,7 +201,7 @@ public class LabelQueriesTests : IntegrationTestBase
     {
         // Arrange
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var issue = new Issue
+        Issue issue = new Issue
         {
             Id = new Guid("CB547CF5-CB28-412E-8DA4-2A7F10E3A5FE"),
             Title = "issue title",
@@ -216,7 +217,7 @@ public class LabelQueriesTests : IntegrationTestBase
                 Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbLabel = new Label
+        Label dbLabel = new Label
         {
             Id = new Guid(id),
             Color = "112233",
@@ -238,10 +239,10 @@ public class LabelQueriesTests : IntegrationTestBase
             });
             context.Labels.Add(dbLabel);
         });
-        var request = CreateGetLabelRequest(id);
+        GraphQLRequest request = CreateGetLabelRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
+        GraphQLResponse<GetLabelResponse> response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
         using (new AssertionScope())
@@ -249,7 +250,7 @@ public class LabelQueriesTests : IntegrationTestBase
             response.Should().NotBeNull();
             response.Errors.Should().BeNull();
             response.Data.Should().NotBeNull();
-            var label = response.Data.Label;
+            GetLabelDto? label = response.Data.Label;
 
             label.Should().NotBeNull();
             label!.Id.Should().Be(dbLabel.Id);
@@ -265,7 +266,7 @@ public class LabelQueriesTests : IntegrationTestBase
 
     private static GraphQLRequest CreateGetLabelsRequest()
     {
-        var queryRequest = new GraphQLRequest
+        GraphQLRequest queryRequest = new GraphQLRequest
         {
             Query = """
                     query labels
@@ -317,7 +318,7 @@ public class LabelQueriesTests : IntegrationTestBase
 
     private static GraphQLRequest CreateGetLabelRequest(string id)
     {
-        var queryRequest = new GraphQLRequest
+        GraphQLRequest queryRequest = new GraphQLRequest
         {
             Query = $$"""
                     query label

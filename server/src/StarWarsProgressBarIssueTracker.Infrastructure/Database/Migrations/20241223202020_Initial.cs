@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialDbModel : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

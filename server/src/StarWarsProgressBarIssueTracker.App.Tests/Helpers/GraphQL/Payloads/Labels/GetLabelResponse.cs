@@ -1,8 +1,8 @@
-using StarWarsProgressBarIssueTracker.Domain.Labels;
+using StarWarsProgressBarIssueTracker.App.Labels;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Labels;
 
 public class GetLabelResponse
 {
-    public Label? Label { get; set; }
+    public GetLabelDto? Label { get; set; }
 }

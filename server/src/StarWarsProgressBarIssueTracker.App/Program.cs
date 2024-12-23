@@ -5,13 +5,13 @@ using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.Infrastructure;
 using StarWarsProgressBarIssueTracker.Infrastructure.Gitlab;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders().AddConsole();
 
-var gitlabConfig = builder.Configuration.GetSection("Gitlab");
-var gitlabToken = gitlabConfig.GetValue<string>("Token");
-var gitlabGraphQlUrl = new Uri(gitlabConfig.GetValue<string>("GraphQLUrl") ?? string.Empty);
+IConfigurationSection gitlabConfig = builder.Configuration.GetSection("Gitlab");
+string gitlabToken = gitlabConfig.GetValue<string>("Token")!;
+Uri gitlabGraphQlUrl = new Uri(gitlabConfig.GetValue<string>("GraphQLUrl") ?? string.Empty);
 builder.Services.AddGitlabClient().ConfigureHttpClient(client =>
 {
     client.BaseAddress = GetGraphQLUri(gitlabGraphQlUrl);
@@ -26,7 +26,7 @@ builder.Services.AddGitlabClient().ConfigureHttpClient(client =>
 });
 builder.Services.AddGitHubClient();
 
-var connectionString = builder.Configuration.GetConnectionString("IssueTrackerContext");
+string connectionString = builder.Configuration.GetConnectionString("IssueTrackerContext")!;
 builder.Services.RegisterDbContext(connectionString);
 
 builder.Services.AddGraphQLServer()
@@ -95,7 +95,7 @@ builder.Services.AddGitlabServices();
 //     corsOptions.AddDefaultPolicy(corsPolicyBuilder =>
 //         corsPolicyBuilder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
