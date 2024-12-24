@@ -41,9 +41,9 @@ public class LabelMapper
             GitlabId = label.GitlabId,
             Issues = label.Issues.Select(issue => new LabelIssueDto
             {
-                Id = label.Id,
-                CreatedAt = label.CreatedAt,
-                LastModifiedAt = label.LastModifiedAt,
+                Id = issue.Id,
+                CreatedAt = issue.CreatedAt,
+                LastModifiedAt = issue.LastModifiedAt,
                 Title = issue.Title,
                 Description = issue.Description,
                 GitlabId = issue.GitlabId,
@@ -68,9 +68,9 @@ public class LabelMapper
             GitlabId = label.GitlabId,
             Issues = label.Issues.Select(issue => new Issue
             {
-                Id = label.Id,
-                CreatedAt = label.CreatedAt,
-                LastModifiedAt = label.LastModifiedAt,
+                Id = issue.Id,
+                CreatedAt = issue.CreatedAt,
+                LastModifiedAt = issue.LastModifiedAt,
                 Title = issue.Title,
                 Description = issue.Description,
                 GitlabId = issue.GitlabId,
