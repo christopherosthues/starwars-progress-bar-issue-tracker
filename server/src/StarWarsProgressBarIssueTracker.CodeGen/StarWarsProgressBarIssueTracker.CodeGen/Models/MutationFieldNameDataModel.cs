@@ -4,17 +4,17 @@ namespace StarWarsProgressBarIssueTracker.CodeGen.Models;
 
 public class MutationFieldNameDataModel
 {
-    public required string MethodName { get; set; }
+    public string MethodName { get; set; } = string.Empty;
 
-    public required string FullyQualifiedTypeName { get; set; }
+    public string FullyQualifiedTypeName { get; set; } = string.Empty;
 
-    public required string MinimalTypeName { get; set; }
+    public string MinimalTypeName { get; set; } = string.Empty;
 
-    public required string Namespace { get; set; }
+    public string Namespace { get; set; } = string.Empty;
 
-    public required string FieldName { get; set; }
+    public string FieldName { get; set; } = string.Empty;
 
-    public required string MethodReturnType { get; set; }
+    public string MethodReturnType { get; set; } = string.Empty;
 
-    public required ImmutableArray<string> MethodParameters { get; set; }
+    public ImmutableArray<string> MethodParameters { get; set; }
 }

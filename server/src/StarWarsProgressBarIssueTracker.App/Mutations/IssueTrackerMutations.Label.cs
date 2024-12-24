@@ -1,6 +1,7 @@
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using StarWarsProgressBarIssueTracker.App.Labels;
+using StarWarsProgressBarIssueTracker.CodeGen;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
 
@@ -12,6 +13,7 @@ public partial class IssueTrackerMutations
     [Error<StringTooShortException>]
     [Error<StringTooLongException>]
     [Error<ColorFormatException>]
+    [MutationFieldName(nameof(Label))]
     public partial async Task<LabelDto> AddLabel(string title, string color, string textColor, string? description,
         CancellationToken cancellationToken)
     {
@@ -20,18 +22,13 @@ public partial class IssueTrackerMutations
             cancellationToken));
     }
 
-    [UseMutationConvention(PayloadFieldName = "label")]
-    public partial Task<LabelDto> AddLabel(string title, string color, string textColor, string? description,
-        CancellationToken cancellationToken);
-
-
     [Error<ValueNotSetException>]
     [Error<StringTooShortException>]
     [Error<StringTooLongException>]
     [Error<ColorFormatException>]
     [Error<DomainIdNotFoundException>]
-    [UseMutationConvention(PayloadFieldName = "label")]
-    public async Task<LabelDto> UpdateLabel([ID] Guid id, string title, string color, string textColor,
+    [MutationFieldName(nameof(Label))]
+    public partial async Task<LabelDto> UpdateLabel([ID] Guid id, string title, string color, string textColor,
         string? description, CancellationToken cancellationToken)
     {
         return labelMapper.MapToLabelDto(await labelService.UpdateLabelAsync(
@@ -46,8 +43,8 @@ public partial class IssueTrackerMutations
     }
 
     [Error<DomainIdNotFoundException>]
-    [UseMutationConvention(PayloadFieldName = "label")]
-    public async Task<LabelDto> DeleteLabel([ID] Guid id, CancellationToken cancellationToken)
+    [MutationFieldName(nameof(Label))]
+    public partial async Task<LabelDto> DeleteLabel([ID] Guid id, CancellationToken cancellationToken)
     {
         return labelMapper.MapToLabelDto(await labelService.DeleteLabelAsync(id, cancellationToken));
     }

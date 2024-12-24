@@ -4,7 +4,7 @@ namespace StarWarsProgressBarIssueTracker.CodeGen;
 
 public class SourceCodeWriter
 {
-    private int _tabLevel = 0;
+    private int _tabLevel;
     private readonly StringBuilder _builder = new();
 
     public void WriteLine()
@@ -27,7 +27,7 @@ public class SourceCodeWriter
             return;
         }
 
-        if (line[0] is '}' or ']')
+        if (line[0].Equals('}'))
         {
             _tabLevel--;
         }
@@ -36,7 +36,7 @@ public class SourceCodeWriter
 
         _builder.AppendLine(line);
 
-        if (line is ['{' or '['])
+        if (line[0].Equals('{'))
         {
             _tabLevel++;
         }
