@@ -1,5 +1,6 @@
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
+using StarWarsProgressBarIssueTracker.CodeGen;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 
@@ -10,7 +11,8 @@ public partial class IssueTrackerMutations
     [Error<ValueNotSetException>]
     [Error<StringTooShortException>]
     [Error<StringTooLongException>]
-    public async Task<Milestone> AddMilestone(string title, string? description, CancellationToken cancellationToken)
+    [MutationFieldName(nameof(Milestone))]
+    public partial async Task<Milestone> AddMilestone(string title, string? description, CancellationToken cancellationToken)
     {
         return await milestoneService.AddMilestoneAsync(new()
         {
@@ -24,7 +26,8 @@ public partial class IssueTrackerMutations
     [Error<StringTooShortException>]
     [Error<StringTooLongException>]
     [Error<DomainIdNotFoundException>]
-    public async Task<Milestone> UpdateMilestone([ID] Guid id, string title, MilestoneState state, string? description, CancellationToken cancellationToken)
+    [MutationFieldName(nameof(Milestone))]
+    public partial async Task<Milestone> UpdateMilestone([ID] Guid id, string title, MilestoneState state, string? description, CancellationToken cancellationToken)
     {
         return await milestoneService.UpdateMilestoneAsync(new Milestone
         {
@@ -36,7 +39,8 @@ public partial class IssueTrackerMutations
     }
 
     [Error<DomainIdNotFoundException>]
-    public async Task<Milestone> DeleteMilestone([ID] Guid id, CancellationToken cancellationToken)
+    [MutationFieldName(nameof(Milestone))]
+    public partial async Task<Milestone> DeleteMilestone([ID] Guid id, CancellationToken cancellationToken)
     {
         return await milestoneService.DeleteMilestoneAsync(id, cancellationToken);
     }
