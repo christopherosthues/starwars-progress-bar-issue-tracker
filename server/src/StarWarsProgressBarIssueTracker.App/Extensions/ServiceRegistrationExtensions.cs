@@ -55,7 +55,9 @@ public static class ServiceRegistrationExtensions
 
     public static IServiceCollection AddMappers(this IServiceCollection serviceCollection)
     {
+        serviceCollection.AddScoped<IssueMapper>();
         serviceCollection.AddScoped<LabelMapper>();
+        serviceCollection.AddScoped<MilestoneMapper>();
 
         return serviceCollection;
     }
