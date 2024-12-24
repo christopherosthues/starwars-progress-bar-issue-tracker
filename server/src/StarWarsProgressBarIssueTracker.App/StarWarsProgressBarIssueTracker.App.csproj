@@ -36,6 +36,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\StarWarsProgressBarIssueTracker.CodeGen\StarWarsProgressBarIssueTracker.CodeGen\StarWarsProgressBarIssueTracker.CodeGen.csproj"
+                      OutputItemType="Analyzer" />
     <ProjectReference Include="..\StarWarsProgressBarIssueTracker.Domain\StarWarsProgressBarIssueTracker.Domain.csproj" />
     <ProjectReference Include="..\StarWarsProgressBarIssueTracker.Infrastructure\StarWarsProgressBarIssueTracker.Infrastructure.csproj" />
   </ItemGroup>

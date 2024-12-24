@@ -5,7 +5,7 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Lab
 
 public class UpdateLabelPayload
 {
-    public required LabelDto LabelDto { get; set; }
+    public required LabelDto Label { get; set; }
 
     public Error[] Errors { get; set; } = [];
 }

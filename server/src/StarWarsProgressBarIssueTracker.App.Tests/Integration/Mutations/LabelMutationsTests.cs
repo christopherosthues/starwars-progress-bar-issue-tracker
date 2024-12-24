@@ -433,7 +433,7 @@ public class LabelMutationsTests : IntegrationTestBase
                       {
                           addLabel(input: {title: "{{expectedLabel.Title}}", color: "{{expectedLabel.Color}}", textColor: "{{expectedLabel.TextColor}}"{{descriptionParameter}}})
                           {
-                              labelDto
+                              label
                               {
                                   id
                                   title
@@ -467,7 +467,7 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
-            addedLabel = response.Data.AddLabel.LabelDto;
+            addedLabel = response.Data.AddLabel.Label;
             addedLabel.Id.Should().NotBeEmpty();
             addedLabel.Title.Should().Be(expectedLabel.Title);
             addedLabel.Description.Should().Be(expectedLabel.Description);
@@ -506,7 +506,7 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             response.Should().NotBeNull();
             response.Data.AddLabel.Errors.Should().NotBeNullOrEmpty();
-            response.Data.AddLabel.LabelDto.Should().BeNull();
+            response.Data.AddLabel.Label.Should().BeNull();
 
             IEnumerable<string> resultErrors = response.Data.AddLabel.Errors.Select(error => error.Message);
             resultErrors.Should().BeEquivalentTo(errors);
@@ -532,7 +532,7 @@ public class LabelMutationsTests : IntegrationTestBase
                       {
                           updateLabel(input: {id: "{{expectedLabel.Id}}", title: "{{expectedLabel.Title}}", color: "{{expectedLabel.Color}}", textColor: "{{expectedLabel.TextColor}}"{{descriptionParameter}}})
                           {
-                              labelDto
+                              label
                               {
                                   id
                                   title
@@ -566,7 +566,7 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
-            updatedLabel = response.Data.UpdateLabel.LabelDto;
+            updatedLabel = response.Data.UpdateLabel.Label;
             updatedLabel.Id.Should().Be(expectedLabel.Id);
             updatedLabel.Title.Should().Be(expectedLabel.Title);
             updatedLabel.Description.Should().Be(expectedLabel.Description);
@@ -637,7 +637,7 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             response.Should().NotBeNull();
             response.Data.UpdateLabel.Errors.Should().NotBeNullOrEmpty();
-            response.Data.UpdateLabel.LabelDto.Should().BeNull();
+            response.Data.UpdateLabel.Label.Should().BeNull();
 
             IEnumerable<string> resultErrors = response.Data.UpdateLabel.Errors.Select(error => error.Message);
             resultErrors.Should().BeEquivalentTo(errors);
@@ -658,7 +658,7 @@ public class LabelMutationsTests : IntegrationTestBase
                       {
                           deleteLabel(input: {id: "{{expectedLabel.Id}}"})
                           {
-                              labelDto
+                              label
                               {
                                   id
                                   title
@@ -689,7 +689,7 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
-            LabelDto deletedLabel = response.Data.DeleteLabel.LabelDto;
+            LabelDto deletedLabel = response.Data.DeleteLabel.Label;
             deletedLabel.Id.Should().NotBeEmpty();
             deletedLabel.Title.Should().Be(expectedLabel.Title);
             deletedLabel.Description.Should().Be(expectedLabel.Description);
@@ -719,7 +719,7 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             response.Should().NotBeNull();
             response.Data.DeleteLabel.Errors.Should().NotBeNullOrEmpty();
-            response.Data.DeleteLabel.LabelDto.Should().BeNull();
+            response.Data.DeleteLabel.Label.Should().BeNull();
 
             IEnumerable<string> resultErrors = response.Data.DeleteLabel.Errors.Select(error => error.Message);
             resultErrors.Should().BeEquivalentTo(errors);
