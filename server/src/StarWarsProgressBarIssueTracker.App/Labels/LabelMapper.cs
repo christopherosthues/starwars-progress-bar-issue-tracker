@@ -1,10 +1,16 @@
-using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
+using StarWarsProgressBarIssueTracker.Domain.Milestones;
+using StarWarsProgressBarIssueTracker.Domain.Releases;
 
 namespace StarWarsProgressBarIssueTracker.App.Labels;
 
 public class LabelMapper
 {
+    public LabelDto? MapToNullableLabelDto(Label? label)
+    {
+        return label == null ? null : MapToLabelDto(label);
+    }
+
     public LabelDto MapToLabelDto(Label label)
     {
         return new LabelDto
@@ -18,17 +24,72 @@ public class LabelMapper
             TextColor = label.TextColor,
             GitHubId = label.GitHubId,
             GitlabId = label.GitlabId,
+            Issues = label.Issues.Select(issue => new IssueDto
+            {
+                Id = issue.Id,
+                CreatedAt = issue.CreatedAt,
+                LastModifiedAt = issue.LastModifiedAt,
+                Title = issue.Title,
+                Description = issue.Description,
+                State = issue.State,
+                Priority = issue.Priority,
+                Milestone = MapToMilestoneDto(issue.Milestone),
+                Release = MapToReleaseDto(issue.Release),
+                Vehicle = issue.Vehicle,
+                Labels = issue.Labels.Select(MapToIssueLabelDto).ToList(),
+                GitlabId = issue.GitlabId,
+                GitlabIid = issue.GitlabIid,
+                GitHubId = issue.GitlabId,
+            }).ToList()
         };
     }
 
-    public GetLabelDto? MapToGetLabelDto(Label? label)
+    private static MilestoneDto? MapToMilestoneDto(Milestone? milestone)
     {
-        if (label == null)
+        if (milestone == null)
         {
             return null;
         }
 
-        return new GetLabelDto
+        return new MilestoneDto
+        {
+            Id = milestone.Id,
+            CreatedAt = milestone.CreatedAt,
+            LastModifiedAt = milestone.LastModifiedAt,
+            Title = milestone.Title,
+            Description = milestone.Description,
+            State = milestone.State,
+            GitlabId = milestone.GitlabId,
+            GitlabIid = milestone.GitlabIid,
+            GitHubId = milestone.GitHubId,
+        };
+    }
+
+    private static ReleaseDto? MapToReleaseDto(Release? release)
+    {
+        if (release == null)
+        {
+            return null;
+        }
+
+        return new ReleaseDto
+        {
+            Id = release.Id,
+            CreatedAt = release.CreatedAt,
+            LastModifiedAt = release.LastModifiedAt,
+            Title = release.Title,
+            Notes = release.Notes,
+            State = release.State,
+            Date = release.Date,
+            GitlabId = release.GitlabId,
+            GitlabIid = release.GitlabIid,
+            GitHubId = release.GitlabId,
+        };
+    }
+
+    private static IssueLabelDto MapToIssueLabelDto(Label label)
+    {
+        return new IssueLabelDto
         {
             Id = label.Id,
             CreatedAt = label.CreatedAt,
@@ -39,21 +100,10 @@ public class LabelMapper
             TextColor = label.TextColor,
             GitHubId = label.GitHubId,
             GitlabId = label.GitlabId,
-            Issues = label.Issues.Select(issue => new LabelIssueDto
-            {
-                Id = issue.Id,
-                CreatedAt = issue.CreatedAt,
-                LastModifiedAt = issue.LastModifiedAt,
-                Title = issue.Title,
-                Description = issue.Description,
-                GitlabId = issue.GitlabId,
-                GitlabIid = issue.GitlabIid,
-                GitHubId = issue.GitlabId,
-            }).ToList()
         };
     }
 
-    public Label MapToLabel(GetLabelDto label)
+    public Label MapToLabel(LabelDto label)
     {
         return new Label
         {
@@ -65,18 +115,7 @@ public class LabelMapper
             Color = label.Color,
             TextColor = label.TextColor,
             GitHubId = label.GitHubId,
-            GitlabId = label.GitlabId,
-            Issues = label.Issues.Select(issue => new Issue
-            {
-                Id = issue.Id,
-                CreatedAt = issue.CreatedAt,
-                LastModifiedAt = issue.LastModifiedAt,
-                Title = issue.Title,
-                Description = issue.Description,
-                GitlabId = issue.GitlabId,
-                GitlabIid = issue.GitlabIid,
-                GitHubId = issue.GitlabId,
-            }).ToList()
+            GitlabId = label.GitlabId
         };
     }
 }

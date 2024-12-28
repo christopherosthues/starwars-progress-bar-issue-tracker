@@ -15,26 +15,26 @@ public partial class IssueTrackerQueries
 {
     [UsePaging(IncludeTotalCount = true)]
     [UseSorting]
-    public async Task<Connection<GetLabelDto>> GetLabels(
+    public async Task<Connection<LabelDto>> GetLabels(
         PagingArguments pagingArguments,
         ILabelService labelService,
         LabelMapper labelMapper,
         CancellationToken cancellationToken)
     {
         Page<Label> page = await labelService.GetAllLabelsAsync(pagingArguments, cancellationToken);
-        Page<GetLabelDto> dtoPage = new Page<GetLabelDto>(
-            [..page.Items.Select(label => labelMapper.MapToGetLabelDto(label)!)], page.HasNextPage,
+        Page<LabelDto> dtoPage = new Page<LabelDto>(
+            [..page.Items.Select(labelMapper.MapToLabelDto)], page.HasNextPage,
             page.HasPreviousPage, label => page.CreateCursor(labelMapper.MapToLabel(label)), page.TotalCount);
         return dtoPage.ToConnectionWithTotalCount();
     }
 
     [Error<DomainIdNotFoundException>]
-    public async Task<GetLabelDto?> GetLabel(
+    public async Task<LabelDto?> GetLabel(
         ILabelService labelService,
         LabelMapper labelMapper,
         Guid id, CancellationToken cancellationToken)
     {
-        return labelMapper.MapToGetLabelDto(await labelService.GetLabelAsync(id, cancellationToken));
+        return labelMapper.MapToNullableLabelDto(await labelService.GetLabelAsync(id, cancellationToken));
     }
 
     [DataLoader]

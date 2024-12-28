@@ -13,6 +13,20 @@ public class LabelRepository(IssueTrackerContext context) : IssueTrackerReposito
         return await DbSet
             .AsNoTracking()
             .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Milestone)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Release)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Vehicle)
+            .ThenInclude(dbVehicle => dbVehicle!.Appearances)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Vehicle)
+            .ThenInclude(dbVehicle => dbVehicle!.Photos)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Vehicle)
+            .ThenInclude(dbVehicle => dbVehicle!.Translations)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Labels)
             .OrderBy(label => label.Title)
             .ThenBy(label => label.Id)
             .ToPageAsync(pagingArguments, true, cancellationToken);
@@ -23,6 +37,20 @@ public class LabelRepository(IssueTrackerContext context) : IssueTrackerReposito
         return DbSet
             .AsNoTracking()
             .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Milestone)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Release)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Vehicle)
+            .ThenInclude(dbVehicle => dbVehicle!.Appearances)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Vehicle)
+            .ThenInclude(dbVehicle => dbVehicle!.Photos)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Vehicle)
+            .ThenInclude(dbVehicle => dbVehicle!.Translations)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Labels)
             .Where(label => ids.Contains(label.Id));
     }
 
