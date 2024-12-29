@@ -2,7 +2,7 @@ namespace StarWarsProgressBarIssueTracker.Domain.Models;
 
 public abstract class DomainBase
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; } = Guid.CreateVersion7();
 
     public DateTime CreatedAt { get; set; }
 
