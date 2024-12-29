@@ -120,4 +120,79 @@ public class IssueMapper
             GitlabId = label.GitlabId,
         };
     }
+
+    public Issue MapToIssue(IssueDto issue)
+    {
+        return new Issue
+        {
+            Id = issue.Id,
+            CreatedAt = issue.CreatedAt,
+            LastModifiedAt = issue.LastModifiedAt,
+            Title = issue.Title,
+            Description = issue.Description,
+            State = issue.State,
+            Priority = issue.Priority,
+            Milestone = MapToMilestone(issue.Milestone),
+            Release = MapToRelease(issue.Release),
+            Vehicle = issue.Vehicle,
+            Labels = issue.Labels.Select(label => new Label
+            {
+                Id = label.Id,
+                CreatedAt = label.CreatedAt,
+                LastModifiedAt = label.LastModifiedAt,
+                Title = label.Title,
+                Description = label.Description,
+                Color = label.Color,
+                TextColor = label.TextColor,
+                GitHubId = label.GitHubId,
+                GitlabId = label.GitlabId,
+            }).ToList(),
+            GitlabId = issue.GitlabId,
+            GitlabIid = issue.GitlabIid,
+            GitHubId = issue.GitlabId,
+        };
+    }
+
+    private static Milestone? MapToMilestone(MilestoneDto? milestone)
+    {
+        if (milestone == null)
+        {
+            return null;
+        }
+
+        return new Milestone
+        {
+            Id = milestone.Id,
+            CreatedAt = milestone.CreatedAt,
+            LastModifiedAt = milestone.LastModifiedAt,
+            Title = milestone.Title,
+            Description = milestone.Description,
+            State = milestone.State,
+            GitlabId = milestone.GitlabId,
+            GitlabIid = milestone.GitlabIid,
+            GitHubId = milestone.GitHubId,
+        };
+    }
+
+    private static Release? MapToRelease(ReleaseDto? release)
+    {
+        if (release == null)
+        {
+            return null;
+        }
+
+        return new Release
+        {
+            Id = release.Id,
+            CreatedAt = release.CreatedAt,
+            LastModifiedAt = release.LastModifiedAt,
+            Title = release.Title,
+            Notes = release.Notes,
+            State = release.State,
+            Date = release.Date,
+            GitlabId = release.GitlabId,
+            GitlabIid = release.GitlabIid,
+            GitHubId = release.GitlabId,
+        };
+    }
 }

@@ -1,3 +1,4 @@
+using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
@@ -115,7 +116,20 @@ public class LabelMapper
             Color = label.Color,
             TextColor = label.TextColor,
             GitHubId = label.GitHubId,
-            GitlabId = label.GitlabId
+            GitlabId = label.GitlabId,
+            Issues = label.Issues.Select(issue => new Issue
+            {
+                Id = issue.Id,
+                CreatedAt = issue.CreatedAt,
+                LastModifiedAt = issue.LastModifiedAt,
+                Title = issue.Title,
+                Description = issue.Description,
+                State = issue.State,
+                Priority = issue.Priority,
+                GitHubId = issue.GitlabIid,
+                GitlabId = issue.GitlabId,
+                GitlabIid = issue.GitlabIid,
+            }).ToList()
         };
     }
 }

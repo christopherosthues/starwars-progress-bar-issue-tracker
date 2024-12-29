@@ -1,3 +1,4 @@
+using StarWarsProgressBarIssueTracker.App.Issues;
 using StarWarsProgressBarIssueTracker.App.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
@@ -13,4 +14,5 @@ public partial class IssueTrackerMutations(
     IIssueService issueService,
     IMilestoneService milestoneService,
     IReleaseService releaseService,
-    LabelMapper labelMapper);
+    LabelMapper labelMapper,
+    IssueMapper issueMapper);
