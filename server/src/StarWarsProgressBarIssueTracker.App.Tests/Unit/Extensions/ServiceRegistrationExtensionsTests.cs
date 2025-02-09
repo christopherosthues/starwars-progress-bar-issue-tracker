@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
+using NSubstitute;
 using StarWarsProgressBarIssueTracker.App.Appearances;
 using StarWarsProgressBarIssueTracker.App.Extensions;
 using StarWarsProgressBarIssueTracker.App.Issues;
@@ -17,29 +17,27 @@ using StarWarsProgressBarIssueTracker.TestHelpers.Extensions;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Unit.Extensions;
 
-[TestFixture(TestOf = typeof(ServiceRegistrationExtensions))]
 public class ServiceCollectionExtensionsTests
 {
     [Test]
     public void AddIssueTrackerServices_RegistersAllServices()
     {
         // Arrange
-        Mock<IServiceCollection> serviceCollectionMock = new();
-        IServiceCollection sut = serviceCollectionMock.Object;
+        IServiceCollection sut = Substitute.For<IServiceCollection>();
 
         // Act
         sut.AddIssueTrackerServices();
 
         // Assert
-        serviceCollectionMock.VerifyServiceRegistered(typeof(IAppearanceService), typeof(AppearanceService),
+        sut.VerifyServiceRegistered(typeof(IAppearanceService), typeof(AppearanceService),
             ServiceLifetime.Scoped);
-        serviceCollectionMock.VerifyServiceRegistered(typeof(IIssueService), typeof(IssueService),
+        sut.VerifyServiceRegistered(typeof(IIssueService), typeof(IssueService),
             ServiceLifetime.Scoped);
-        serviceCollectionMock.VerifyServiceRegistered(typeof(ILabelService), typeof(LabelService),
+        sut.VerifyServiceRegistered(typeof(ILabelService), typeof(LabelService),
             ServiceLifetime.Scoped);
-        serviceCollectionMock.VerifyServiceRegistered(typeof(IMilestoneService), typeof(MilestoneService),
+        sut.VerifyServiceRegistered(typeof(IMilestoneService), typeof(MilestoneService),
             ServiceLifetime.Scoped);
-        serviceCollectionMock.VerifyServiceRegistered(typeof(IReleaseService), typeof(ReleaseService),
+        sut.VerifyServiceRegistered(typeof(IReleaseService), typeof(ReleaseService),
             ServiceLifetime.Scoped);
     }
 
@@ -47,27 +45,25 @@ public class ServiceCollectionExtensionsTests
     public void AddGraphQlQueries_RegistersGraphQlQueries()
     {
         // Arrange
-        Mock<IServiceCollection> serviceCollectionMock = new();
-        IServiceCollection sut = serviceCollectionMock.Object;
+        IServiceCollection sut = Substitute.For<IServiceCollection>();
 
         // Act
         sut.AddGraphQlQueries();
 
         // Assert
-        serviceCollectionMock.VerifyServiceRegistered(typeof(IssueTrackerQueries), ServiceLifetime.Scoped);
+        sut.VerifyServiceRegistered(typeof(IssueTrackerQueries), ServiceLifetime.Scoped);
     }
 
     [Test]
     public void AddGraphQlMutations_RegistersGraphQlMutations()
     {
         // Arrange
-        Mock<IServiceCollection> serviceCollectionMock = new();
-        IServiceCollection sut = serviceCollectionMock.Object;
+        IServiceCollection sut = Substitute.For<IServiceCollection>();
 
         // Act
         sut.AddGraphQlMutations();
 
         // Assert
-        serviceCollectionMock.VerifyServiceRegistered(typeof(IssueTrackerMutations), ServiceLifetime.Scoped);
+        sut.VerifyServiceRegistered(typeof(IssueTrackerMutations), ServiceLifetime.Scoped);
     }
 }

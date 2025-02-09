@@ -1,11 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
+using NSubstitute;
 using StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Networking;
 using StarWarsProgressBarIssueTracker.TestHelpers;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Tests;
 
-[TestFixture(TestOf = typeof(RegisterServices))]
 [Category(TestCategory.Unit)]
 public class RegisterServicesTests
 {
@@ -13,19 +12,17 @@ public class RegisterServicesTests
     public void AddGitlabServicesShouldRegisterGitlabGraphQlAndRestServices()
     {
         // Arrange
-        var serviceCollectionMock = new Mock<IServiceCollection>();
+        IServiceCollection? serviceCollectionMock = Substitute.For<IServiceCollection>();
 
         // Act
-        serviceCollectionMock.Object.AddGitlabServices();
+        serviceCollectionMock.AddGitlabServices();
 
         // Assert
-        serviceCollectionMock.Verify(
-            mock => mock.Add(It.Is<ServiceDescriptor>(sd =>
+        serviceCollectionMock.Received(1).Add(Arg.Is<ServiceDescriptor>(sd =>
                 sd.ServiceType == typeof(GraphQLService) && sd.ImplementationType == typeof(GraphQLService) &&
-                sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
-        serviceCollectionMock.Verify(
-            mock => mock.Add(It.Is<ServiceDescriptor>(sd =>
+                sd.Lifetime == ServiceLifetime.Scoped));
+        serviceCollectionMock.Received(1).Add(Arg.Is<ServiceDescriptor>(sd =>
                 sd.ServiceType == typeof(RestService) && sd.ImplementationType == typeof(RestService) &&
-                sd.Lifetime == ServiceLifetime.Scoped)), Times.Once);
+                sd.Lifetime == ServiceLifetime.Scoped));
     }
 }

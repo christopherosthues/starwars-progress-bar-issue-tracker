@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using FluentAssertions;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -15,31 +14,31 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Integration;
 /// </summary>
 public class IntegrationTestBase
 {
-    protected IssueTrackerWebApplicationFactory ApiFactory = default!;
-    protected HttpClient HttpClient = default!;
-    protected GraphQLHttpClient GraphQLClient = default!;
+    protected static IssueTrackerWebApplicationFactory ApiFactory = null!;
+    protected static HttpClient HttpClient = null!;
+    protected static GraphQLHttpClient GraphQLClient = null!;
 
-    [OneTimeSetUp]
-    public async Task SetUpOnceBase()
+    [Before(Class)]
+    public static async Task SetUpOnceBase()
     {
-        AssertionOptions.AssertEquivalencyUsing(options =>
-            options.Using<DateTime>(ctx =>
-                    ctx.Subject.Should().BeCloseTo(ctx.Expectation, TimeSpan.FromMilliseconds(300)))
-                .WhenTypeIs<DateTime>());
-        AssertionOptions.AssertEquivalencyUsing(options =>
-            options.Using<DateTime?>(ctx =>
-                {
-                    if (ctx.Expectation.HasValue)
-                    {
-                        ctx.Subject.Should().NotBeNull();
-                        ctx.Subject.Should().BeCloseTo(ctx.Expectation.Value, TimeSpan.FromMilliseconds(300));
-                    }
-                    else
-                    {
-                        ctx.Subject.Should().BeNull();
-                    }
-                })
-                .WhenTypeIs<DateTime?>());
+        // AssertionOptions.AssertEquivalencyUsing(options =>
+        //     options.Using<DateTime>(ctx =>
+        //             ctx.Subject.Should().BeCloseTo(ctx.Expectation, TimeSpan.FromMilliseconds(300)))
+        //         .WhenTypeIs<DateTime>());
+        // AssertionOptions.AssertEquivalencyUsing(options =>
+        //     options.Using<DateTime?>(ctx =>
+        //         {
+        //             if (ctx.Expectation.HasValue)
+        //             {
+        //                 ctx.Subject.Should().NotBeNull();
+        //                 ctx.Subject.Should().BeCloseTo(ctx.Expectation.Value, TimeSpan.FromMilliseconds(300));
+        //             }
+        //             else
+        //             {
+        //                 ctx.Subject.Should().BeNull();
+        //             }
+        //         })
+        //         .WhenTypeIs<DateTime?>());
 
         ApiFactory = new IssueTrackerWebApplicationFactory();
         await ApiFactory.StartAsync();
@@ -54,7 +53,7 @@ public class IntegrationTestBase
                 HttpClient);
     }
 
-    [SetUp]
+    [Before(Test)]
     public async Task SetUpBase()
     {
         using var scope = ApiFactory.Services.CreateScope();
@@ -83,15 +82,15 @@ public class IntegrationTestBase
         await dbContext.SaveChangesAsync();
     }
 
-    protected void CheckDbContent(Action<IssueTrackerContext> check)
+    protected async Task CheckDbContentAsync(Func<IssueTrackerContext, Task> checkAsync)
     {
         using var scope = ApiFactory.Services.CreateScope();
         var serviceProvider = scope.ServiceProvider;
         var dbContext = serviceProvider.GetRequiredService<IssueTrackerContext>();
-        check(dbContext);
+        await checkAsync(dbContext);
     }
 
-    [TearDown]
+    [After(Test)]
     public async Task TearDownBase()
     {
         using var scope = ApiFactory.Services.CreateScope();
@@ -122,8 +121,8 @@ public class IntegrationTestBase
         await dbContext.SaveChangesAsync();
     }
 
-    [OneTimeTearDown]
-    public async Task TearDownOnceBase()
+    [After(Class)]
+    public static async Task TearDownOnceBase()
     {
         HttpClient.Dispose();
         GraphQLClient.Dispose();

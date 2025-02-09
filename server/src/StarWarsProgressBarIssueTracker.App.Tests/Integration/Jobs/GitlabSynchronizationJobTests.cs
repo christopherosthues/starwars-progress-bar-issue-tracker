@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using StarWarsProgressBarIssueTracker.App.Jobs;
@@ -15,14 +14,13 @@ using WireMock.Settings;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Jobs;
 
-[TestFixture(TestOf = typeof(GitlabSynchronizationJob))]
 [Category(TestCategory.Integration)]
-[Ignore("Needs to be fixed after Gitlab synchronization is migrated")]
+[Skip("Needs to be fixed after Gitlab synchronization is migrated")]
 public class GitlabSynchronizationJobTests : IntegrationTestBase
 {
-    private WireMockServer _server = default!;
+    private WireMockServer _server = null!;
 
-    [SetUp]
+    [Before(Test)]
     public void SetUp()
     {
         _server = WireMockServer.Start(new WireMockServerSettings
@@ -32,7 +30,7 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
         });
     }
 
-    [TearDown]
+    [After(Test)]
     public void TearDown()
     {
         _server.Stop();
@@ -70,11 +68,13 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(GitlabMockData.LabelResponse));
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().ContainEquivalentOf(deletedLabel,
-                options => options.Excluding(dbLabel => dbLabel.Id).Excluding(dbLabel => dbLabel.CreatedAt)
-                    .Excluding(dbLabel => dbLabel.Issues));
+            await Assert.That(context.Labels).Contains(deletedLabel);
+            // context.Labels.Should().ContainEquivalentOf(deletedLabel,
+                // options => options.Excluding(dbLabel => dbLabel.Id).Excluding(dbLabel => dbLabel.CreatedAt)
+                    // .Excluding(dbLabel => dbLabel.Issues));
+            await Assert.That()
             context.Labels.Should().ContainEquivalentOf(githubLabel,
                 options => options.Excluding(dbLabel => dbLabel.Id).Excluding(dbLabel => dbLabel.CreatedAt));
             context.Labels.Should().ContainEquivalentOf(expectedDbLabels[0],
@@ -82,14 +82,14 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
             context.Issues.Should().ContainEquivalentOf(dbIssue,
                 options => options.Excluding(issue => issue.Id).Excluding(issue => issue.CreatedAt)
                     .Excluding(issue => issue.Labels));
-            context.Issues.Include(entity => entity.Labels).First().Labels.Should().NotBeEmpty();
+            await Assert.That(context.Issues.Include(entity => entity.Labels).First().Labels).IsNotEmpty();
         });
 
         // Act
         await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
             context.Labels.Should().NotBeEmpty();
             var resultLabels = context.Labels.ToList();
@@ -104,7 +104,7 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
             var issues = context.Issues.Include(issue => issue.Labels).ToList();
             issues.Should().ContainEquivalentOf(dbIssue, options => options.Excluding(issue => issue.Id)
                 .Excluding(issue => issue.CreatedAt).Excluding(issue => issue.Labels));
-            issues[0].Labels.Should().BeEmpty();
+            await Assert.That(issues[0].Labels).IsEmpty();
         });
     }
 
@@ -142,7 +142,7 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(GitlabMockData.AppearanceResponse));
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
             context.Appearances.Should().ContainEquivalentOf(deletedAppearance,
                 options => options.Excluding(dbAppearance => dbAppearance.Id).Excluding(dbAppearance => dbAppearance.CreatedAt));
@@ -160,7 +160,7 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
         await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
             context.Appearances.Should().NotBeEmpty();
             var resultAppearances = context.Appearances.ToList();
@@ -208,7 +208,7 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(GitlabMockData.MilestoneResponse));
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
             context.Milestones.Should().ContainEquivalentOf(deletedMilestone,
                 options => options.Excluding(dbMilestone => dbMilestone.Id).Excluding(dbMilestone => dbMilestone.CreatedAt)
@@ -227,7 +227,7 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
         await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
             context.Milestones.Should().NotBeEmpty();
             var resultMilestones = context.Milestones.ToList();
@@ -277,7 +277,7 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(GitlabMockData.ReleaseResponse));
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
             context.Releases.Should().ContainEquivalentOf(deletedRelease,
                 options => options.Excluding(dbRelease => dbRelease.Id).Excluding(dbRelease => dbRelease.CreatedAt)
@@ -296,7 +296,7 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
         await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
             context.Releases.Should().NotBeEmpty();
             var resultReleases = context.Releases.ToList();

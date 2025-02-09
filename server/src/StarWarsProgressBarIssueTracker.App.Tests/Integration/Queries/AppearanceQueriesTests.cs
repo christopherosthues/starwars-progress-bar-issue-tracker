@@ -9,7 +9,6 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
-[TestFixture(TestOf = typeof(IssueTrackerQueries))]
 [Category(TestCategory.Integration)]
 public class AppearanceQueriesTests : IntegrationTestBase
 {
@@ -17,7 +16,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
     public async Task GetAppearancesShouldReturnEmptyListIfNoAppearanceExist()
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().BeEmpty();
         });
@@ -65,7 +64,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
             context.Appearances.Add(dbAppearance);
             context.Appearances.Add(dbAppearance2);
         });
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().ContainEquivalentOf(dbAppearance);
             context.Appearances.Should().ContainEquivalentOf(dbAppearance2);
@@ -168,7 +167,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
     public async Task GetAppearanceShouldReturnNullIfAppearancesAreEmpty()
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().BeEmpty();
         });

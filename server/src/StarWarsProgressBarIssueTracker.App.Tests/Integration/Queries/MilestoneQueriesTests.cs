@@ -20,7 +20,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
     public async Task GetMilestonesShouldReturnEmptyListIfNoReleaseExist()
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().BeEmpty();
         });
@@ -87,7 +87,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
             context.Milestones.Add(dbMilestone);
             context.Milestones.Add(dbMilestone2);
         });
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             var dbMilestones = context.Milestones.ToList();
             dbMilestones.Any(milestone => milestone.Id.Equals(dbMilestone.Id)).Should().BeTrue();
@@ -211,7 +211,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
     public async Task GetMilestoneShouldReturnNullIfMilestonesAreEmpty()
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().BeEmpty();
         });

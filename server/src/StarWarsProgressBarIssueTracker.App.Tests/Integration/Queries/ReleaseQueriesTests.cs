@@ -20,7 +20,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
     public async Task GetReleasesShouldReturnEmptyListIfNoReleaseExist()
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Releases.Should().BeEmpty();
         });
@@ -88,7 +88,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             context.Releases.Add(dbRelease);
             context.Releases.Add(dbRelease2);
         });
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             var dbReleases = context.Releases.ToList();
             dbReleases.Any(release => release.Id.Equals(dbRelease.Id)).Should().BeTrue();
@@ -217,7 +217,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
     public async Task GetReleaseShouldReturnNullIfReleasesAreEmpty()
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Releases.Should().BeEmpty();
         });

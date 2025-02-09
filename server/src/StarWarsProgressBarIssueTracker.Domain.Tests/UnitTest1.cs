@@ -4,7 +4,7 @@ namespace StarWarsProgressBarIssueTracker.Domain.Tests;
 
 public class Tests
 {
-    [SetUp]
+    [Before(Test)]
     public void Setup()
     {
     }
@@ -13,6 +13,6 @@ public class Tests
     [Error("Error")]
     public void Test1()
     {
-        Assert.Pass();
+        Assert.Fail("Error test");
     }
 }

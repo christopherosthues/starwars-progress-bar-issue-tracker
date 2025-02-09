@@ -21,7 +21,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task AddAppearanceShouldAddAppearance(Appearance expectedAppearance)
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().BeEmpty();
         });
@@ -53,7 +53,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         {
             context.Appearances.Add(dbAppearance);
         });
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().ContainEquivalentOf(dbAppearance);
         });
@@ -72,7 +72,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task AddAppearanceShouldNotAddAppearance((Appearance expectedAppearance, IEnumerable<string> errors) expectedResult)
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().BeEmpty();
         });
@@ -104,7 +104,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         });
         expectedAppearance.Id = dbAppearance.Id;
         expectedAppearance.CreatedAt = dbAppearance.CreatedAt;
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().ContainEquivalentOf(dbAppearance);
         });
@@ -150,7 +150,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         });
         expectedAppearance.Id = dbAppearance.Id;
         expectedAppearance.CreatedAt = dbAppearance.CreatedAt;
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().ContainEquivalentOf(dbAppearance);
             context.Appearances.Should().ContainEquivalentOf(dbAppearance2);
@@ -170,7 +170,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task UpdateAppearanceShouldNotUpdateAppearance((Appearance expectedAppearance, IEnumerable<string> errors) expectedResult)
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().BeEmpty();
         });
@@ -188,7 +188,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     {
         // Arrange
         var appearance = CreateAppearance();
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().BeEmpty();
         });
@@ -221,7 +221,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         });
         appearance.CreatedAt = dbAppearance.CreatedAt;
         appearance.LastModifiedAt = dbAppearance.LastModifiedAt;
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().ContainEquivalentOf(dbAppearance);
         });
@@ -279,7 +279,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         });
         appearance.CreatedAt = dbAppearance.CreatedAt;
         appearance.LastModifiedAt = dbAppearance.LastModifiedAt;
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().ContainEquivalentOf(dbAppearance);
         });
@@ -290,7 +290,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
 
         // Assert
         AssertDeletedAppearance(response, appearance);
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             var dbVehicles = context.Vehicles.Include(dbVehicle => dbVehicle.Appearances).ToList();
             foreach (var dbVehicle in dbVehicles)
@@ -335,7 +335,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         });
         appearance.CreatedAt = dbAppearance.CreatedAt;
         appearance.LastModifiedAt = dbAppearance.LastModifiedAt;
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().ContainEquivalentOf(dbAppearance);
             context.Appearances.Should().ContainEquivalentOf(dbAppearance2);
@@ -354,7 +354,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     {
         // Arrange
         var appearance = CreateAppearance();
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().BeEmpty();
         });
@@ -426,7 +426,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             addedAppearance.LastModifiedAt.Should().BeNull();
         }
 
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             using (new AssertionScope())
             {
@@ -460,7 +460,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             resultErrors.Should().BeEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().BeEmpty();
         });
@@ -525,7 +525,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
                 .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
         }
 
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             using (new AssertionScope())
             {
@@ -573,7 +573,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             resultErrors.Should().BeEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().BeEmpty();
         });
@@ -630,7 +630,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             deletedAppearance.LastModifiedAt.Should().BeCloseTo(expectedAppearance.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
         }
 
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             using (new AssertionScope())
             {
@@ -656,7 +656,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             resultErrors.Should().BeEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Appearances.Should().BeEmpty();
         });

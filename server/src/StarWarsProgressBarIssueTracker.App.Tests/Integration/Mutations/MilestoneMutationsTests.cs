@@ -21,7 +21,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     public async Task AddMilestoneShouldAddMilestone(Milestone expectedMilestone)
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().BeEmpty();
         });
@@ -53,7 +53,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         {
             context.Milestones.Add(dbMilestone);
         });
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().ContainEquivalentOf(dbMilestone);
         });
@@ -72,7 +72,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     public async Task AddMilestoneShouldNotAddMilestone((Milestone expectedMilestone, IEnumerable<string> errors) expectedResult)
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().BeEmpty();
         });
@@ -103,7 +103,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         });
         expectedMilestone.Id = dbMilestone.Id;
         expectedMilestone.CreatedAt = dbMilestone.CreatedAt;
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().ContainEquivalentOf(dbMilestone);
         });
@@ -147,7 +147,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         });
         expectedMilestone.Id = dbMilestone.Id;
         expectedMilestone.CreatedAt = dbMilestone.CreatedAt;
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().ContainEquivalentOf(dbMilestone);
             context.Milestones.Should().ContainEquivalentOf(dbMilestone2);
@@ -167,7 +167,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     public async Task UpdateMilestoneShouldNotUpdateMilestone((Milestone expectedMilestone, IEnumerable<string> errors) expectedResult)
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().BeEmpty();
         });
@@ -185,7 +185,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     {
         // Arrange
         var milestone = CreateMilestone();
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().BeEmpty();
         });
@@ -217,7 +217,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         });
         milestone.CreatedAt = dbMilestone.CreatedAt;
         milestone.LastModifiedAt = dbMilestone.LastModifiedAt;
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().ContainEquivalentOf(dbMilestone);
         });
@@ -272,7 +272,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         });
         milestone.CreatedAt = dbMilestone.CreatedAt;
         milestone.LastModifiedAt = dbMilestone.LastModifiedAt;
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().ContainEquivalentOf(dbMilestone, options => options.Excluding(entity => entity.Issues));
         });
@@ -283,7 +283,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
 
         // Assert
         AssertDeletedMilestone(response, milestone);
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             var dbIssues = context.Issues.Include(dbEntity => dbEntity.Milestone).ToList();
             dbIssues.Should().Contain(i => i.Id.Equals(dbIssue.Id));
@@ -328,7 +328,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         });
         milestone.CreatedAt = dbMilestone.CreatedAt;
         milestone.LastModifiedAt = dbMilestone.LastModifiedAt;
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().ContainEquivalentOf(dbMilestone);
             context.Milestones.Should().ContainEquivalentOf(dbMilestone2);
@@ -347,7 +347,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     {
         // Arrange
         var milestone = CreateMilestone();
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().BeEmpty();
         });
@@ -423,7 +423,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             addedMilestone.LastModifiedAt.Should().BeNull();
         }
 
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             using (new AssertionScope())
             {
@@ -458,7 +458,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             resultErrors.Should().BeEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().BeEmpty();
         });
@@ -534,7 +534,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             }
         }
 
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             using (new AssertionScope())
             {
@@ -598,7 +598,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             resultErrors.Should().BeEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().BeEmpty();
         });
@@ -657,7 +657,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             deletedMilestone.LastModifiedAt.Should().BeCloseTo(expectedMilestone.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
         }
 
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             using (new AssertionScope())
             {
@@ -683,7 +683,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             resultErrors.Should().BeEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Milestones.Should().BeEmpty();
         });

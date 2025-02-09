@@ -21,7 +21,7 @@ public class LabelQueriesTests : IntegrationTestBase
     public async Task GetLabelsShouldReturnEmptyListIfNoLabelExist()
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Labels.Should().BeEmpty();
         });
@@ -69,7 +69,7 @@ public class LabelQueriesTests : IntegrationTestBase
             context.Labels.Add(dbLabel);
             context.Labels.Add(dbLabel2);
         });
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Labels.Should().ContainEquivalentOf(dbLabel);
             context.Labels.Should().ContainEquivalentOf(dbLabel2);
@@ -172,7 +172,7 @@ public class LabelQueriesTests : IntegrationTestBase
     public async Task GetLabelShouldReturnNullIfLabelsAreEmpty()
     {
         // Arrange
-        CheckDbContent(context =>
+        CheckDbContentAsync(context =>
         {
             context.Labels.Should().BeEmpty();
         });
