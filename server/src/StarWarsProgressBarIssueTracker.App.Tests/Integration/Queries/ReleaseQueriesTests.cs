@@ -12,7 +12,6 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
-[TestFixture(TestOf = typeof(IssueTrackerQueries))]
 [Category(TestCategory.Integration)]
 public class ReleaseQueriesTests : IntegrationTestBase
 {
@@ -30,7 +29,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         var response = await GraphQLClient.SendQueryAsync<GetReleasesResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
@@ -102,7 +101,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         var response = await GraphQLClient.SendQueryAsync<GetReleasesResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
@@ -202,7 +201,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         var response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNull();
@@ -228,7 +227,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         var response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNull();
@@ -285,7 +284,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         var response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNull();

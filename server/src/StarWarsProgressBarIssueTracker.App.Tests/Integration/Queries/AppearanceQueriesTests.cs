@@ -1,7 +1,4 @@
-using FluentAssertions;
-using FluentAssertions.Execution;
 using GraphQL;
-using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Appearances;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
@@ -16,9 +13,9 @@ public class AppearanceQueriesTests : IntegrationTestBase
     public async Task GetAppearancesShouldReturnEmptyListIfNoAppearanceExist()
     {
         // Arrange
-        CheckDbContentAsync(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().BeEmpty();
+            await Assert.That(context.Appearances).IsEmpty();
         });
         var request = CreateGetAppearancesRequest();
 
@@ -26,18 +23,18 @@ public class AppearanceQueriesTests : IntegrationTestBase
         var response = await GraphQLClient.SendQueryAsync<GetAppearancesResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
-            response.Data.Should().NotBeNull();
-            response.Data.Appearances.TotalCount.Should().Be(0);
-            response.Data.Appearances.PageInfo.HasNextPage.Should().BeFalse();
-            response.Data.Appearances.PageInfo.HasPreviousPage.Should().BeFalse();
-            response.Data.Appearances.PageInfo.StartCursor.Should().BeNull();
-            response.Data.Appearances.PageInfo.EndCursor.Should().BeNull();
-            response.Data.Appearances.Edges.Should().BeEmpty();
-            response.Data.Appearances.Nodes.Should().BeEmpty();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Appearances.TotalCount).IsEqualTo(0);
+            await Assert.That(response.Data.Appearances.PageInfo.HasNextPage).IsFalse();
+            await Assert.That(response.Data.Appearances.PageInfo.HasPreviousPage).IsFalse();
+            await Assert.That(response.Data.Appearances.PageInfo.StartCursor).IsNull();
+            await Assert.That(response.Data.Appearances.PageInfo.EndCursor).IsNull();
+            await Assert.That(response.Data.Appearances.Edges).IsEmpty();
+            await Assert.That(response.Data.Appearances.Nodes).IsEmpty();
         }
     }
 
@@ -64,10 +61,13 @@ public class AppearanceQueriesTests : IntegrationTestBase
             context.Appearances.Add(dbAppearance);
             context.Appearances.Add(dbAppearance2);
         });
-        CheckDbContentAsync(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().ContainEquivalentOf(dbAppearance);
-            context.Appearances.Should().ContainEquivalentOf(dbAppearance2);
+            using (Assert.Multiple())
+            {
+                await Assert.That(context.Appearances).Contains(dbAppearance);
+                await Assert.That(context.Appearances).Contains(dbAppearance2);
+            }
         });
         var request = CreateGetAppearancesRequest();
 
@@ -75,58 +75,58 @@ public class AppearanceQueriesTests : IntegrationTestBase
         var response = await GraphQLClient.SendQueryAsync<GetAppearancesResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
-            response.Data.Should().NotBeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
+            await Assert.That(response.Data).IsNotNull();
 
-            response.Data.Appearances.TotalCount.Should().Be(2);
-            response.Data.Appearances.PageInfo.HasNextPage.Should().BeFalse();
-            response.Data.Appearances.PageInfo.HasPreviousPage.Should().BeFalse();
-            response.Data.Appearances.PageInfo.StartCursor.Should().NotBeNull();
-            response.Data.Appearances.PageInfo.EndCursor.Should().NotBeNull();
+            await Assert.That(response.Data.Appearances.TotalCount).IsEqualTo(2);
+            await Assert.That(response.Data.Appearances.PageInfo.HasNextPage).IsFalse();
+            await Assert.That(response.Data.Appearances.PageInfo.HasPreviousPage).IsFalse();
+            await Assert.That(response.Data.Appearances.PageInfo.StartCursor).IsNotNull();
+            await Assert.That(response.Data.Appearances.PageInfo.EndCursor).IsNotNull();
             List<Appearance> appearances = response.Data.Appearances.Nodes.ToList();
-            appearances.Count.Should().Be(2);
+            await Assert.That(appearances.Count).IsEqualTo(2);
 
             var appearance = appearances.Single(entity => entity.Id.Equals(dbAppearance.Id));
-            appearance.Id.Should().Be(dbAppearance.Id);
-            appearance.Title.Should().Be(dbAppearance.Title);
-            appearance.Description.Should().Be(dbAppearance.Description);
-            appearance.Color.Should().Be(dbAppearance.Color);
-            appearance.TextColor.Should().Be(dbAppearance.TextColor);
-            appearance.CreatedAt.Should().BeCloseTo(dbAppearance.CreatedAt, TimeSpan.FromMilliseconds(300));
-            appearance.LastModifiedAt.Should().Be(dbAppearance.LastModifiedAt);
+            await Assert.That(appearance.Id).IsEqualTo(dbAppearance.Id);
+            await Assert.That(appearance.Title).IsEqualTo(dbAppearance.Title);
+            await Assert.That(appearance.Description).IsEqualTo(dbAppearance.Description);
+            await Assert.That(appearance.Color).IsEqualTo(dbAppearance.Color);
+            await Assert.That(appearance.TextColor).IsEqualTo(dbAppearance.TextColor);
+            await Assert.That(appearance.CreatedAt).IsEqualTo(dbAppearance.CreatedAt);
+            await Assert.That(appearance.LastModifiedAt).IsEqualTo(dbAppearance.LastModifiedAt);
 
             var appearance2 = appearances.Single(entity => entity.Id.Equals(dbAppearance2.Id));
-            appearance2.Id.Should().Be(dbAppearance2.Id);
-            appearance2.Title.Should().Be(dbAppearance2.Title);
-            appearance2.Description.Should().Be(dbAppearance2.Description);
-            appearance2.Color.Should().Be(dbAppearance2.Color);
-            appearance2.TextColor.Should().Be(dbAppearance2.TextColor);
-            appearance2.CreatedAt.Should().BeCloseTo(dbAppearance2.CreatedAt, TimeSpan.FromMilliseconds(300));
-            appearance2.LastModifiedAt.Should().Be(dbAppearance2.LastModifiedAt);
+            await Assert.That(appearance2.Id).IsEqualTo(dbAppearance2.Id);
+            await Assert.That(appearance2.Title).IsEqualTo(dbAppearance2.Title);
+            await Assert.That(appearance2.Description).IsEqualTo(dbAppearance2.Description);
+            await Assert.That(appearance2.Color).IsEqualTo(dbAppearance2.Color);
+            await Assert.That(appearance2.TextColor).IsEqualTo(dbAppearance2.TextColor);
+            await Assert.That(appearance2.CreatedAt).IsEqualTo(dbAppearance2.CreatedAt);
+            await Assert.That(appearance2.LastModifiedAt).IsEqualTo(dbAppearance2.LastModifiedAt);
 
             List<Edge<Appearance>> edges = response.Data.Appearances.Edges.ToList();
-            edges.Count.Should().Be(2);
+            await Assert.That(edges.Count).IsEqualTo(2);
 
             Appearance edgeAppearance = edges.Single(entity => entity.Node.Id.Equals(dbAppearance.Id)).Node;
-            edgeAppearance.Id.Should().Be(dbAppearance.Id);
-            edgeAppearance.Title.Should().Be(dbAppearance.Title);
-            edgeAppearance.Description.Should().Be(dbAppearance.Description);
-            edgeAppearance.Color.Should().Be(dbAppearance.Color);
-            edgeAppearance.TextColor.Should().Be(dbAppearance.TextColor);
-            edgeAppearance.CreatedAt.Should().BeCloseTo(dbAppearance.CreatedAt, TimeSpan.FromMilliseconds(300));
-            edgeAppearance.LastModifiedAt.Should().Be(dbAppearance.LastModifiedAt);
+            await Assert.That(edgeAppearance.Id).IsEqualTo(dbAppearance.Id);
+            await Assert.That(edgeAppearance.Title).IsEqualTo(dbAppearance.Title);
+            await Assert.That(edgeAppearance.Description).IsEqualTo(dbAppearance.Description);
+            await Assert.That(edgeAppearance.Color).IsEqualTo(dbAppearance.Color);
+            await Assert.That(edgeAppearance.TextColor).IsEqualTo(dbAppearance.TextColor);
+            await Assert.That(edgeAppearance.CreatedAt).IsEqualTo(dbAppearance.CreatedAt);
+            await Assert.That(edgeAppearance.LastModifiedAt).IsEqualTo(dbAppearance.LastModifiedAt);
 
             Appearance edgeAppearance2 = edges.Single(entity => entity.Node.Id.Equals(dbAppearance2.Id)).Node;
-            edgeAppearance2.Id.Should().Be(dbAppearance2.Id);
-            edgeAppearance2.Title.Should().Be(dbAppearance2.Title);
-            edgeAppearance2.Description.Should().Be(dbAppearance2.Description);
-            edgeAppearance2.Color.Should().Be(dbAppearance2.Color);
-            edgeAppearance2.TextColor.Should().Be(dbAppearance2.TextColor);
-            edgeAppearance2.CreatedAt.Should().BeCloseTo(dbAppearance2.CreatedAt, TimeSpan.FromMilliseconds(300));
-            edgeAppearance2.LastModifiedAt.Should().Be(dbAppearance2.LastModifiedAt);
+            await Assert.That(edgeAppearance2.Id).IsEqualTo(dbAppearance2.Id);
+            await Assert.That(edgeAppearance2.Title).IsEqualTo(dbAppearance2.Title);
+            await Assert.That(edgeAppearance2.Description).IsEqualTo(dbAppearance2.Description);
+            await Assert.That(edgeAppearance2.Color).IsEqualTo(dbAppearance2.Color);
+            await Assert.That(edgeAppearance2.TextColor).IsEqualTo(dbAppearance2.TextColor);
+            await Assert.That(edgeAppearance2.CreatedAt).IsEqualTo(dbAppearance2.CreatedAt);
+            await Assert.That(edgeAppearance2.LastModifiedAt).IsEqualTo(dbAppearance2.LastModifiedAt);
         }
     }
 
@@ -152,14 +152,14 @@ public class AppearanceQueriesTests : IntegrationTestBase
         var response = await GraphQLClient.SendQueryAsync<GetAppearanceResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull();
             // response.Errors!.First().Extensions!["message"].Should().Be($"No Appearance found with id '{id}'.",
             //     StringComparer.InvariantCultureIgnoreCase);
-            response.Data.Should().NotBeNull();
-            response.Data.Appearance.Should().BeNull();
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Appearance).IsNull();
         }
     }
 
@@ -167,9 +167,9 @@ public class AppearanceQueriesTests : IntegrationTestBase
     public async Task GetAppearanceShouldReturnNullIfAppearancesAreEmpty()
     {
         // Arrange
-        CheckDbContentAsync(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().BeEmpty();
+            await Assert.That(context.Appearances).IsEmpty();
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
         var request = CreateGetAppearanceRequest(id);
@@ -178,14 +178,14 @@ public class AppearanceQueriesTests : IntegrationTestBase
         var response = await GraphQLClient.SendQueryAsync<GetAppearanceResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull();
             // response.Errors!.First().Extensions!["message"].Should().Be($"No Appearance found with id '{id}'.",
             //     StringComparer.InvariantCultureIgnoreCase);
-            response.Data.Should().NotBeNull();
-            response.Data.Appearance.Should().BeNull();
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Appearance).IsNull();
         }
     }
 
@@ -220,21 +220,21 @@ public class AppearanceQueriesTests : IntegrationTestBase
         var response = await GraphQLClient.SendQueryAsync<GetAppearanceResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
-            response.Data.Should().NotBeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull();
+            await Assert.That(response.Data).IsNotNull();
             var appearance = response.Data.Appearance;
 
-            appearance.Should().NotBeNull();
-            appearance!.Id.Should().Be(dbAppearance.Id);
-            appearance.Title.Should().Be(dbAppearance.Title);
-            appearance.Description.Should().Be(dbAppearance.Description);
-            appearance.Color.Should().Be(dbAppearance.Color);
-            appearance.TextColor.Should().Be(dbAppearance.TextColor);
-            appearance.CreatedAt.Should().BeCloseTo(dbAppearance.CreatedAt, TimeSpan.FromMilliseconds(300));
-            appearance.LastModifiedAt.Should().Be(dbAppearance.LastModifiedAt);
+            await Assert.That(appearance).IsNotNull();
+            await Assert.That(appearance!.Id).IsEqualTo(dbAppearance.Id);
+            await Assert.That(appearance.Title).IsEqualTo(dbAppearance.Title);
+            await Assert.That(appearance.Description).IsEqualTo(dbAppearance.Description);
+            await Assert.That(appearance.Color).IsEqualTo(dbAppearance.Color);
+            await Assert.That(appearance.TextColor).IsEqualTo(dbAppearance.TextColor);
+            await Assert.That(appearance.CreatedAt).IsEqualTo(dbAppearance.CreatedAt);
+            await Assert.That(appearance.LastModifiedAt).IsEqualTo(dbAppearance.LastModifiedAt);
         }
     }
 

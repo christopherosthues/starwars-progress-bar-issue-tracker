@@ -1,10 +1,7 @@
 using Bogus;
-using FluentAssertions;
-using FluentAssertions.Execution;
 using GraphQL;
 using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.App.Labels;
-using StarWarsProgressBarIssueTracker.App.Mutations;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
@@ -18,7 +15,8 @@ public class LabelMutationsTests : IntegrationTestBase
     private const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ß_#%";
     private const string HexCodeColorChars = "0123456789abcdef";
 
-    [TestCaseSource(nameof(AddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(AddLabelCases))]
     public async Task AddLabelShouldAddLabel(Label expectedLabel)
     {
         // Arrange
@@ -34,10 +32,11 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLResponse<AddLabelResponse> response = await GraphQLClient.SendMutationAsync<AddLabelResponse>(mutationRequest);
 
         // Assert
-        AssertAddedLabelAsync(response, expectedLabel, startTime);
+        await AssertAddedLabelAsync(response, expectedLabel, startTime);
     }
 
-    [TestCaseSource(nameof(AddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(AddLabelCases))]
     public async Task AddLabelShouldAddLabelIfLabelsAreNotEmpty(Label expectedLabel)
     {
         // Arrange
@@ -66,10 +65,11 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLResponse<AddLabelResponse> response = await GraphQLClient.SendMutationAsync<AddLabelResponse>(mutationRequest);
 
         // Assert
-        AssertAddedLabelAsync(response, expectedLabel, startTime, dbLabel);
+        await AssertAddedLabelAsync(response, expectedLabel, startTime, dbLabel);
     }
 
-    [TestCaseSource(nameof(InvalidAddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(InvalidAddLabelCases))]
     public async Task AddLabelShouldNotAddLabel((Label expectedLabel, IEnumerable<string> errors) expectedResult)
     {
         // Arrange
@@ -83,10 +83,11 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLResponse<AddLabelResponse> response = await GraphQLClient.SendMutationAsync<AddLabelResponse>(mutationRequest);
 
         // Assert
-        AssertLabelNotAddedAsync(response, expectedResult.errors);
+        await AssertLabelNotAddedAsync(response, expectedResult.errors);
     }
 
-    [TestCaseSource(nameof(AddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(AddLabelCases))]
     public async Task UpdateLabelShouldUpdateLabel(Label expectedLabel)
     {
         // Arrange
@@ -117,10 +118,11 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
-        AssertUpdatedLabelAsync(response, expectedLabel, startTime);
+        await AssertUpdatedLabelAsync(response, expectedLabel, startTime);
     }
 
-    [TestCaseSource(nameof(AddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(AddLabelCases))]
     public async Task UpdateLabelShouldUpdateLabelWithIssues(Label expectedLabel)
     {
         // Arrange
@@ -156,7 +158,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
-        AssertUpdatedLabelAsync(response, expectedLabel, startTime, emptyIssues: false);
+        await AssertUpdatedLabelAsync(response, expectedLabel, startTime, emptyIssues: false);
         await CheckDbContentAsync(async context =>
         {
             Label resultLabel = context.Labels.Include(label => label.Issues).First(label => label.Id == dbLabel.Id);
@@ -165,7 +167,8 @@ public class LabelMutationsTests : IntegrationTestBase
         });
     }
 
-    [TestCaseSource(nameof(AddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(AddLabelCases))]
     public async Task UpdateLabelShouldUpdateLabelIfLabelsAreNotEmpty(Label expectedLabel)
     {
         // Arrange
@@ -209,10 +212,11 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
-        AssertUpdatedLabelAsync(response, expectedLabel, startTime, dbLabel, dbLabel2);
+        await AssertUpdatedLabelAsync(response, expectedLabel, startTime, dbLabel, dbLabel2);
     }
 
-    [TestCaseSource(nameof(InvalidAddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(InvalidAddLabelCases))]
     public async Task UpdateLabelShouldNotUpdateLabel((Label expectedLabel, IEnumerable<string> errors) expectedResult)
     {
         // Arrange
@@ -226,7 +230,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
-        AssertLabelNotUpdatedAsync(response, expectedResult.errors);
+        await AssertLabelNotUpdatedAsync(response, expectedResult.errors);
     }
 
     [Test]
@@ -244,7 +248,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
-        AssertLabelNotUpdatedAsync(response, new List<string> { $"No {nameof(Label)} found with id '{label.Id}'." });
+        await AssertLabelNotUpdatedAsync(response, new List<string> { $"No {nameof(Label)} found with id '{label.Id}'." });
     }
 
     [Test]
@@ -277,7 +281,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLResponse<DeleteLabelResponse> response = await GraphQLClient.SendMutationAsync<DeleteLabelResponse>(mutationRequest);
 
         // Assert
-        AssertDeletedLabelAsync(response, label);
+        await AssertDeletedLabelAsync(response, label);
     }
 
     [Test]
@@ -338,7 +342,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLResponse<DeleteLabelResponse> response = await GraphQLClient.SendMutationAsync<DeleteLabelResponse>(mutationRequest);
 
         // Assert
-        AssertDeletedLabelAsync(response, label);
+        await AssertDeletedLabelAsync(response, label);
         await CheckDbContentAsync(async context =>
         {
             List<Issue> dbIssues = context.Issues.Include(entity => entity.Labels).ToList();
@@ -348,7 +352,7 @@ public class LabelMutationsTests : IntegrationTestBase
                 await Assert.That(dbIssues).Contains<List<Issue>, Issue>(i => i.Id.Equals(dbIssue2.Id));
                 foreach (Issue entity in dbIssues)
                 {
-                    await Assert.That(dbIssue.Labels).DoesNotContain<List<Label>, Label>(l => l.Id.Equals(entity.Id));
+                    await Assert.That(dbIssue.Labels.ToList()).DoesNotContain<List<Label>, Label>(l => l.Id.Equals(entity.Id));
                 }
                 await Assert.That(dbIssues.First(entity => entity.Id.Equals(dbIssue2.Id)).Labels).Contains(dbLabel2);
             }
@@ -401,7 +405,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLResponse<DeleteLabelResponse> response = await GraphQLClient.SendMutationAsync<DeleteLabelResponse>(mutationRequest);
 
         // Assert
-        AssertDeletedLabelAsync(response, label, dbLabel2);
+        await AssertDeletedLabelAsync(response, label, dbLabel2);
     }
 
     [Test]
@@ -419,7 +423,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLResponse<DeleteLabelResponse> response = await GraphQLClient.SendMutationAsync<DeleteLabelResponse>(mutationRequest);
 
         // Assert
-        AssertLabelNotDeletedAsync(response, new List<string> { $"No {nameof(Label)} found with id '{label.Id}'." });
+        await AssertLabelNotDeletedAsync(response, new List<string> { $"No {nameof(Label)} found with id '{label.Id}'." });
     }
 
     private static GraphQLRequest CreateAddRequest(Label expectedLabel)
@@ -486,7 +490,7 @@ public class LabelMutationsTests : IntegrationTestBase
             {
                 if (dbLabel is not null)
                 {
-                    await Assert.That(context.Labels).Contains<List<Label>, Label>(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
+                    await Assert.That(context.Labels.ToList()).Contains<List<Label>, Label>(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
                 }
                 Label addedDbLabel = context.Labels.First(dbLabel1 => dbLabel1.Id.Equals(addedLabel.Id));
                 await Assert.That(addedLabel).IsNotNull();
@@ -583,7 +587,7 @@ public class LabelMutationsTests : IntegrationTestBase
             {
                 if (dbLabel is not null)
                 {
-                    await Assert.That(context.Labels).Contains(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
+                    await Assert.That(context.Labels.ToList()).Contains<List<Label>, Label>(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
                 }
                 Label updatedDbLabel = context.Labels.Include(label => label.Issues)
                     .First(dbLabel1 => dbLabel1.Id.Equals(updatedLabel.Id));
@@ -704,11 +708,11 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             using (Assert.Multiple())
             {
-                await Assert.That(context.Labels).DoesNotContain(dbLabel1 => dbLabel1.Id.Equals(expectedLabel.Id));
+                await Assert.That(context.Labels.ToList()).DoesNotContain<List<Label>, Label>(dbLabel1 => dbLabel1.Id.Equals(expectedLabel.Id));
 
                 if (dbLabel is not null)
                 {
-                    await Assert.That(context.Labels).Contains(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
+                    await Assert.That(context.Labels.ToList()).Contains<List<Label>, Label>(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
                 }
             }
         });
@@ -743,36 +747,37 @@ public class LabelMutationsTests : IntegrationTestBase
         return faker.Generate();
     }
 
-    private static IEnumerable<Label> AddLabelCases()
+    public static IEnumerable<Func<Label>> AddLabelCases()
     {
         Faker<Label>? faker = new Faker<Label>()
             .RuleFor(label => label.Title, f => f.Random.String2(1, 50, AllowedChars))
             .RuleFor(label => label.Description, f => f.Random.String2(0, 255, AllowedChars).OrNull(f, 0.3f))
             .RuleFor(label => label.Color, f => "#" + f.Random.String2(6, 6, HexCodeColorChars))
             .RuleFor(label => label.TextColor, f => "#" + f.Random.String2(6, 6, HexCodeColorChars));
-        return faker.Generate(20);
+        IEnumerable<Label> labels = faker.Generate(20);
+        return labels.Select<Label, Func<Label>>(label => () => label);
     }
 
-    private static IEnumerable<(Label, IEnumerable<string>)> InvalidAddLabelCases()
+    public static IEnumerable<Func<(Label, IEnumerable<string>)>> InvalidAddLabelCases()
     {
-        yield return (new Label { Title = null!, Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set.", $"The value '' for {nameof(Label.Title)} is too short. The length of {nameof(Label.Title)} has to be between 1 and 50." });
-        yield return (new Label { Title = "", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set.", $"The value '' for {nameof(Label.Title)} is too short. The length of {nameof(Label.Title)} has to be between 1 and 50." });
-        yield return (new Label { Title = "  \t ", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set." });
-        yield return (new Label { Title = new string('a', 51), Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Label.Title)} is long short. The length of {nameof(Label.Title)} has to be between 1 and 50." });
-        yield return (new Label { Title = "Valid", Description = new string('a', 256), Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Label.Description)} is long short. The length of {nameof(Label.Description)} has to be less than 256." });
-        yield return (new Label { Title = "Valid", Description = null, Color = null!, TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Color)} is not set.", $"The value '' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, Color = "01122", TextColor = "#334455" }, new List<string> { $"The value '01122' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, Color = "001122", TextColor = "#334455" }, new List<string> { $"The value '001122' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, Color = "#01122", TextColor = "#334455" }, new List<string> { $"The value '#01122' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, Color = "", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Color)} is not set.", $"The value '' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, Color = " ", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Color)} is not set.", $"The value ' ' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, Color = "g", TextColor = "#334455" }, new List<string> { $"The value 'g' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = null!, Color = "#334455" }, new List<string> { $"The value for {nameof(Label.TextColor)} is not set.", $"The value '' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = "01122", Color = "#334455" }, new List<string> { $"The value '01122' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = "001122", Color = "#334455" }, new List<string> { $"The value '001122' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = "#01122", Color = "#334455" }, new List<string> { $"The value '#01122' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = "", Color = "#334455" }, new List<string> { $"The value for {nameof(Label.TextColor)} is not set.", $"The value '' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = " ", Color = "#334455" }, new List<string> { $"The value for {nameof(Label.TextColor)} is not set.", $"The value ' ' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = "g", Color = "#334455" }, new List<string> { $"The value 'g' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = null!, Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set.", $"The value '' for {nameof(Label.Title)} is too short. The length of {nameof(Label.Title)} has to be between 1 and 50." });
+        yield return () => (new Label { Title = "", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set.", $"The value '' for {nameof(Label.Title)} is too short. The length of {nameof(Label.Title)} has to be between 1 and 50." });
+        yield return () => (new Label { Title = "  \t ", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set." });
+        yield return () => (new Label { Title = new string('a', 51), Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Label.Title)} is long short. The length of {nameof(Label.Title)} has to be between 1 and 50." });
+        yield return () => (new Label { Title = "Valid", Description = new string('a', 256), Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Label.Description)} is long short. The length of {nameof(Label.Description)} has to be less than 256." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = null!, TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Color)} is not set.", $"The value '' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = "01122", TextColor = "#334455" }, new List<string> { $"The value '01122' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = "001122", TextColor = "#334455" }, new List<string> { $"The value '001122' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = "#01122", TextColor = "#334455" }, new List<string> { $"The value '#01122' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = "", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Color)} is not set.", $"The value '' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = " ", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Color)} is not set.", $"The value ' ' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = "g", TextColor = "#334455" }, new List<string> { $"The value 'g' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = null!, Color = "#334455" }, new List<string> { $"The value for {nameof(Label.TextColor)} is not set.", $"The value '' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = "01122", Color = "#334455" }, new List<string> { $"The value '01122' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = "001122", Color = "#334455" }, new List<string> { $"The value '001122' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = "#01122", Color = "#334455" }, new List<string> { $"The value '#01122' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = "", Color = "#334455" }, new List<string> { $"The value for {nameof(Label.TextColor)} is not set.", $"The value '' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = " ", Color = "#334455" }, new List<string> { $"The value for {nameof(Label.TextColor)} is not set.", $"The value ' ' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = "g", Color = "#334455" }, new List<string> { $"The value 'g' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
     }
 }

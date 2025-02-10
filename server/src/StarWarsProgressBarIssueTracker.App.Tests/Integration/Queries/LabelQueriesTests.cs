@@ -13,7 +13,6 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
-[TestFixture(TestOf = typeof(IssueTrackerQueries))]
 [Category(TestCategory.Integration)]
 public class LabelQueriesTests : IntegrationTestBase
 {
@@ -31,7 +30,7 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLResponse<GetLabelsResponse> response = await GraphQLClient.SendQueryAsync<GetLabelsResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
@@ -80,7 +79,7 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLResponse<GetLabelsResponse> response = await GraphQLClient.SendQueryAsync<GetLabelsResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNullOrEmpty();
@@ -157,7 +156,7 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLResponse<GetLabelResponse> response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNull();
@@ -183,7 +182,7 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLResponse<GetLabelResponse> response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNull();
@@ -245,7 +244,7 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLResponse<GetLabelResponse> response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
             response.Should().NotBeNull();
             response.Errors.Should().BeNull();
