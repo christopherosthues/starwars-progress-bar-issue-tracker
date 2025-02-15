@@ -14,35 +14,15 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Integration;
 /// </summary>
 public class IntegrationTestBase
 {
-    protected static IssueTrackerWebApplicationFactory ApiFactory = null!;
-    protected static HttpClient HttpClient = null!;
-    protected static GraphQLHttpClient GraphQLClient = null!;
+    [ClassDataSource<IssueTrackerWebApplicationFactory>(Shared = SharedType.None)]
+    public required IssueTrackerWebApplicationFactory ApiFactory { get; set; }
 
-    [Before(Class)]
-    public static async Task SetUpOnceBase()
+    protected GraphQLHttpClient GraphQLClient = null!;
+
+    [Before(Test)]
+    public async Task SetUpOnceBase()
     {
-        // AssertionOptions.AssertEquivalencyUsing(options =>
-        //     options.Using<DateTime>(ctx =>
-        //             ctx.Subject.Should().BeCloseTo(ctx.Expectation, TimeSpan.FromMilliseconds(300)))
-        //         .WhenTypeIs<DateTime>());
-        // AssertionOptions.AssertEquivalencyUsing(options =>
-        //     options.Using<DateTime?>(ctx =>
-        //         {
-        //             if (ctx.Expectation.HasValue)
-        //             {
-        //                 ctx.Subject.Should().NotBeNull();
-        //                 ctx.Subject.Should().BeCloseTo(ctx.Expectation.Value, TimeSpan.FromMilliseconds(300));
-        //             }
-        //             else
-        //             {
-        //                 ctx.Subject.Should().BeNull();
-        //             }
-        //         })
-        //         .WhenTypeIs<DateTime?>());
-
-        ApiFactory = new IssueTrackerWebApplicationFactory();
-        await ApiFactory.StartAsync();
-        HttpClient = ApiFactory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        var httpClient = ApiFactory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
         GraphQLClient =
             new GraphQLHttpClient(new GraphQLHttpClientOptions { EndPoint = new Uri("http://localhost:8080/graphql"), },
                 new SystemTextJsonSerializer(new JsonSerializerOptions
@@ -50,12 +30,7 @@ public class IntegrationTestBase
                     PropertyNameCaseInsensitive = true,
                     Converters = { new JsonStringEnumConverter() }
                 }),
-                HttpClient);
-    }
-
-    [Before(Test)]
-    public async Task SetUpBase()
-    {
+                httpClient);
         using var scope = ApiFactory.Services.CreateScope();
         var serviceProvider = scope.ServiceProvider;
         var dbContext = serviceProvider.GetRequiredService<IssueTrackerContext>();
@@ -97,6 +72,9 @@ public class IntegrationTestBase
         var serviceProvider = scope.ServiceProvider;
         var dbContext = serviceProvider.GetRequiredService<IssueTrackerContext>();
         await ResetDatabase(dbContext);
+
+        GraphQLClient.Dispose();
+        await ApiFactory.DisposeAsync();
     }
 
     /// <summary>
@@ -119,14 +97,5 @@ public class IntegrationTestBase
         dbContext.Tasks.RemoveRange(dbContext.Tasks);
 
         await dbContext.SaveChangesAsync();
-    }
-
-    [After(Class)]
-    public static async Task TearDownOnceBase()
-    {
-        HttpClient.Dispose();
-        GraphQLClient.Dispose();
-        await ApiFactory.StopAsync();
-        await ApiFactory.DisposeAsync();
     }
 }

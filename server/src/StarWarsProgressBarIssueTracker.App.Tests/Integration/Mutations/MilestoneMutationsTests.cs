@@ -293,8 +293,8 @@ public class MilestoneMutationsTests : IntegrationTestBase
             using (Assert.Multiple())
             {
                 var dbIssues = context.Issues.Include(dbEntity => dbEntity.Milestone).ToList();
-                await Assert.That(dbIssues).Contains<List<Issue>, Issue>(i => i.Id.Equals(dbIssue.Id));
-                await Assert.That(dbIssues).Contains<List<Issue>, Issue>(i => i.Id.Equals(dbIssue2.Id));
+                await Assert.That(dbIssues).Contains(i => i.Id.Equals(dbIssue.Id));
+                await Assert.That(dbIssues).Contains(i => i.Id.Equals(dbIssue2.Id));
 
                 var changedDbIssue = context.Issues.Include(dbEntity => dbEntity.Milestone).Single(dbEntity => dbEntity.Id.Equals(dbIssue.Id));
                 await Assert.That(changedDbIssue.Milestone).IsNull();
@@ -441,7 +441,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
                 if (dbMilestone is not null)
                 {
                     await Assert.That(context.Milestones.ToList())
-                        .Contains<List<Milestone>, Milestone>(dbMilestone1 => dbMilestone1.Id.Equals(dbMilestone.Id));
+                        .Contains(dbMilestone1 => dbMilestone1.Id.Equals(dbMilestone.Id));
                 }
                 var addedDbMilestone = context.Milestones.Include(dbMilestone2 => dbMilestone2.Issues)
                     .First(dbMilestone1 => dbMilestone1.Id.Equals(addedMilestone.Id));
@@ -553,7 +553,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
                 if (dbMilestone is not null)
                 {
                     await Assert.That(context.Milestones.ToList())
-                        .Contains<List<Milestone>, Milestone>(dbMilestone1 => dbMilestone1.Id.Equals(dbMilestone.Id));
+                        .Contains(dbMilestone1 => dbMilestone1.Id.Equals(dbMilestone.Id));
                 }
                 var updatedDbMilestone = context.Milestones.Include(dbMilestone2 => dbMilestone2.Issues)
                     .First(dbMilestone1 => dbMilestone1.Id.Equals(updatedMilestone.Id));
@@ -675,13 +675,12 @@ public class MilestoneMutationsTests : IntegrationTestBase
             using (Assert.Multiple())
             {
                 await Assert.That(context.Milestones.ToList())
-                    .DoesNotContain<List<Milestone>, Milestone>(dbMilestone1 =>
-                        dbMilestone1.Id.Equals(expectedMilestone.Id));
+                    .DoesNotContain(dbMilestone1 => dbMilestone1.Id.Equals(expectedMilestone.Id));
 
                 if (dbMilestone is not null)
                 {
                     await Assert.That(context.Milestones.ToList())
-                        .Contains<List<Milestone>, Milestone>(dbMilestone1 => dbMilestone1.Id.Equals(dbMilestone.Id));
+                        .Contains(dbMilestone1 => dbMilestone1.Id.Equals(dbMilestone.Id));
                 }
             }
         });

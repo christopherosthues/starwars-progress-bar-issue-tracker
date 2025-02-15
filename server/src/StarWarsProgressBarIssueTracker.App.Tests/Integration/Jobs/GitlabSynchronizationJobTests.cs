@@ -70,19 +70,24 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
 
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Labels).Contains(deletedLabel);
-            // context.Labels.Should().ContainEquivalentOf(deletedLabel,
+            using (Assert.Multiple())
+            {
+                await Assert.That(context.Labels).Contains(deletedLabel);
+                // context.Labels.Should().ContainEquivalentOf(deletedLabel,
                 // options => options.Excluding(dbLabel => dbLabel.Id).Excluding(dbLabel => dbLabel.CreatedAt)
-                    // .Excluding(dbLabel => dbLabel.Issues));
-            await Assert.That()
-            context.Labels.Should().ContainEquivalentOf(githubLabel,
-                options => options.Excluding(dbLabel => dbLabel.Id).Excluding(dbLabel => dbLabel.CreatedAt));
-            context.Labels.Should().ContainEquivalentOf(expectedDbLabels[0],
-                options => options.Excluding(dbLabel => dbLabel.Id).Excluding(dbLabel => dbLabel.CreatedAt));
-            context.Issues.Should().ContainEquivalentOf(dbIssue,
-                options => options.Excluding(issue => issue.Id).Excluding(issue => issue.CreatedAt)
-                    .Excluding(issue => issue.Labels));
-            await Assert.That(context.Issues.Include(entity => entity.Labels).First().Labels).IsNotEmpty();
+                // .Excluding(dbLabel => dbLabel.Issues));
+                await Assert.That(context.Labels).Contains(githubLabel);
+                // context.Labels.Should().ContainEquivalentOf(githubLabel,
+                // options => options.Excluding(dbLabel => dbLabel.Id).Excluding(dbLabel => dbLabel.CreatedAt));
+                await Assert.That(context.Labels).Contains(expectedDbLabels[0]);
+                // context.Labels.Should().ContainEquivalentOf(expectedDbLabels[0],
+                // options => options.Excluding(dbLabel => dbLabel.Id).Excluding(dbLabel => dbLabel.CreatedAt));
+                await Assert.That(context.Issues).Contains(dbIssue);
+                // context.Issues.Should().ContainEquivalentOf(dbIssue,
+                // options => options.Excluding(issue => issue.Id).Excluding(issue => issue.CreatedAt)
+                // .Excluding(issue => issue.Labels));
+                await Assert.That(context.Issues.Include(entity => entity.Labels).First().Labels).IsNotEmpty();
+            }
         });
 
         // Act
@@ -91,20 +96,24 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
         // Assert
         await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().NotBeEmpty();
             var resultLabels = context.Labels.ToList();
-
-            resultLabels.Should().HaveCount(expectedDbLabels.Count);
-            resultLabels.Should().NotContainEquivalentOf(deletedLabel,
-                options => options.Excluding(dbLabel => dbLabel.Id).Excluding(dbLabel => dbLabel.CreatedAt)
-                    .Excluding(dbLabel => dbLabel.Issues));
-            resultLabels.Should().BeEquivalentTo(expectedDbLabels,
-                options => options.Excluding(dbLabel => dbLabel.Id).Excluding(dbLabel => dbLabel.CreatedAt));
-
             var issues = context.Issues.Include(issue => issue.Labels).ToList();
-            issues.Should().ContainEquivalentOf(dbIssue, options => options.Excluding(issue => issue.Id)
-                .Excluding(issue => issue.CreatedAt).Excluding(issue => issue.Labels));
-            await Assert.That(issues[0].Labels).IsEmpty();
+            using (Assert.Multiple())
+            {
+                await Assert.That(context.Labels).IsNotEmpty();
+                await Assert.That(resultLabels.Count).IsEqualTo(expectedDbLabels.Count);
+                await Assert.That(resultLabels).DoesNotContain(deletedLabel);
+                // resultLabels.Should().NotContainEquivalentOf(deletedLabel,
+                // options => options.Excluding(dbLabel => dbLabel.Id).Excluding(dbLabel => dbLabel.CreatedAt)
+                // .Excluding(dbLabel => dbLabel.Issues));
+                await Assert.That(resultLabels).IsEquivalentTo(expectedDbLabels);
+                // resultLabels.Should().BeEquivalentTo(expectedDbLabels,
+                // options => options.Excluding(dbLabel => dbLabel.Id).Excluding(dbLabel => dbLabel.CreatedAt));
+                await Assert.That(issues).Contains(dbIssue);
+                // issues.Should().ContainEquivalentOf(dbIssue, options => options.Excluding(issue => issue.Id)
+                // .Excluding(issue => issue.CreatedAt).Excluding(issue => issue.Labels));
+                await Assert.That(issues[0].Labels).IsEmpty();
+            }
         });
     }
 
@@ -144,16 +153,26 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
 
         await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().ContainEquivalentOf(deletedAppearance,
-                options => options.Excluding(dbAppearance => dbAppearance.Id).Excluding(dbAppearance => dbAppearance.CreatedAt));
-            context.Appearances.Should().ContainEquivalentOf(githubAppearance,
-                options => options.Excluding(dbAppearance => dbAppearance.Id).Excluding(dbAppearance => dbAppearance.CreatedAt));
-            context.Appearances.Should().ContainEquivalentOf(expectedAppearances[0],
-                options => options.Excluding(dbAppearance => dbAppearance.Id).Excluding(dbAppearance => dbAppearance.CreatedAt));
-            context.Issues.Should().ContainEquivalentOf(dbIssue,
-                options => options.Excluding(issue => issue.Id).Excluding(issue => issue.CreatedAt)
-                    .Excluding(issue => issue.Vehicle));
-            context.Issues.Include(entity => entity.Vehicle).ThenInclude(entity => entity!.Appearances).First().Vehicle!.Appearances.Should().NotBeEmpty();
+            var resultAppearances = context.Appearances.ToList();
+            var dbIssues = context.Issues.Include(entity => entity.Vehicle).ThenInclude(entity => entity!.Appearances).ToList();
+            using (Assert.Multiple())
+            {
+                await Assert.That(resultAppearances).Contains(deletedAppearance);
+                // context.Appearances.Should().ContainEquivalentOf(deletedAppearance,
+                // options => options.Excluding(dbAppearance => dbAppearance.Id).Excluding(dbAppearance => dbAppearance.CreatedAt));
+                await Assert.That(resultAppearances).Contains(githubAppearance);
+                // context.Appearances.Should().ContainEquivalentOf(githubAppearance,
+                // options => options.Excluding(dbAppearance => dbAppearance.Id).Excluding(dbAppearance => dbAppearance.CreatedAt));
+                await Assert.That(resultAppearances).Contains(expectedAppearances[0]);
+                // context.Appearances.Should().ContainEquivalentOf(expectedAppearances[0],
+                // options => options.Excluding(dbAppearance => dbAppearance.Id).Excluding(dbAppearance => dbAppearance.CreatedAt));
+                await Assert.That(dbIssues).Contains(dbIssue);
+                // context.Issues.Should().ContainEquivalentOf(dbIssue,
+                // options => options.Excluding(issue => issue.Id).Excluding(issue => issue.CreatedAt)
+                // .Excluding(issue => issue.Vehicle));
+                await Assert.That(dbIssues.First().Vehicle).IsNotNull();
+                await Assert.That(dbIssues.First().Vehicle!.Appearances).IsNotEmpty();
+            }
         });
 
         // Act
@@ -162,19 +181,25 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
         // Assert
         await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().NotBeEmpty();
             var resultAppearances = context.Appearances.ToList();
-
-            resultAppearances.Should().HaveCount(expectedAppearances.Count);
-            resultAppearances.Should().NotContainEquivalentOf(deletedAppearance,
-                options => options.Excluding(dbAppearance => dbAppearance.Id).Excluding(dbAppearance => dbAppearance.CreatedAt));
-            resultAppearances.Should().BeEquivalentTo(expectedAppearances,
-                options => options.Excluding(dbAppearance => dbAppearance.Id).Excluding(dbAppearance => dbAppearance.CreatedAt));
-
             var issues = context.Issues.Include(issue => issue.Vehicle).ThenInclude(vehicle => vehicle!.Appearances).ToList();
-            issues.Should().ContainEquivalentOf(dbIssue, options => options.Excluding(issue => issue.Id)
-                .Excluding(issue => issue.CreatedAt).Excluding(issue => issue.Vehicle));
-            issues[0].Vehicle!.Appearances.Should().BeEmpty();
+
+            using (Assert.Multiple())
+            {
+                await Assert.That(resultAppearances).IsNotEmpty();
+                await Assert.That(resultAppearances.Count).IsEqualTo(expectedAppearances.Count);
+                await Assert.That(resultAppearances).DoesNotContain(deletedAppearance);
+                // resultAppearances.Should().NotContainEquivalentOf(deletedAppearance,
+                // options => options.Excluding(dbAppearance => dbAppearance.Id).Excluding(dbAppearance => dbAppearance.CreatedAt));
+                await Assert.That(resultAppearances).IsEquivalentTo(expectedAppearances);
+                // resultAppearances.Should().BeEquivalentTo(expectedAppearances,
+                // options => options.Excluding(dbAppearance => dbAppearance.Id).Excluding(dbAppearance => dbAppearance.CreatedAt));
+                await Assert.That(issues).Contains(dbIssue);
+                // issues.Should().ContainEquivalentOf(dbIssue, options => options.Excluding(issue => issue.Id)
+                // .Excluding(issue => issue.CreatedAt).Excluding(issue => issue.Vehicle));
+                await Assert.That(issues[0].Vehicle).IsNotNull();
+                await Assert.That(issues[0].Vehicle!.Appearances).IsEmpty();
+            }
         });
     }
 
@@ -210,17 +235,23 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
 
         await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().ContainEquivalentOf(deletedMilestone,
-                options => options.Excluding(dbMilestone => dbMilestone.Id).Excluding(dbMilestone => dbMilestone.CreatedAt)
-                    .Excluding(dbMilestone => dbMilestone.Issues));
-            context.Milestones.Should().ContainEquivalentOf(githubMilestone,
-                options => options.Excluding(dbMilestone => dbMilestone.Id).Excluding(dbMilestone => dbMilestone.CreatedAt));
-            context.Milestones.Should().ContainEquivalentOf(expectedMilestones[0],
-                options => options.Excluding(dbMilestone => dbMilestone.Id).Excluding(dbMilestone => dbMilestone.CreatedAt));
-            context.Issues.Should().ContainEquivalentOf(dbIssue,
-                options => options.Excluding(issue => issue.Id).Excluding(issue => issue.CreatedAt)
-                    .Excluding(issue => issue.Milestone));
-            context.Issues.Include(entity => entity.Milestone).First().Milestone.Should().NotBeNull();
+            var milestones = context.Milestones.ToList();
+            var issues = context.Issues.Include(entity => entity.Milestone);
+            await Assert.That(milestones).Contains(deletedMilestone);
+            // milestones.Should().ContainEquivalentOf(deletedMilestone,
+            // options => options.Excluding(dbMilestone => dbMilestone.Id).Excluding(dbMilestone => dbMilestone.CreatedAt)
+            // .Excluding(dbMilestone => dbMilestone.Issues));
+            await Assert.That(milestones).Contains(githubMilestone);
+            // milestones.Should().ContainEquivalentOf(githubMilestone,
+            // options => options.Excluding(dbMilestone => dbMilestone.Id).Excluding(dbMilestone => dbMilestone.CreatedAt));
+            await Assert.That(milestones).Contains(expectedMilestones[0]);
+            // milestones.Should().ContainEquivalentOf(expectedMilestones[0],
+            // options => options.Excluding(dbMilestone => dbMilestone.Id).Excluding(dbMilestone => dbMilestone.CreatedAt));
+            await Assert.That(issues).Contains(dbIssue);
+            // context.Issues.Should().ContainEquivalentOf(dbIssue,
+            // options => options.Excluding(issue => issue.Id).Excluding(issue => issue.CreatedAt)
+            // .Excluding(issue => issue.Milestone));
+            await Assert.That(issues.First().Milestone).IsNull();
         });
 
         // Act
@@ -229,21 +260,26 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
         // Assert
         await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().NotBeEmpty();
             var resultMilestones = context.Milestones.ToList();
-
-            resultMilestones.Should().HaveCount(expectedMilestones.Count);
-            resultMilestones.Should().NotContainEquivalentOf(deletedMilestone,
-                options => options.Excluding(dbMilestone => dbMilestone.Id).Excluding(dbMilestone => dbMilestone.CreatedAt)
-                    .Excluding(dbMilestone => dbMilestone.Issues));
-            resultMilestones.Should().BeEquivalentTo(expectedMilestones,
-                options => options.Excluding(dbMilestone => dbMilestone.Id).Excluding(dbMilestone => dbMilestone.CreatedAt));
-
             var issues = context.Issues.Include(issue => issue.Milestone).ToList();
-            issues.Should().ContainEquivalentOf(dbIssue, options => options.Excluding(issue => issue.Id)
-                .Excluding(issue => issue.LastModifiedAt).Excluding(issue => issue.CreatedAt)
-                .Excluding(issue => issue.Milestone));
-            issues[0].Milestone.Should().BeNull();
+
+            using (Assert.Multiple())
+            {
+                await Assert.That(resultMilestones).IsNotEmpty();
+                await Assert.That(resultMilestones.Count).IsEqualTo(expectedMilestones.Count);
+                await Assert.That(resultMilestones).DoesNotContain(deletedMilestone);
+                // resultMilestones.Should().NotContainEquivalentOf(deletedMilestone,
+                // options => options.Excluding(dbMilestone => dbMilestone.Id).Excluding(dbMilestone => dbMilestone.CreatedAt)
+                // .Excluding(dbMilestone => dbMilestone.Issues));
+                await Assert.That(resultMilestones).IsEquivalentTo(expectedMilestones);
+                // resultMilestones.Should().BeEquivalentTo(expectedMilestones,
+                // options => options.Excluding(dbMilestone => dbMilestone.Id).Excluding(dbMilestone => dbMilestone.CreatedAt));
+                await Assert.That(issues).Contains(dbIssue);
+                // issues.Should().ContainEquivalentOf(dbIssue, options => options.Excluding(issue => issue.Id)
+                // .Excluding(issue => issue.LastModifiedAt).Excluding(issue => issue.CreatedAt)
+                // .Excluding(issue => issue.Milestone));
+                await Assert.That(issues[0].Milestone).IsNotNull();
+            }
         });
     }
 
@@ -279,17 +315,26 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
 
         await CheckDbContentAsync(async context =>
         {
-            context.Releases.Should().ContainEquivalentOf(deletedRelease,
-                options => options.Excluding(dbRelease => dbRelease.Id).Excluding(dbRelease => dbRelease.CreatedAt)
-                    .Excluding(dbRelease => dbRelease.Issues));
-            context.Releases.Should().ContainEquivalentOf(githubRelease,
-                options => options.Excluding(dbRelease => dbRelease.Id).Excluding(dbRelease => dbRelease.CreatedAt));
-            context.Releases.Should().ContainEquivalentOf(expectedReleases[0],
-                options => options.Excluding(dbRelease => dbRelease.Id).Excluding(dbRelease => dbRelease.CreatedAt));
-            context.Issues.Should().ContainEquivalentOf(dbIssue,
-                options => options.Excluding(issue => issue.Id).Excluding(issue => issue.CreatedAt)
-                    .Excluding(issue => issue.Release));
-            context.Issues.Include(entity => entity.Release).First().Release.Should().NotBeNull();
+            var releases = context.Releases.ToList();
+            var issues = context.Issues.Include(entity => entity.Release);
+            using (Assert.Multiple())
+            {
+                await Assert.That(releases).Contains(deletedRelease);
+                // releases.Should().ContainEquivalentOf(deletedRelease,
+                // options => options.Excluding(dbRelease => dbRelease.Id).Excluding(dbRelease => dbRelease.CreatedAt)
+                // .Excluding(dbRelease => dbRelease.Issues));
+                await Assert.That(releases).Contains(githubRelease);
+                // releases.Should().ContainEquivalentOf(githubRelease,
+                // options => options.Excluding(dbRelease => dbRelease.Id).Excluding(dbRelease => dbRelease.CreatedAt));
+                await Assert.That(releases).Contains(expectedReleases[0]);
+                // releases.Should().ContainEquivalentOf(expectedReleases[0],
+                // options => options.Excluding(dbRelease => dbRelease.Id).Excluding(dbRelease => dbRelease.CreatedAt));
+                await Assert.That(issues).Contains(dbIssue);
+                // context.Issues.Should().ContainEquivalentOf(dbIssue,
+                // options => options.Excluding(issue => issue.Id).Excluding(issue => issue.CreatedAt)
+                // .Excluding(issue => issue.Release));
+                await Assert.That(issues.First().Release).IsNotNull();
+            }
         });
 
         // Act
@@ -298,21 +343,25 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
         // Assert
         await CheckDbContentAsync(async context =>
         {
-            context.Releases.Should().NotBeEmpty();
             var resultReleases = context.Releases.ToList();
-
-            resultReleases.Should().HaveCount(expectedReleases.Count);
-            resultReleases.Should().NotContainEquivalentOf(deletedRelease,
-                options => options.Excluding(dbRelease => dbRelease.Id).Excluding(dbRelease => dbRelease.CreatedAt)
-                    .Excluding(dbRelease => dbRelease.Issues));
-            resultReleases.Should().BeEquivalentTo(expectedReleases,
-                options => options.Excluding(dbRelease => dbRelease.Id).Excluding(dbRelease => dbRelease.CreatedAt));
-
             var issues = context.Issues.Include(issue => issue.Release).ToList();
-            issues.Should().ContainEquivalentOf(dbIssue, options => options.Excluding(issue => issue.Id)
-                .Excluding(issue => issue.LastModifiedAt).Excluding(issue => issue.CreatedAt)
-                .Excluding(issue => issue.Release));
-            issues[0].Release.Should().BeNull();
+            using (Assert.Multiple())
+            {
+                await Assert.That(resultReleases).IsNotEmpty();
+                await Assert.That(resultReleases.Count).IsEqualTo(expectedReleases.Count);
+                await Assert.That(resultReleases).DoesNotContain(deletedRelease);
+                // resultReleases.Should().NotContainEquivalentOf(deletedRelease,
+                // options => options.Excluding(dbRelease => dbRelease.Id).Excluding(dbRelease => dbRelease.CreatedAt)
+                // .Excluding(dbRelease => dbRelease.Issues));
+                await Assert.That(resultReleases).IsEquivalentTo(expectedReleases);
+                // resultReleases.Should().BeEquivalentTo(expectedReleases,
+                // options => options.Excluding(dbRelease => dbRelease.Id).Excluding(dbRelease => dbRelease.CreatedAt));
+                await Assert.That(issues).Contains(dbIssue);
+                // issues.Should().ContainEquivalentOf(dbIssue, options => options.Excluding(issue => issue.Id)
+                // .Excluding(issue => issue.LastModifiedAt).Excluding(issue => issue.CreatedAt)
+                // .Excluding(issue => issue.Release));
+                await Assert.That(issues[0].Release).IsNull();
+            }
         });
     }
 }

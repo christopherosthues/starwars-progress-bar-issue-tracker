@@ -1,16 +1,14 @@
-using StarWarsProgressBarIssueTracker.Domain.Releases;
+using StarWarsProgressBarIssueTracker.Domain.Milestones;
 
 namespace StarWarsProgressBarIssueTracker.App.Issues;
 
-public class ReleaseDto : DtoBase
+public class IssueMilestoneDto : DtoBase
 {
     public required string Title { get; set; }
 
-    public string? Notes { get; set; }
+    public string? Description { get; set; }
 
-    public ReleaseState State { get; set; }
-
-    public DateTime? Date { get; set; }
+    public MilestoneState State { get; set; }
 
     public string? GitlabId { get; set; }
 

@@ -6,6 +6,7 @@
 
         <IsPackable>false</IsPackable>
 
+<!--      <GenerateTestingPlatformEntryPoint>false</GenerateTestingPlatformEntryPoint>-->
         <RootNamespace>StarWarsProgressBarIssueTracker.CodeGen.Tests</RootNamespace>
     </PropertyGroup>
 

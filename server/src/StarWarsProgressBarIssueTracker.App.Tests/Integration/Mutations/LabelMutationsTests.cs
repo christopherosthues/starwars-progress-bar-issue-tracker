@@ -348,11 +348,11 @@ public class LabelMutationsTests : IntegrationTestBase
             List<Issue> dbIssues = context.Issues.Include(entity => entity.Labels).ToList();
             using (Assert.Multiple())
             {
-                await Assert.That(dbIssues).Contains<List<Issue>, Issue>(i => i.Id.Equals(dbIssue.Id));
-                await Assert.That(dbIssues).Contains<List<Issue>, Issue>(i => i.Id.Equals(dbIssue2.Id));
+                await Assert.That(dbIssues).Contains(i => i.Id.Equals(dbIssue.Id));
+                await Assert.That(dbIssues).Contains(i => i.Id.Equals(dbIssue2.Id));
                 foreach (Issue entity in dbIssues)
                 {
-                    await Assert.That(dbIssue.Labels.ToList()).DoesNotContain<List<Label>, Label>(l => l.Id.Equals(entity.Id));
+                    await Assert.That(dbIssue.Labels.ToList()).DoesNotContain(l => l.Id.Equals(entity.Id));
                 }
                 await Assert.That(dbIssues.First(entity => entity.Id.Equals(dbIssue2.Id)).Labels).Contains(dbLabel2);
             }
@@ -490,7 +490,7 @@ public class LabelMutationsTests : IntegrationTestBase
             {
                 if (dbLabel is not null)
                 {
-                    await Assert.That(context.Labels.ToList()).Contains<List<Label>, Label>(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
+                    await Assert.That(context.Labels.ToList()).Contains(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
                 }
                 Label addedDbLabel = context.Labels.First(dbLabel1 => dbLabel1.Id.Equals(addedLabel.Id));
                 await Assert.That(addedLabel).IsNotNull();
@@ -587,7 +587,7 @@ public class LabelMutationsTests : IntegrationTestBase
             {
                 if (dbLabel is not null)
                 {
-                    await Assert.That(context.Labels.ToList()).Contains<List<Label>, Label>(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
+                    await Assert.That(context.Labels.ToList()).Contains(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
                 }
                 Label updatedDbLabel = context.Labels.Include(label => label.Issues)
                     .First(dbLabel1 => dbLabel1.Id.Equals(updatedLabel.Id));
@@ -708,11 +708,11 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             using (Assert.Multiple())
             {
-                await Assert.That(context.Labels.ToList()).DoesNotContain<List<Label>, Label>(dbLabel1 => dbLabel1.Id.Equals(expectedLabel.Id));
+                await Assert.That(context.Labels.ToList()).DoesNotContain(dbLabel1 => dbLabel1.Id.Equals(expectedLabel.Id));
 
                 if (dbLabel is not null)
                 {
-                    await Assert.That(context.Labels.ToList()).Contains<List<Label>, Label>(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
+                    await Assert.That(context.Labels.ToList()).Contains(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
                 }
             }
         });

@@ -27,7 +27,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.1">
       <PrivateAssets>all</PrivateAssets>
@@ -45,7 +45,8 @@
     <PackageVersion Include="StrawberryShake.Server" Version="14.3.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.2.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.1.0" />
-    <PackageVersion Include="TUnit" Version="0.7.24" />
+    <PackageVersion Include="TUnit" Version="0.12.25" />
+    <PackageVersion Include="TUnit.Core" Version="0.12.25" />
     <PackageVersion Include="WireMock.Net" Version="1.7.1" />
   </ItemGroup>
 </Project>

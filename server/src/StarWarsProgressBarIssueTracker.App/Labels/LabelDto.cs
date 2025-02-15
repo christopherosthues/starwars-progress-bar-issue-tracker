@@ -11,7 +11,7 @@ public class LabelDto : DtoBase
 
     public required string TextColor { get; init; }
 
-    public IList<IssueDto> Issues { get; init; } = [];
+    public IList<LabelIssueDto> Issues { get; init; } = [];
 
     public string? GitlabId { get; init; }
 

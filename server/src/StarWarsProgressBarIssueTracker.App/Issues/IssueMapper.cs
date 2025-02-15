@@ -62,14 +62,14 @@ public class IssueMapper
         };
     }
 
-    private static MilestoneDto? MapToMilestoneDto(Milestone? milestone)
+    private static IssueMilestoneDto? MapToMilestoneDto(Milestone? milestone)
     {
         if (milestone == null)
         {
             return null;
         }
 
-        return new MilestoneDto
+        return new IssueMilestoneDto
         {
             Id = milestone.Id,
             CreatedAt = milestone.CreatedAt,
@@ -83,14 +83,14 @@ public class IssueMapper
         };
     }
 
-    private static ReleaseDto? MapToReleaseDto(Release? release)
+    private static IssueReleaseDto? MapToReleaseDto(Release? release)
     {
         if (release == null)
         {
             return null;
         }
 
-        return new ReleaseDto
+        return new IssueReleaseDto
         {
             Id = release.Id,
             CreatedAt = release.CreatedAt,
@@ -105,9 +105,9 @@ public class IssueMapper
         };
     }
 
-    private static LabelDto MapToIssueLabelDto(Label label)
+    private static IssueLabelDto MapToIssueLabelDto(Label label)
     {
-        return new LabelDto
+        return new IssueLabelDto
         {
             Id = label.Id,
             CreatedAt = label.CreatedAt,
@@ -153,7 +153,7 @@ public class IssueMapper
         };
     }
 
-    private static Milestone? MapToMilestone(MilestoneDto? milestone)
+    private static Milestone? MapToMilestone(IssueMilestoneDto? milestone)
     {
         if (milestone == null)
         {
@@ -174,7 +174,7 @@ public class IssueMapper
         };
     }
 
-    private static Release? MapToRelease(ReleaseDto? release)
+    private static Release? MapToRelease(IssueReleaseDto? release)
     {
         if (release == null)
         {

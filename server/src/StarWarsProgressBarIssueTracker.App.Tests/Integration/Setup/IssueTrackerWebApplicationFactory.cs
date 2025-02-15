@@ -8,22 +8,13 @@ using StarWarsProgressBarIssueTracker.Infrastructure.Database;
 using StarWarsProgressBarIssueTracker.Infrastructure.GitHub.Configuration;
 using StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Configuration;
 using Testcontainers.PostgreSql;
+using TUnit.Core.Interfaces;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Setup;
 
-public class IssueTrackerWebApplicationFactory : WebApplicationFactory<Program>
+public class IssueTrackerWebApplicationFactory : WebApplicationFactory<Program>, IAsyncInitializer
 {
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder().Build();
-
-    public async Task StartAsync()
-    {
-        await _postgreSqlContainer.StartAsync();
-    }
-
-    public async Task StopAsync()
-    {
-        await _postgreSqlContainer.StopAsync();
-    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -75,5 +66,16 @@ public class IssueTrackerWebApplicationFactory : WebApplicationFactory<Program>
                 client.Uri = new UriBuilder(Uri.UriSchemeWs, gitlabGraphQlUrl.Host, gitlabGraphQlUrl.Port, gitlabGraphQlUrl.PathAndQuery).Uri;
             });
         });
+    }
+
+    public async Task InitializeAsync()
+    {
+        await _postgreSqlContainer.StartAsync();
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        await _postgreSqlContainer.StopAsync();
+        await base.DisposeAsync();
     }
 }

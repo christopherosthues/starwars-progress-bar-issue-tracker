@@ -1,7 +1,4 @@
-using FluentAssertions;
-using FluentAssertions.Execution;
 using GraphQL;
-using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
@@ -19,9 +16,9 @@ public class MilestoneQueriesTests : IntegrationTestBase
     public async Task GetMilestonesShouldReturnEmptyListIfNoReleaseExist()
     {
         // Arrange
-        CheckDbContentAsync(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().BeEmpty();
+            await Assert.That(context.Milestones).IsEmpty();
         });
         var request = CreateGetMilestonesRequest();
 
@@ -31,16 +28,16 @@ public class MilestoneQueriesTests : IntegrationTestBase
         // Assert
         using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
-            response.Data.Should().NotBeNull();
-            response.Data.Milestones.TotalCount.Should().Be(0);
-            response.Data.Milestones.PageInfo.HasNextPage.Should().BeFalse();
-            response.Data.Milestones.PageInfo.HasPreviousPage.Should().BeFalse();
-            response.Data.Milestones.PageInfo.StartCursor.Should().BeNull();
-            response.Data.Milestones.PageInfo.EndCursor.Should().BeNull();
-            response.Data.Milestones.Edges.Should().BeEmpty();
-            response.Data.Milestones.Nodes.Should().BeEmpty();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Milestones.TotalCount).IsEqualTo(0);
+            await Assert.That(response.Data.Milestones.PageInfo.HasNextPage).IsFalse();
+            await Assert.That(response.Data.Milestones.PageInfo.HasPreviousPage).IsFalse();
+            await Assert.That(response.Data.Milestones.PageInfo.StartCursor).IsNull();
+            await Assert.That(response.Data.Milestones.PageInfo.EndCursor).IsNull();
+            await Assert.That(response.Data.Milestones.Edges).IsEmpty();
+            await Assert.That(response.Data.Milestones.Nodes).IsEmpty();
         }
     }
 
@@ -86,13 +83,16 @@ public class MilestoneQueriesTests : IntegrationTestBase
             context.Milestones.Add(dbMilestone);
             context.Milestones.Add(dbMilestone2);
         });
-        CheckDbContentAsync(context =>
+        await CheckDbContentAsync(async context =>
         {
             var dbMilestones = context.Milestones.ToList();
-            dbMilestones.Any(milestone => milestone.Id.Equals(dbMilestone.Id)).Should().BeTrue();
-            dbMilestones.Any(milestone => milestone.Id.Equals(dbMilestone2.Id)).Should().BeTrue();
             var dbIssues = context.Issues.ToList();
-            dbIssues.Any(issue => issue.Id.Equals(dbIssue.Id)).Should().BeTrue();
+            using (Assert.Multiple())
+            {
+                await Assert.That(dbMilestones).Contains(milestone => milestone.Id.Equals(dbMilestone.Id));
+                await Assert.That(dbMilestones).Contains(milestone => milestone.Id.Equals(dbMilestone2.Id));
+                await Assert.That(dbIssues).Contains(issue => issue.Id.Equals(dbIssue.Id));
+            }
         });
         var request = CreateGetMilestonesRequest();
 
@@ -102,74 +102,74 @@ public class MilestoneQueriesTests : IntegrationTestBase
         // Assert
         using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
-            response.Data.Should().NotBeNull();
-            response.Data.Milestones.TotalCount.Should().Be(2);
-            response.Data.Milestones.PageInfo.HasNextPage.Should().BeFalse();
-            response.Data.Milestones.PageInfo.HasPreviousPage.Should().BeFalse();
-            response.Data.Milestones.PageInfo.StartCursor.Should().NotBeNull();
-            response.Data.Milestones.PageInfo.EndCursor.Should().NotBeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Milestones.TotalCount).IsEqualTo(2);
+            await Assert.That(response.Data.Milestones.PageInfo.HasNextPage).IsFalse();
+            await Assert.That(response.Data.Milestones.PageInfo.HasPreviousPage).IsFalse();
+            await Assert.That(response.Data.Milestones.PageInfo.StartCursor).IsNotNull();
+            await Assert.That(response.Data.Milestones.PageInfo.EndCursor).IsNotNull();
 
             List<Milestone> milestones = response.Data.Milestones.Nodes.ToList();
-            milestones.Count.Should().Be(2);
+            await Assert.That(milestones.Count).IsEqualTo(2);
 
             Milestone milestone = milestones.Single(entity => entity.Id.Equals(dbMilestone.Id));
-            milestone.Id.Should().Be(dbMilestone.Id);
-            milestone.Title.Should().Be(dbMilestone.Title);
-            milestone.Description.Should().BeNull();
-            milestone.State.Should().Be(dbMilestone.State);
-            milestone.CreatedAt.Should().BeCloseTo(dbMilestone.CreatedAt, TimeSpan.FromMilliseconds(300));
-            milestone.LastModifiedAt.Should().Be(dbMilestone.LastModifiedAt);
-            milestone.Issues.Should().BeEmpty();
+            await Assert.That(milestone.Id).IsEqualTo(dbMilestone.Id);
+            await Assert.That(milestone.Title).IsEqualTo(dbMilestone.Title);
+            await Assert.That(milestone.Description).IsNull();
+            await Assert.That(milestone.State).IsEqualTo(dbMilestone.State);
+            await Assert.That(milestone.CreatedAt).IsEqualTo(dbMilestone.CreatedAt);
+            await Assert.That(milestone.LastModifiedAt).IsEqualTo(dbMilestone.LastModifiedAt);
+            await Assert.That(milestone.Issues).IsEmpty();
 
             Milestone milestone2 = milestones.Single(entity => entity.Id.Equals(dbMilestone2.Id));
-            milestone2.Id.Should().Be(dbMilestone2.Id);
-            milestone2.Title.Should().Be(dbMilestone2.Title);
-            milestone2.Description.Should().Be(dbMilestone2.Description);
-            milestone2.State.Should().Be(dbMilestone2.State);
-            milestone2.CreatedAt.Should().BeCloseTo(dbMilestone2.CreatedAt, TimeSpan.FromMilliseconds(300));
-            milestone2.LastModifiedAt.Should().BeCloseTo(dbMilestone2.LastModifiedAt!.Value, TimeSpan.FromMilliseconds(300));
-            milestone2.Issues.Should().NotBeEmpty();
-            milestone2.Issues.Count.Should().Be(1);
+            await Assert.That(milestone2.Id).IsEqualTo(dbMilestone2.Id);
+            await Assert.That(milestone2.Title).IsEqualTo(dbMilestone2.Title);
+            await Assert.That(milestone2.Description).IsEqualTo(dbMilestone2.Description);
+            await Assert.That(milestone2.State).IsEqualTo(dbMilestone2.State);
+            await Assert.That(milestone2.CreatedAt).IsEqualTo(dbMilestone2.CreatedAt);
+            await Assert.That(milestone2.LastModifiedAt).IsEqualTo(dbMilestone2.LastModifiedAt);
+            await Assert.That(milestone2.Issues).IsNotEmpty();
+            await Assert.That(milestone2.Issues.Count).IsEqualTo(1);
             Issue issue = milestone2.Issues.First();
-            issue.Id.Should().Be(dbIssue.Id);
-            issue.Release.Should().NotBeNull();
-            issue.Release!.Id.Should().Be(dbIssue.Release.Id);
-            issue.Vehicle.Should().NotBeNull();
-            issue.Vehicle!.Id.Should().Be(dbIssue.Vehicle.Id);
-            issue.Vehicle!.Translations.Should().BeEmpty();
-            issue.Vehicle!.Photos.Should().BeEmpty();
+            await Assert.That(issue.Id).IsEqualTo(dbIssue.Id);
+            await Assert.That(issue.Release).IsNotNull();
+            await Assert.That(issue.Release!.Id).IsEqualTo(dbIssue.Release.Id);
+            await Assert.That(issue.Vehicle).IsNotNull();
+            await Assert.That(issue.Vehicle!.Id).IsEqualTo(dbIssue.Vehicle.Id);
+            await Assert.That(issue.Vehicle!.Translations).IsEmpty();
+            await Assert.That(issue.Vehicle!.Photos).IsEmpty();
 
             List<Edge<Milestone>> edges = response.Data.Milestones.Edges.ToList();
-            edges.Count.Should().Be(2);
+            await Assert.That(edges.Count).IsEqualTo(2);
 
             Milestone edgeMilestone = edges.Single(entity => entity.Node.Id.Equals(dbMilestone.Id)).Node;
-            edgeMilestone.Id.Should().Be(dbMilestone.Id);
-            edgeMilestone.Title.Should().Be(dbMilestone.Title);
-            edgeMilestone.Description.Should().BeNull();
-            edgeMilestone.State.Should().Be(dbMilestone.State);
-            edgeMilestone.CreatedAt.Should().BeCloseTo(dbMilestone.CreatedAt, TimeSpan.FromMilliseconds(300));
-            edgeMilestone.LastModifiedAt.Should().Be(dbMilestone.LastModifiedAt);
-            edgeMilestone.Issues.Should().BeEmpty();
+            await Assert.That(edgeMilestone.Id).IsEqualTo(dbMilestone.Id);
+            await Assert.That(edgeMilestone.Title).IsEqualTo(dbMilestone.Title);
+            await Assert.That(edgeMilestone.Description).IsNull();
+            await Assert.That(edgeMilestone.State).IsEqualTo(dbMilestone.State);
+            await Assert.That(edgeMilestone.CreatedAt).IsEqualTo(dbMilestone.CreatedAt);
+            await Assert.That(edgeMilestone.LastModifiedAt).IsEqualTo(dbMilestone.LastModifiedAt);
+            await Assert.That(edgeMilestone.Issues).IsEmpty();
 
             Milestone edgeMilestone2 = edges.Single(entity => entity.Node.Id.Equals(dbMilestone2.Id)).Node;
-            edgeMilestone2.Id.Should().Be(dbMilestone2.Id);
-            edgeMilestone2.Title.Should().Be(dbMilestone2.Title);
-            edgeMilestone2.Description.Should().Be(dbMilestone2.Description);
-            edgeMilestone2.State.Should().Be(dbMilestone2.State);
-            edgeMilestone2.CreatedAt.Should().BeCloseTo(dbMilestone2.CreatedAt, TimeSpan.FromMilliseconds(300));
-            edgeMilestone2.LastModifiedAt.Should().BeCloseTo(dbMilestone2.LastModifiedAt!.Value, TimeSpan.FromMilliseconds(300));
-            edgeMilestone2.Issues.Should().NotBeEmpty();
-            edgeMilestone2.Issues.Count.Should().Be(1);
+            await Assert.That(edgeMilestone2.Id).IsEqualTo(dbMilestone2.Id);
+            await Assert.That(edgeMilestone2.Title).IsEqualTo(dbMilestone2.Title);
+            await Assert.That(edgeMilestone2.Description).IsEqualTo(dbMilestone2.Description);
+            await Assert.That(edgeMilestone2.State).IsEqualTo(dbMilestone2.State);
+            await Assert.That(edgeMilestone2.CreatedAt).IsEqualTo(dbMilestone2.CreatedAt);
+            await Assert.That(edgeMilestone2.LastModifiedAt).IsEqualTo(dbMilestone2.LastModifiedAt);
+            await Assert.That(edgeMilestone2.Issues).IsNotEmpty();
+            await Assert.That(edgeMilestone2.Issues.Count).IsEqualTo(1);
             Issue edgeIssue = edgeMilestone2.Issues.First();
-            edgeIssue.Id.Should().Be(dbIssue.Id);
-            edgeIssue.Release.Should().NotBeNull();
-            edgeIssue.Release!.Id.Should().Be(dbIssue.Release.Id);
-            edgeIssue.Vehicle.Should().NotBeNull();
-            edgeIssue.Vehicle!.Id.Should().Be(dbIssue.Vehicle.Id);
-            edgeIssue.Vehicle!.Translations.Should().BeEmpty();
-            edgeIssue.Vehicle!.Photos.Should().BeEmpty();
+            await Assert.That(edgeIssue.Id).IsEqualTo(dbIssue.Id);
+            await Assert.That(edgeIssue.Release).IsNotNull();
+            await Assert.That(edgeIssue.Release!.Id).IsEqualTo(dbIssue.Release.Id);
+            await Assert.That(edgeIssue.Vehicle).IsNotNull();
+            await Assert.That(edgeIssue.Vehicle!.Id).IsEqualTo(dbIssue.Vehicle.Id);
+            await Assert.That(edgeIssue.Vehicle!.Translations).IsEmpty();
+            await Assert.That(edgeIssue.Vehicle!.Photos).IsEmpty();
         }
     }
 
@@ -197,12 +197,11 @@ public class MilestoneQueriesTests : IntegrationTestBase
         // Assert
         using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
-            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
-            //     StringComparer.InvariantCultureIgnoreCase);
-            response.Data.Should().NotBeNull();
-            response.Data.Milestone.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull();
+            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.", StringComparer.InvariantCultureIgnoreCase);
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Milestone).IsNull();
         }
     }
 
@@ -210,9 +209,9 @@ public class MilestoneQueriesTests : IntegrationTestBase
     public async Task GetMilestoneShouldReturnNullIfMilestonesAreEmpty()
     {
         // Arrange
-        CheckDbContentAsync(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().BeEmpty();
+            await Assert.That(context.Milestones).IsEmpty();
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
         var request = CreateGetMilestoneRequest(id);
@@ -223,12 +222,11 @@ public class MilestoneQueriesTests : IntegrationTestBase
         // Assert
         using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
-            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
-            //     StringComparer.InvariantCultureIgnoreCase);
-            response.Data.Should().NotBeNull();
-            response.Data.Milestone.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull();
+            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.", StringComparer.InvariantCultureIgnoreCase);
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Milestone).IsNull();
         }
     }
 
@@ -280,28 +278,28 @@ public class MilestoneQueriesTests : IntegrationTestBase
         // Assert
         using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
-            response.Data.Should().NotBeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull();
+            await Assert.That(response.Data).IsNotNull();
             var milestone = response.Data.Milestone;
 
-            milestone.Should().NotBeNull();
-            milestone!.Id.Should().Be(dbMilestone.Id);
-            milestone.Title.Should().Be(dbMilestone.Title);
-            milestone.Description.Should().Be(dbMilestone.Description);
-            milestone.State.Should().Be(dbMilestone.State);
-            milestone.CreatedAt.Should().BeCloseTo(dbMilestone.CreatedAt, TimeSpan.FromMilliseconds(300));
-            milestone.LastModifiedAt.Should().BeCloseTo(dbMilestone.LastModifiedAt!.Value, TimeSpan.FromMilliseconds(300));
-            milestone.Issues.Should().NotBeEmpty();
-            milestone.Issues.Should().HaveCount(1);
+            await Assert.That(milestone).IsNotNull();
+            await Assert.That(milestone!.Id).IsEqualTo(dbMilestone.Id);
+            await Assert.That(milestone.Title).IsEqualTo(dbMilestone.Title);
+            await Assert.That(milestone.Description).IsEqualTo(dbMilestone.Description);
+            await Assert.That(milestone.State).IsEqualTo(dbMilestone.State);
+            await Assert.That(milestone.CreatedAt).IsEqualTo(dbMilestone.CreatedAt);
+            await Assert.That(milestone.LastModifiedAt).IsEqualTo(dbMilestone.LastModifiedAt);
+            await Assert.That(milestone.Issues).IsNotEmpty();
+            await Assert.That(milestone.Issues.Count).IsEqualTo(1);
             var issue = milestone.Issues.First();
-            issue.Id.Should().Be(dbIssue.Id);
-            issue.Release.Should().NotBeNull();
-            issue.Release!.Id.Should().Be(dbIssue.Release.Id);
-            issue.Vehicle.Should().NotBeNull();
-            issue.Vehicle!.Id.Should().Be(dbIssue.Vehicle.Id);
-            issue.Vehicle!.Translations.Should().BeEmpty();
-            issue.Vehicle!.Photos.Should().BeEmpty();
+            await Assert.That(issue.Id).IsEqualTo(dbIssue.Id);
+            await Assert.That(issue.Release).IsNotNull();
+            await Assert.That(issue.Release!.Id).IsEqualTo(dbIssue.Release.Id);
+            await Assert.That(issue.Vehicle).IsNotNull();
+            await Assert.That(issue.Vehicle!.Id).IsEqualTo(dbIssue.Vehicle.Id);
+            await Assert.That(issue.Vehicle!.Translations).IsEmpty();
+            await Assert.That(issue.Vehicle!.Photos).IsEmpty();
         }
     }
 

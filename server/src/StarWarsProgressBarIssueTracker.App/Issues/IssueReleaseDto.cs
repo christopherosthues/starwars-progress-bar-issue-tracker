@@ -1,8 +1,8 @@
 using StarWarsProgressBarIssueTracker.Domain.Releases;
 
-namespace StarWarsProgressBarIssueTracker.App.Labels;
+namespace StarWarsProgressBarIssueTracker.App.Issues;
 
-public class ReleaseDto : DtoBase
+public class IssueReleaseDto : DtoBase
 {
     public required string Title { get; set; }
 

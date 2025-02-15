@@ -8,6 +8,7 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Mutations;
 
 [Category(TestCategory.Integration)]
+[NotInParallel]
 public class AppearanceMutationsTests : IntegrationTestBase
 {
     private const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ß_#%";
@@ -443,8 +444,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
                 if (dbAppearance is not null)
                 {
                     await Assert.That(context.Appearances.ToList())
-                        .Contains<List<Appearance>, Appearance>(dbAppearance1 =>
-                            dbAppearance1.Id.Equals(dbAppearance.Id));
+                        .Contains(dbAppearance1 => dbAppearance1.Id.Equals(dbAppearance.Id));
                 }
                 var addedDbAppearance = context.Appearances.First(dbAppearance1 => dbAppearance1.Id.Equals(addedAppearance.Id));
                 await Assert.That(addedDbAppearance).IsNotNull();
@@ -544,8 +544,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
                 if (dbAppearance is not null)
                 {
                     await Assert.That(context.Appearances.ToList())
-                        .Contains<List<Appearance>, Appearance>(dbAppearance1 =>
-                            dbAppearance1.Id.Equals(dbAppearance.Id));
+                        .Contains(dbAppearance1 => dbAppearance1.Id.Equals(dbAppearance.Id));
                 }
                 var updatedDbAppearance = context.Appearances.First(dbAppearance1 => dbAppearance1.Id.Equals(updatedAppearance.Id));
                 await Assert.That(updatedDbAppearance).IsNotNull();
@@ -648,14 +647,12 @@ public class AppearanceMutationsTests : IntegrationTestBase
             using (Assert.Multiple())
             {
                 await Assert.That(context.Appearances.ToList())
-                    .DoesNotContain<List<Appearance>, Appearance>(dbAppearance1 =>
-                        dbAppearance1.Id.Equals(expectedAppearance.Id));
+                    .DoesNotContain(dbAppearance1 => dbAppearance1.Id.Equals(expectedAppearance.Id));
 
                 if (dbAppearance is not null)
                 {
                     await Assert.That(context.Appearances.ToList())
-                        .Contains<List<Appearance>, Appearance>(dbAppearance1 =>
-                            dbAppearance1.Id.Equals(dbAppearance.Id));
+                        .Contains(dbAppearance1 => dbAppearance1.Id.Equals(dbAppearance.Id));
                 }
             }
         });

@@ -1,8 +1,8 @@
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 
-namespace StarWarsProgressBarIssueTracker.App.Issues;
+namespace StarWarsProgressBarIssueTracker.App.Labels;
 
-public class MilestoneDto : DtoBase
+public class LabelMilestoneDto : DtoBase
 {
     public required string Title { get; set; }
 
