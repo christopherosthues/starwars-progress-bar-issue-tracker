@@ -14,6 +14,7 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 [NotInParallel(NotInParallelTests.ReleaseRetrieval)]
 public class ReleaseQueriesTests : IntegrationTestBase
 {
+    // TODO: Check DoesNotContain and Contains
     [Test]
     public async Task GetReleasesShouldReturnEmptyListIfNoReleaseExist()
     {
@@ -124,8 +125,8 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(release.Notes).IsNull();
             await Assert.That(release.State).IsEqualTo(dbRelease.State);
             await Assert.That(release.Date).IsNull();
-            await Assert.That(release.CreatedAt).IsEqualTo(dbRelease.CreatedAt);
-            await Assert.That(release.LastModifiedAt).IsEqualTo(dbRelease.LastModifiedAt);
+            await Assert.That(release.CreatedAt).IsEquivalentTo(dbRelease.CreatedAt);
+            await Assert.That(release.LastModifiedAt).IsEquivalentTo(dbRelease.LastModifiedAt);
             await Assert.That(release.Issues).IsEmpty();
 
             Release release2 = releases.Single(entity => entity.Id.Equals(dbRelease2.Id));
@@ -133,9 +134,9 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(release2.Title).IsEqualTo(dbRelease2.Title);
             await Assert.That(release2.Notes).IsEqualTo(dbRelease2.Notes);
             await Assert.That(release2.State).IsEqualTo(dbRelease2.State);
-            await Assert.That(release2.Date).IsEqualTo(dbRelease2.Date);
-            await Assert.That(release2.CreatedAt).IsEqualTo(dbRelease2.CreatedAt);
-            await Assert.That(release2.LastModifiedAt).IsEqualTo(dbRelease2.LastModifiedAt);
+            await Assert.That(release2.Date).IsEquivalentTo(dbRelease2.Date);
+            await Assert.That(release2.CreatedAt).IsEquivalentTo(dbRelease2.CreatedAt);
+            await Assert.That(release2.LastModifiedAt).IsEquivalentTo(dbRelease2.LastModifiedAt);
             await Assert.That(release2.Issues).IsNotEmpty();
             await Assert.That(release2.Issues.Count).IsEqualTo(1);
             Issue issue = release2.Issues.First();
@@ -156,8 +157,8 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(edgeRelease.Notes).IsNull();
             await Assert.That(edgeRelease.State).IsEqualTo(dbRelease.State);
             await Assert.That(edgeRelease.Date).IsNull();
-            await Assert.That(edgeRelease.CreatedAt).IsEqualTo(dbRelease.CreatedAt);
-            await Assert.That(edgeRelease.LastModifiedAt).IsEqualTo(dbRelease.LastModifiedAt);
+            await Assert.That(edgeRelease.CreatedAt).IsEquivalentTo(dbRelease.CreatedAt);
+            await Assert.That(edgeRelease.LastModifiedAt).IsEquivalentTo(dbRelease.LastModifiedAt);
             await Assert.That(edgeRelease.Issues).IsEmpty();
 
             Release edgeRelease2 = edges.Single(entity => entity.Node.Id.Equals(dbRelease2.Id)).Node;
@@ -165,9 +166,9 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(edgeRelease2.Title).IsEqualTo(dbRelease2.Title);
             await Assert.That(edgeRelease2.Notes).IsEqualTo(dbRelease2.Notes);
             await Assert.That(edgeRelease2.State).IsEqualTo(dbRelease2.State);
-            await Assert.That(edgeRelease2.Date).IsEqualTo(dbRelease2.Date);
-            await Assert.That(edgeRelease2.CreatedAt).IsEqualTo(dbRelease2.CreatedAt);
-            await Assert.That(edgeRelease2.LastModifiedAt).IsEqualTo(dbRelease2.LastModifiedAt);
+            await Assert.That(edgeRelease2.Date).IsEquivalentTo(dbRelease2.Date);
+            await Assert.That(edgeRelease2.CreatedAt).IsEquivalentTo(dbRelease2.CreatedAt);
+            await Assert.That(edgeRelease2.LastModifiedAt).IsEquivalentTo(dbRelease2.LastModifiedAt);
             await Assert.That(edgeRelease2.Issues).IsNotEmpty();
             await Assert.That(edgeRelease2.Issues.Count).IsEqualTo(1);
             Issue edgeIssue = edgeRelease2.Issues.First();
@@ -297,9 +298,9 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(release.Title).IsEqualTo(dbRelease.Title);
             await Assert.That(release.Notes).IsEqualTo(dbRelease.Notes);
             await Assert.That(release.State).IsEqualTo(dbRelease.State);
-            await Assert.That(release.Date).IsEqualTo(dbRelease.Date);
-            await Assert.That(release.CreatedAt).IsEqualTo(dbRelease.CreatedAt);
-            await Assert.That(release.LastModifiedAt).IsEqualTo(dbRelease.LastModifiedAt);
+            await Assert.That(release.Date).IsEquivalentTo(dbRelease.Date);
+            await Assert.That(release.CreatedAt).IsEquivalentTo(dbRelease.CreatedAt);
+            await Assert.That(release.LastModifiedAt).IsEquivalentTo(dbRelease.LastModifiedAt);
             await Assert.That(release.Issues).IsNotEmpty();
             await Assert.That(release.Issues.Count).IsEqualTo(1);
             Issue issue = release.Issues.First();

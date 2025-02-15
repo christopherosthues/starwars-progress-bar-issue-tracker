@@ -14,6 +14,7 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 [NotInParallel(NotInParallelTests.MilestoneRetrieval)]
 public class MilestoneQueriesTests : IntegrationTestBase
 {
+    // TODO: Check DoesNotContain and Contains
     [Test]
     public async Task GetMilestonesShouldReturnEmptyListIfNoReleaseExist()
     {
@@ -121,8 +122,8 @@ public class MilestoneQueriesTests : IntegrationTestBase
             await Assert.That(milestone.Title).IsEqualTo(dbMilestone.Title);
             await Assert.That(milestone.Description).IsNull();
             await Assert.That(milestone.State).IsEqualTo(dbMilestone.State);
-            await Assert.That(milestone.CreatedAt).IsEqualTo(dbMilestone.CreatedAt);
-            await Assert.That(milestone.LastModifiedAt).IsEqualTo(dbMilestone.LastModifiedAt);
+            await Assert.That(milestone.CreatedAt).IsEquivalentTo(dbMilestone.CreatedAt);
+            await Assert.That(milestone.LastModifiedAt).IsEquivalentTo(dbMilestone.LastModifiedAt);
             await Assert.That(milestone.Issues).IsEmpty();
 
             Milestone milestone2 = milestones.Single(entity => entity.Id.Equals(dbMilestone2.Id));
@@ -130,8 +131,8 @@ public class MilestoneQueriesTests : IntegrationTestBase
             await Assert.That(milestone2.Title).IsEqualTo(dbMilestone2.Title);
             await Assert.That(milestone2.Description).IsEqualTo(dbMilestone2.Description);
             await Assert.That(milestone2.State).IsEqualTo(dbMilestone2.State);
-            await Assert.That(milestone2.CreatedAt).IsEqualTo(dbMilestone2.CreatedAt);
-            await Assert.That(milestone2.LastModifiedAt).IsEqualTo(dbMilestone2.LastModifiedAt);
+            await Assert.That(milestone2.CreatedAt).IsEquivalentTo(dbMilestone2.CreatedAt);
+            await Assert.That(milestone2.LastModifiedAt).IsEquivalentTo(dbMilestone2.LastModifiedAt);
             await Assert.That(milestone2.Issues).IsNotEmpty();
             await Assert.That(milestone2.Issues.Count).IsEqualTo(1);
             Issue issue = milestone2.Issues.First();
@@ -151,8 +152,8 @@ public class MilestoneQueriesTests : IntegrationTestBase
             await Assert.That(edgeMilestone.Title).IsEqualTo(dbMilestone.Title);
             await Assert.That(edgeMilestone.Description).IsNull();
             await Assert.That(edgeMilestone.State).IsEqualTo(dbMilestone.State);
-            await Assert.That(edgeMilestone.CreatedAt).IsEqualTo(dbMilestone.CreatedAt);
-            await Assert.That(edgeMilestone.LastModifiedAt).IsEqualTo(dbMilestone.LastModifiedAt);
+            await Assert.That(edgeMilestone.CreatedAt).IsEquivalentTo(dbMilestone.CreatedAt);
+            await Assert.That(edgeMilestone.LastModifiedAt).IsEquivalentTo(dbMilestone.LastModifiedAt);
             await Assert.That(edgeMilestone.Issues).IsEmpty();
 
             Milestone edgeMilestone2 = edges.Single(entity => entity.Node.Id.Equals(dbMilestone2.Id)).Node;
@@ -160,8 +161,8 @@ public class MilestoneQueriesTests : IntegrationTestBase
             await Assert.That(edgeMilestone2.Title).IsEqualTo(dbMilestone2.Title);
             await Assert.That(edgeMilestone2.Description).IsEqualTo(dbMilestone2.Description);
             await Assert.That(edgeMilestone2.State).IsEqualTo(dbMilestone2.State);
-            await Assert.That(edgeMilestone2.CreatedAt).IsEqualTo(dbMilestone2.CreatedAt);
-            await Assert.That(edgeMilestone2.LastModifiedAt).IsEqualTo(dbMilestone2.LastModifiedAt);
+            await Assert.That(edgeMilestone2.CreatedAt).IsEquivalentTo(dbMilestone2.CreatedAt);
+            await Assert.That(edgeMilestone2.LastModifiedAt).IsEquivalentTo(dbMilestone2.LastModifiedAt);
             await Assert.That(edgeMilestone2.Issues).IsNotEmpty();
             await Assert.That(edgeMilestone2.Issues.Count).IsEqualTo(1);
             Issue edgeIssue = edgeMilestone2.Issues.First();
@@ -290,8 +291,8 @@ public class MilestoneQueriesTests : IntegrationTestBase
             await Assert.That(milestone.Title).IsEqualTo(dbMilestone.Title);
             await Assert.That(milestone.Description).IsEqualTo(dbMilestone.Description);
             await Assert.That(milestone.State).IsEqualTo(dbMilestone.State);
-            await Assert.That(milestone.CreatedAt).IsEqualTo(dbMilestone.CreatedAt);
-            await Assert.That(milestone.LastModifiedAt).IsEqualTo(dbMilestone.LastModifiedAt);
+            await Assert.That(milestone.CreatedAt).IsEquivalentTo(dbMilestone.CreatedAt);
+            await Assert.That(milestone.LastModifiedAt).IsEquivalentTo(dbMilestone.LastModifiedAt);
             await Assert.That(milestone.Issues).IsNotEmpty();
             await Assert.That(milestone.Issues.Count).IsEqualTo(1);
             Issue issue = milestone.Issues.First();

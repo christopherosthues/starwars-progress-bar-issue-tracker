@@ -17,13 +17,7 @@ public class IntegrationTestBase
     [ClassDataSource<IssueTrackerWebApplicationFactory>(Shared = SharedType.PerClass)]
     public required IssueTrackerWebApplicationFactory ApiFactory { get; set; }
 
-    // protected GraphQLHttpClient GraphQLClient = null!;
-    //
-    // [Before(Class)]
-    // public static async Task SetUpOnceBase()
-    // {
-    //
-    // }
+    protected TimeSpan Tolerance => TimeSpan.FromMilliseconds(300);
 
     protected GraphQLHttpClient CreateGraphQLClient()
     {

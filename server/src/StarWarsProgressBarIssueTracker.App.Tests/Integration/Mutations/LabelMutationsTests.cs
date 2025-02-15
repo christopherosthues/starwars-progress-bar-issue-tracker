@@ -14,6 +14,7 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Mutations;
 [NotInParallel(NotInParallelTests.LabelMutation)]
 public class LabelMutationsTests : IntegrationTestBase
 {
+    // TODO: Check DoesNotContain and Contains
     private const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ß_#%";
     private const string HexCodeColorChars = "0123456789abcdef";
 
@@ -482,7 +483,7 @@ public class LabelMutationsTests : IntegrationTestBase
             await Assert.That(addedLabel.Description).IsEqualTo(expectedLabel.Description);
             await Assert.That(addedLabel.Color).IsEqualTo(expectedLabel.Color);
             await Assert.That(addedLabel.TextColor).IsEqualTo(expectedLabel.TextColor);
-            await Assert.That(addedLabel.CreatedAt).IsGreaterThanOrEqualTo(startTime).And.IsLessThanOrEqualTo(endTime);
+            await Assert.That(addedLabel.CreatedAt).IsBetween(startTime, endTime).WithInclusiveBounds();
             await Assert.That(addedLabel.LastModifiedAt).IsNull();
         }
 
@@ -501,7 +502,7 @@ public class LabelMutationsTests : IntegrationTestBase
                 await Assert.That(addedLabel.Description).IsEqualTo(expectedLabel.Description);
                 await Assert.That(addedLabel.Color).IsEqualTo(expectedLabel.Color);
                 await Assert.That(addedLabel.TextColor).IsEqualTo(expectedLabel.TextColor);
-                await Assert.That(addedLabel.CreatedAt).IsGreaterThanOrEqualTo(startTime).And.IsLessThanOrEqualTo(endTime);
+                await Assert.That(addedLabel.CreatedAt).IsBetween(startTime, endTime).WithInclusiveBounds();
                 await Assert.That(addedLabel.LastModifiedAt).IsNull();
             }
         });
@@ -580,7 +581,7 @@ public class LabelMutationsTests : IntegrationTestBase
             await Assert.That(updatedLabel.Color).IsEqualTo(expectedLabel.Color);
             await Assert.That(updatedLabel.TextColor).IsEqualTo(expectedLabel.TextColor);
             await Assert.That(updatedLabel.CreatedAt).IsEqualTo(expectedLabel.CreatedAt);
-            await Assert.That(updatedLabel.LastModifiedAt!.Value).IsGreaterThanOrEqualTo(startTime).And.IsLessThanOrEqualTo(endTime);
+            await Assert.That(updatedLabel.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
         }
 
         await CheckDbContentAsync(async context =>
@@ -600,7 +601,7 @@ public class LabelMutationsTests : IntegrationTestBase
                 await Assert.That(updatedDbLabel.Color).IsEqualTo(updatedLabel.Color);
                 await Assert.That(updatedDbLabel.TextColor).IsEqualTo(updatedLabel.TextColor);
                 await Assert.That(updatedDbLabel.CreatedAt).IsEqualTo(updatedLabel.CreatedAt);
-                await Assert.That(updatedLabel.LastModifiedAt!.Value).IsGreaterThanOrEqualTo(startTime).And.IsLessThanOrEqualTo(endTime);
+                await Assert.That(updatedLabel.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
                 if (emptyIssues)
                 {
                     await Assert.That(context.Issues).IsEmpty();

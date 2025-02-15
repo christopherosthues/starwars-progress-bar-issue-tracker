@@ -12,6 +12,7 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Mutations;
 [NotInParallel(NotInParallelTests.AppearanceMutation)]
 public class AppearanceMutationsTests : IntegrationTestBase
 {
+    // TODO: Check DoesNotContain and Contains
     private const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ß_#%";
     private const string HexCodeColorChars = "0123456789abcdef";
 
@@ -20,13 +21,13 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task AddAppearanceShouldAddAppearance(Appearance expectedAppearance)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         await CheckDbContentAsync(async context =>
         {
             await Assert.That(context.Appearances).IsEmpty();
         });
         GraphQLRequest mutationRequest = CreateAddRequest(expectedAppearance);
 
-        DateTime startTime = DateTime.UtcNow;
 
         // Act
         GraphQLResponse<AddAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<AddAppearanceResponse>(mutationRequest);
@@ -40,6 +41,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task AddAppearanceShouldAddAppearanceIfAppearancesAreNotEmpty(Appearance expectedAppearance)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Appearance dbAppearance = new Appearance
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -55,11 +57,9 @@ public class AppearanceMutationsTests : IntegrationTestBase
         });
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Appearances).Contains(dbAppearance);
+            await Assert.That(context.Appearances.ToList()).ContainsEquivalentOf(dbAppearance);
         });
         GraphQLRequest mutationRequest = CreateAddRequest(expectedAppearance);
-
-        DateTime startTime = DateTime.UtcNow;
 
         // Act
         GraphQLResponse<AddAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<AddAppearanceResponse>(mutationRequest);
@@ -91,6 +91,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task UpdateAppearanceShouldUpdateAppearance(Appearance expectedAppearance)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Appearance dbAppearance = new Appearance
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -108,11 +109,9 @@ public class AppearanceMutationsTests : IntegrationTestBase
         expectedAppearance.CreatedAt = dbAppearance.CreatedAt;
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Appearances).Contains(dbAppearance);
+            await Assert.That(context.Appearances.ToList()).ContainsEquivalentOf(dbAppearance);
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedAppearance);
-
-        DateTime startTime = DateTime.UtcNow;
 
         // Act
         GraphQLResponse<UpdateAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
@@ -126,6 +125,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task UpdateAppearanceShouldUpdateAppearanceIfAppearancesAreNotEmpty(Appearance expectedAppearance)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Appearance dbAppearance = new Appearance
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -156,13 +156,12 @@ public class AppearanceMutationsTests : IntegrationTestBase
         {
             using (Assert.Multiple())
             {
-                await Assert.That(context.Appearances).Contains(dbAppearance);
-                await Assert.That(context.Appearances).Contains(dbAppearance2);
+                List<Appearance> appearances = context.Appearances.ToList();
+                await Assert.That(appearances).ContainsEquivalentOf(dbAppearance);
+                await Assert.That(appearances).ContainsEquivalentOf(dbAppearance2);
             }
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedAppearance);
-
-        DateTime startTime = DateTime.UtcNow;
 
         // Act
         GraphQLResponse<UpdateAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
@@ -229,7 +228,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         appearance.LastModifiedAt = dbAppearance.LastModifiedAt;
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Appearances).Contains(dbAppearance);
+            await Assert.That(context.Appearances.ToList()).ContainsEquivalentOf(dbAppearance);
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
@@ -287,7 +286,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         appearance.LastModifiedAt = dbAppearance.LastModifiedAt;
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Appearances).Contains(dbAppearance);
+            await Assert.That(context.Appearances.ToList()).ContainsEquivalentOf(dbAppearance);
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
@@ -306,7 +305,9 @@ public class AppearanceMutationsTests : IntegrationTestBase
                     await Assert.That(dbVehicle.Appearances).DoesNotContain(dbAppearance);
                 }
 
-                await Assert.That(dbVehicles.First(dbVehicle => dbVehicle.Id.Equals(dbVehicle2.Id)).Appearances).Contains(dbAppearance2);
+                await Assert
+                    .That(dbVehicles.First(dbVehicle => dbVehicle.Id.Equals(dbVehicle2.Id)).Appearances.ToList())
+                    .ContainsEquivalentOf(dbAppearance2);
             }
         });
     }
@@ -348,8 +349,9 @@ public class AppearanceMutationsTests : IntegrationTestBase
         {
             using (Assert.Multiple())
             {
-                await Assert.That(context.Appearances).Contains(dbAppearance);
-                await Assert.That(context.Appearances).Contains(dbAppearance2);
+                List<Appearance> appearances = context.Appearances.ToList();
+                await Assert.That(appearances).ContainsEquivalentOf(dbAppearance);
+                await Assert.That(appearances).ContainsEquivalentOf(dbAppearance2);
             }
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
@@ -433,8 +435,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             await Assert.That(addedAppearance.Description).IsEqualTo(expectedAppearance.Description);
             await Assert.That(addedAppearance.Color).IsEqualTo(expectedAppearance.Color);
             await Assert.That(addedAppearance.TextColor).IsEqualTo(expectedAppearance.TextColor);
-            await Assert.That(addedAppearance.CreatedAt).IsGreaterThanOrEqualTo(startTime).And
-                .IsLessThanOrEqualTo(endTime);
+            await Assert.That(addedAppearance.CreatedAt).IsBetween(startTime, endTime).WithInclusiveBounds();
             await Assert.That(addedAppearance.LastModifiedAt).IsNull();
         }
 
@@ -454,8 +455,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
                 await Assert.That(addedDbAppearance.Description).IsEqualTo(expectedAppearance.Description);
                 await Assert.That(addedDbAppearance.Color).IsEqualTo(expectedAppearance.Color);
                 await Assert.That(addedDbAppearance.TextColor).IsEqualTo(expectedAppearance.TextColor);
-                await Assert.That(addedDbAppearance.CreatedAt).IsGreaterThanOrEqualTo(startTime).And
-                    .IsLessThanOrEqualTo(endTime);
+                await Assert.That(addedDbAppearance.CreatedAt).IsBetween(startTime, endTime).WithInclusiveBounds();
                 await Assert.That(addedDbAppearance.LastModifiedAt).IsNull();
             }
         });
@@ -533,9 +533,8 @@ public class AppearanceMutationsTests : IntegrationTestBase
             await Assert.That(updatedAppearance.Description).IsEqualTo(expectedAppearance.Description);
             await Assert.That(updatedAppearance.Color).IsEqualTo(expectedAppearance.Color);
             await Assert.That(updatedAppearance.TextColor).IsEqualTo(expectedAppearance.TextColor);
-            await Assert.That(updatedAppearance.CreatedAt).IsEqualTo(expectedAppearance.CreatedAt);
-            await Assert.That(updatedAppearance.LastModifiedAt!.Value).IsGreaterThanOrEqualTo(startTime).And
-                .IsLessThanOrEqualTo(endTime);
+            await Assert.That(updatedAppearance.CreatedAt).IsEquivalentTo(expectedAppearance.CreatedAt);
+            await Assert.That(updatedAppearance.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
         }
 
         await CheckDbContentAsync(async context =>
@@ -554,9 +553,8 @@ public class AppearanceMutationsTests : IntegrationTestBase
                 await Assert.That(updatedDbAppearance.Description).IsEqualTo(expectedAppearance.Description);
                 await Assert.That(updatedDbAppearance.Color).IsEqualTo(expectedAppearance.Color);
                 await Assert.That(updatedDbAppearance.TextColor).IsEqualTo(expectedAppearance.TextColor);
-                await Assert.That(updatedDbAppearance.CreatedAt).IsEqualTo(expectedAppearance.CreatedAt);
-                await Assert.That(updatedDbAppearance.LastModifiedAt!.Value).IsGreaterThanOrEqualTo(startTime).And
-                    .IsLessThanOrEqualTo(endTime);
+                await Assert.That(updatedDbAppearance.CreatedAt).IsEquivalentTo(expectedAppearance.CreatedAt);
+                await Assert.That(updatedDbAppearance.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
 
                 if (notUpdatedAppearance is not null)
                 {
@@ -568,8 +566,8 @@ public class AppearanceMutationsTests : IntegrationTestBase
                     await Assert.That(secondAppearance.Description).IsEqualTo(notUpdatedAppearance.Description);
                     await Assert.That(secondAppearance.Color).IsEqualTo(notUpdatedAppearance.Color);
                     await Assert.That(secondAppearance.TextColor).IsEqualTo(notUpdatedAppearance.TextColor);
-                    await Assert.That(secondAppearance.CreatedAt).IsEqualTo(notUpdatedAppearance.CreatedAt);
-                    await Assert.That(secondAppearance.LastModifiedAt).IsEqualTo(notUpdatedAppearance.LastModifiedAt!.Value);
+                    await Assert.That(secondAppearance.CreatedAt).IsEquivalentTo(notUpdatedAppearance.CreatedAt);
+                    await Assert.That(secondAppearance.LastModifiedAt).IsEquivalentTo(notUpdatedAppearance.LastModifiedAt!.Value);
                 }
             }
         });
@@ -639,8 +637,8 @@ public class AppearanceMutationsTests : IntegrationTestBase
             await Assert.That(deletedAppearance.Description).IsEqualTo(expectedAppearance.Description);
             await Assert.That(deletedAppearance.Color).IsEqualTo(expectedAppearance.Color);
             await Assert.That(deletedAppearance.TextColor).IsEqualTo(expectedAppearance.TextColor);
-            await Assert.That(deletedAppearance.CreatedAt).IsEqualTo(expectedAppearance.CreatedAt);
-            await Assert.That(deletedAppearance.LastModifiedAt).IsEqualTo(expectedAppearance.LastModifiedAt!.Value);
+            await Assert.That(deletedAppearance.CreatedAt).IsEquivalentTo(expectedAppearance.CreatedAt);
+            await Assert.That(deletedAppearance.LastModifiedAt).IsEquivalentTo(expectedAppearance.LastModifiedAt!.Value);
         }
 
         await CheckDbContentAsync(async context =>

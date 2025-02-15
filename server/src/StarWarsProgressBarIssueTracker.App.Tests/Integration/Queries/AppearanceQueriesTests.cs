@@ -11,6 +11,7 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 [NotInParallel(NotInParallelTests.AppearanceRetrieval)]
 public class AppearanceQueriesTests : IntegrationTestBase
 {
+    // TODO: Check DoesNotContain and Contains
     [Test]
     public async Task GetAppearancesShouldReturnEmptyListIfNoAppearanceExist()
     {
@@ -67,8 +68,9 @@ public class AppearanceQueriesTests : IntegrationTestBase
         {
             using (Assert.Multiple())
             {
-                await Assert.That(context.Appearances).Contains(dbAppearance);
-                await Assert.That(context.Appearances).Contains(dbAppearance2);
+                var appearances = context.Appearances.ToList();
+                await Assert.That(appearances).ContainsEquivalentOf(dbAppearance);
+                await Assert.That(appearances).ContainsEquivalentOf(dbAppearance2);
             }
         });
         GraphQLRequest request = CreateGetAppearancesRequest();
@@ -97,8 +99,8 @@ public class AppearanceQueriesTests : IntegrationTestBase
             await Assert.That(appearance.Description).IsEqualTo(dbAppearance.Description);
             await Assert.That(appearance.Color).IsEqualTo(dbAppearance.Color);
             await Assert.That(appearance.TextColor).IsEqualTo(dbAppearance.TextColor);
-            await Assert.That(appearance.CreatedAt).IsEqualTo(dbAppearance.CreatedAt);
-            await Assert.That(appearance.LastModifiedAt).IsEqualTo(dbAppearance.LastModifiedAt);
+            await Assert.That(appearance.CreatedAt).IsEquivalentTo(dbAppearance.CreatedAt);
+            await Assert.That(appearance.LastModifiedAt).IsEquivalentTo(dbAppearance.LastModifiedAt);
 
             Appearance appearance2 = appearances.Single(entity => entity.Id.Equals(dbAppearance2.Id));
             await Assert.That(appearance2.Id).IsEqualTo(dbAppearance2.Id);
@@ -106,8 +108,8 @@ public class AppearanceQueriesTests : IntegrationTestBase
             await Assert.That(appearance2.Description).IsEqualTo(dbAppearance2.Description);
             await Assert.That(appearance2.Color).IsEqualTo(dbAppearance2.Color);
             await Assert.That(appearance2.TextColor).IsEqualTo(dbAppearance2.TextColor);
-            await Assert.That(appearance2.CreatedAt).IsEqualTo(dbAppearance2.CreatedAt);
-            await Assert.That(appearance2.LastModifiedAt).IsEqualTo(dbAppearance2.LastModifiedAt);
+            await Assert.That(appearance2.CreatedAt).IsEquivalentTo(dbAppearance2.CreatedAt);
+            await Assert.That(appearance2.LastModifiedAt).IsEquivalentTo(dbAppearance2.LastModifiedAt);
 
             List<Edge<Appearance>> edges = response.Data.Appearances.Edges.ToList();
             await Assert.That(edges.Count).IsEqualTo(2);
@@ -118,8 +120,8 @@ public class AppearanceQueriesTests : IntegrationTestBase
             await Assert.That(edgeAppearance.Description).IsEqualTo(dbAppearance.Description);
             await Assert.That(edgeAppearance.Color).IsEqualTo(dbAppearance.Color);
             await Assert.That(edgeAppearance.TextColor).IsEqualTo(dbAppearance.TextColor);
-            await Assert.That(edgeAppearance.CreatedAt).IsEqualTo(dbAppearance.CreatedAt);
-            await Assert.That(edgeAppearance.LastModifiedAt).IsEqualTo(dbAppearance.LastModifiedAt);
+            await Assert.That(edgeAppearance.CreatedAt).IsEquivalentTo(dbAppearance.CreatedAt);
+            await Assert.That(edgeAppearance.LastModifiedAt).IsEquivalentTo(dbAppearance.LastModifiedAt);
 
             Appearance edgeAppearance2 = edges.Single(entity => entity.Node.Id.Equals(dbAppearance2.Id)).Node;
             await Assert.That(edgeAppearance2.Id).IsEqualTo(dbAppearance2.Id);
@@ -127,8 +129,8 @@ public class AppearanceQueriesTests : IntegrationTestBase
             await Assert.That(edgeAppearance2.Description).IsEqualTo(dbAppearance2.Description);
             await Assert.That(edgeAppearance2.Color).IsEqualTo(dbAppearance2.Color);
             await Assert.That(edgeAppearance2.TextColor).IsEqualTo(dbAppearance2.TextColor);
-            await Assert.That(edgeAppearance2.CreatedAt).IsEqualTo(dbAppearance2.CreatedAt);
-            await Assert.That(edgeAppearance2.LastModifiedAt).IsEqualTo(dbAppearance2.LastModifiedAt);
+            await Assert.That(edgeAppearance2.CreatedAt).IsEquivalentTo(dbAppearance2.CreatedAt);
+            await Assert.That(edgeAppearance2.LastModifiedAt).IsEquivalentTo(dbAppearance2.LastModifiedAt);
         }
     }
 
@@ -235,8 +237,8 @@ public class AppearanceQueriesTests : IntegrationTestBase
             await Assert.That(appearance.Description).IsEqualTo(dbAppearance.Description);
             await Assert.That(appearance.Color).IsEqualTo(dbAppearance.Color);
             await Assert.That(appearance.TextColor).IsEqualTo(dbAppearance.TextColor);
-            await Assert.That(appearance.CreatedAt).IsEqualTo(dbAppearance.CreatedAt);
-            await Assert.That(appearance.LastModifiedAt).IsEqualTo(dbAppearance.LastModifiedAt);
+            await Assert.That(appearance.CreatedAt).IsEquivalentTo(dbAppearance.CreatedAt);
+            await Assert.That(appearance.LastModifiedAt).IsEquivalentTo(dbAppearance.LastModifiedAt);
         }
     }
 

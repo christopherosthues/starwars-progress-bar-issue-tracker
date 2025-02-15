@@ -13,6 +13,7 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Mutations;
 [NotInParallel(NotInParallelTests.MilestoneMutation)]
 public class MilestoneMutationsTests : IntegrationTestBase
 {
+    // TODO: Check DoesNotContain and Contains
     private const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ß_#%";
 
     [Test]
@@ -431,8 +432,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             await Assert.That(addedMilestone.Description).IsEqualTo(expectedMilestone.Description);
             await Assert.That(addedMilestone.State).IsEqualTo(expectedMilestone.State);
             await Assert.That(addedMilestone.Issues).IsEquivalentTo(expectedMilestone.Issues);
-            await Assert.That(addedMilestone.CreatedAt).IsGreaterThanOrEqualTo(startTime).And
-                .IsLessThanOrEqualTo(endTime);
+            await Assert.That(addedMilestone.CreatedAt).IsBetween(startTime, endTime).WithInclusiveBounds();
             await Assert.That(addedMilestone.LastModifiedAt).IsNull();
         }
 
@@ -453,8 +453,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
                 await Assert.That(addedDbMilestone.Description).IsEqualTo(expectedMilestone.Description);
                 await Assert.That(addedDbMilestone.State).IsEqualTo(expectedMilestone.State);
                 await Assert.That(addedDbMilestone.Issues).IsEquivalentTo(expectedMilestone.Issues);
-                await Assert.That(addedDbMilestone.CreatedAt).IsGreaterThanOrEqualTo(startTime).And
-                    .IsLessThanOrEqualTo(endTime);
+                await Assert.That(addedDbMilestone.CreatedAt).IsBetween(startTime, endTime).WithInclusiveBounds();
                 await Assert.That(addedDbMilestone.LastModifiedAt).IsNull();
             }
         });
@@ -536,8 +535,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             await Assert.That(updatedMilestone.Description).IsEqualTo(expectedMilestone.Description);
             await Assert.That(updatedMilestone.State).IsEqualTo(expectedMilestone.State);
             await Assert.That(updatedMilestone.CreatedAt).IsEqualTo(expectedMilestone.CreatedAt);
-            await Assert.That(updatedMilestone.LastModifiedAt!.Value).IsGreaterThanOrEqualTo(startTime).And
-                .IsLessThanOrEqualTo(endTime);
+            await Assert.That(updatedMilestone.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
             if (emptyIssues)
             {
                 await Assert.That(updatedMilestone.Issues).IsEmpty();
@@ -565,8 +563,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
                 await Assert.That(updatedDbMilestone.Description).IsEqualTo(expectedMilestone.Description);
                 await Assert.That(updatedDbMilestone.State).IsEqualTo(expectedMilestone.State);
                 await Assert.That(updatedDbMilestone.CreatedAt).IsEqualTo(expectedMilestone.CreatedAt);
-                await Assert.That(updatedDbMilestone.LastModifiedAt!.Value).IsGreaterThanOrEqualTo(startTime).And
-                    .IsLessThanOrEqualTo(endTime);
+                await Assert.That(updatedDbMilestone.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
                 if (emptyIssues)
                 {
                     await Assert.That(updatedDbMilestone.Issues).IsEmpty();

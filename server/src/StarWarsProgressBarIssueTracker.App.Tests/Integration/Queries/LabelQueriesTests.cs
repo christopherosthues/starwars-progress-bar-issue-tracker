@@ -15,6 +15,7 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 [NotInParallel(NotInParallelTests.LabelRetrieval)]
 public class LabelQueriesTests : IntegrationTestBase
 {
+    // TODO: Check DoesNotContain and Contains
     [Test]
     public async Task GetLabelsShouldReturnEmptyListIfNoLabelExist()
     {
@@ -101,8 +102,8 @@ public class LabelQueriesTests : IntegrationTestBase
             await Assert.That(label.Description).IsEqualTo(dbLabel.Description);
             await Assert.That(label.Color).IsEqualTo(dbLabel.Color);
             await Assert.That(label.TextColor).IsEqualTo(dbLabel.TextColor);
-            await Assert.That(label.CreatedAt).IsEqualTo(dbLabel.CreatedAt);
-            await Assert.That(label.LastModifiedAt).IsEqualTo(dbLabel.LastModifiedAt);
+            await Assert.That(label.CreatedAt).IsEquivalentTo(dbLabel.CreatedAt);
+            await Assert.That(label.LastModifiedAt).IsEquivalentTo(dbLabel.LastModifiedAt);
 
             LabelDto label2 = labels.Single(entity => entity.Id.Equals(dbLabel2.Id));
             await Assert.That(label2.Id).IsEqualTo(dbLabel2.Id);
@@ -110,8 +111,8 @@ public class LabelQueriesTests : IntegrationTestBase
             await Assert.That(label2.Description).IsEqualTo(dbLabel2.Description);
             await Assert.That(label2.Color).IsEqualTo(dbLabel2.Color);
             await Assert.That(label2.TextColor).IsEqualTo(dbLabel2.TextColor);
-            await Assert.That(label2.CreatedAt).IsEqualTo(dbLabel2.CreatedAt);
-            await Assert.That(label2.LastModifiedAt).IsEqualTo(dbLabel2.LastModifiedAt);
+            await Assert.That(label2.CreatedAt).IsEquivalentTo(dbLabel2.CreatedAt);
+            await Assert.That(label2.LastModifiedAt).IsEquivalentTo(dbLabel2.LastModifiedAt);
 
             List<Edge<LabelDto>> edges = response.Data.Labels.Edges.ToList();
             await Assert.That(edges.Count).IsEqualTo(2);
@@ -122,8 +123,8 @@ public class LabelQueriesTests : IntegrationTestBase
             await Assert.That(edgeLabel.Description).IsEqualTo(dbLabel.Description);
             await Assert.That(edgeLabel.Color).IsEqualTo(dbLabel.Color);
             await Assert.That(edgeLabel.TextColor).IsEqualTo(dbLabel.TextColor);
-            await Assert.That(edgeLabel.CreatedAt).IsEqualTo(dbLabel.CreatedAt);
-            await Assert.That(edgeLabel.LastModifiedAt).IsEqualTo(dbLabel.LastModifiedAt);
+            await Assert.That(edgeLabel.CreatedAt).IsEquivalentTo(dbLabel.CreatedAt);
+            await Assert.That(edgeLabel.LastModifiedAt).IsEquivalentTo(dbLabel.LastModifiedAt);
 
             LabelDto edgeLabel2 = edges.Single(entity => entity.Node.Id.Equals(dbLabel2.Id)).Node;
             await Assert.That(edgeLabel2.Id).IsEqualTo(dbLabel2.Id);
@@ -131,8 +132,8 @@ public class LabelQueriesTests : IntegrationTestBase
             await Assert.That(edgeLabel2.Description).IsEqualTo(dbLabel2.Description);
             await Assert.That(edgeLabel2.Color).IsEqualTo(dbLabel2.Color);
             await Assert.That(edgeLabel2.TextColor).IsEqualTo(dbLabel2.TextColor);
-            await Assert.That(edgeLabel2.CreatedAt).IsEqualTo(dbLabel2.CreatedAt);
-            await Assert.That(edgeLabel2.LastModifiedAt).IsEqualTo(dbLabel2.LastModifiedAt);
+            await Assert.That(edgeLabel2.CreatedAt).IsEquivalentTo(dbLabel2.CreatedAt);
+            await Assert.That(edgeLabel2.LastModifiedAt).IsEquivalentTo(dbLabel2.LastModifiedAt);
         }
     }
 
@@ -258,8 +259,8 @@ public class LabelQueriesTests : IntegrationTestBase
             await Assert.That(label.Color).IsEqualTo(dbLabel.Color);
             await Assert.That(label.TextColor).IsEqualTo(dbLabel.TextColor);
             await Assert.That(label.Issues.ToList()).Contains(i => i.Id.Equals(issue.Id));
-            await Assert.That(label.CreatedAt).IsEqualTo(dbLabel.CreatedAt);
-            await Assert.That(label.LastModifiedAt).IsEqualTo(dbLabel.LastModifiedAt);
+            await Assert.That(label.CreatedAt).IsEquivalentTo(dbLabel.CreatedAt);
+            await Assert.That(label.LastModifiedAt).IsEquivalentTo(dbLabel.LastModifiedAt);
         }
     }
 
