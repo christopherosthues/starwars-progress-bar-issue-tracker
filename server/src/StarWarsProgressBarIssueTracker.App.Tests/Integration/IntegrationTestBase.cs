@@ -22,7 +22,7 @@ public class IntegrationTestBase
     [Before(Test)]
     public async Task SetUpOnceBase()
     {
-        var httpClient = ApiFactory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        HttpClient httpClient = ApiFactory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
         GraphQLClient =
             new GraphQLHttpClient(new GraphQLHttpClientOptions { EndPoint = new Uri("http://localhost:8080/graphql"), },
                 new SystemTextJsonSerializer(new JsonSerializerOptions
@@ -31,9 +31,9 @@ public class IntegrationTestBase
                     Converters = { new JsonStringEnumConverter() }
                 }),
                 httpClient);
-        using var scope = ApiFactory.Services.CreateScope();
-        var serviceProvider = scope.ServiceProvider;
-        var dbContext = serviceProvider.GetRequiredService<IssueTrackerContext>();
+        using IServiceScope scope = ApiFactory.Services.CreateScope();
+        IServiceProvider serviceProvider = scope.ServiceProvider;
+        IssueTrackerContext dbContext = serviceProvider.GetRequiredService<IssueTrackerContext>();
         await SeedInitialDatabase(dbContext);
     }
 
@@ -50,27 +50,27 @@ public class IntegrationTestBase
 
     protected async Task SeedDatabaseAsync(Action<IssueTrackerContext> seed)
     {
-        using var scope = ApiFactory.Services.CreateScope();
-        var serviceProvider = scope.ServiceProvider;
-        var dbContext = serviceProvider.GetRequiredService<IssueTrackerContext>();
+        using IServiceScope scope = ApiFactory.Services.CreateScope();
+        IServiceProvider serviceProvider = scope.ServiceProvider;
+        IssueTrackerContext dbContext = serviceProvider.GetRequiredService<IssueTrackerContext>();
         seed(dbContext);
         await dbContext.SaveChangesAsync();
     }
 
     protected async Task CheckDbContentAsync(Func<IssueTrackerContext, Task> checkAsync)
     {
-        using var scope = ApiFactory.Services.CreateScope();
-        var serviceProvider = scope.ServiceProvider;
-        var dbContext = serviceProvider.GetRequiredService<IssueTrackerContext>();
+        using IServiceScope scope = ApiFactory.Services.CreateScope();
+        IServiceProvider serviceProvider = scope.ServiceProvider;
+        IssueTrackerContext dbContext = serviceProvider.GetRequiredService<IssueTrackerContext>();
         await checkAsync(dbContext);
     }
 
     [After(Test)]
     public async Task TearDownBase()
     {
-        using var scope = ApiFactory.Services.CreateScope();
-        var serviceProvider = scope.ServiceProvider;
-        var dbContext = serviceProvider.GetRequiredService<IssueTrackerContext>();
+        using IServiceScope scope = ApiFactory.Services.CreateScope();
+        IServiceProvider serviceProvider = scope.ServiceProvider;
+        IssueTrackerContext dbContext = serviceProvider.GetRequiredService<IssueTrackerContext>();
         await ResetDatabase(dbContext);
 
         GraphQLClient.Dispose();

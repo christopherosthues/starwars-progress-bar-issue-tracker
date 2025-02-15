@@ -35,7 +35,7 @@ public class IssueService(IIssueRepository issueRepository, IIssueByIdDataLoader
 
     private static void ValidateIssue(Issue issue)
     {
-        var errors = new List<Exception>();
+        List<Exception> errors = [];
         if (string.IsNullOrWhiteSpace(issue.Title))
         {
             errors.Add(new ValueNotSetException(nameof(Issue.Title)));
@@ -86,14 +86,14 @@ public class IssueService(IIssueRepository issueRepository, IIssueByIdDataLoader
                 errors.Add(new ValueNotSetException(nameof(Issue.Vehicle.EngineColor)));
             }
 
-            var hasDuplicatedAppearances = issue.Vehicle.Appearances
+            bool hasDuplicatedAppearances = issue.Vehicle.Appearances
                 .GroupBy(appearance => appearance.Id).Any(group => group.Count() > 1);
             if (hasDuplicatedAppearances)
             {
                 errors.Add(new DuplicatedAppearanceException());
             }
 
-            var hasDuplicatedTranslations = issue.Vehicle.Translations
+            bool hasDuplicatedTranslations = issue.Vehicle.Translations
                 .GroupBy(translation => translation.Country).Any(group => group.Count() > 1);
             // TODO: validate country min and max length and text max length
             if (hasDuplicatedTranslations)
@@ -101,7 +101,7 @@ public class IssueService(IIssueRepository issueRepository, IIssueByIdDataLoader
                 errors.Add(new DuplicatedTranslationsException());
             }
 
-            var hasDuplicatedPhotos = issue.Vehicle.Photos
+            bool hasDuplicatedPhotos = issue.Vehicle.Photos
                 .GroupBy(photo => photo.FilePath).Any(group => group.Count() > 1);
             // TODO: validate max file path length
             if (hasDuplicatedPhotos)

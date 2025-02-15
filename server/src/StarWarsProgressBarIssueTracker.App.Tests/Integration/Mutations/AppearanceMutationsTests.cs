@@ -23,12 +23,12 @@ public class AppearanceMutationsTests : IntegrationTestBase
         {
             await Assert.That(context.Appearances).IsEmpty();
         });
-        var mutationRequest = CreateAddRequest(expectedAppearance);
+        GraphQLRequest mutationRequest = CreateAddRequest(expectedAppearance);
 
-        var startTime = DateTime.UtcNow;
+        DateTime startTime = DateTime.UtcNow;
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<AddAppearanceResponse>(mutationRequest);
+        GraphQLResponse<AddAppearanceResponse> response = await GraphQLClient.SendMutationAsync<AddAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertAddedAppearanceAsync(response, expectedAppearance, startTime);
@@ -39,7 +39,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task AddAppearanceShouldAddAppearanceIfAppearancesAreNotEmpty(Appearance expectedAppearance)
     {
         // Arrange
-        var dbAppearance = new Appearance
+        Appearance dbAppearance = new Appearance
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -56,12 +56,12 @@ public class AppearanceMutationsTests : IntegrationTestBase
         {
             await Assert.That(context.Appearances).Contains(dbAppearance);
         });
-        var mutationRequest = CreateAddRequest(expectedAppearance);
+        GraphQLRequest mutationRequest = CreateAddRequest(expectedAppearance);
 
-        var startTime = DateTime.UtcNow;
+        DateTime startTime = DateTime.UtcNow;
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<AddAppearanceResponse>(mutationRequest);
+        GraphQLResponse<AddAppearanceResponse> response = await GraphQLClient.SendMutationAsync<AddAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertAddedAppearanceAsync(response, expectedAppearance, startTime, dbAppearance);
@@ -76,10 +76,10 @@ public class AppearanceMutationsTests : IntegrationTestBase
         {
             await Assert.That(context.Appearances).IsEmpty();
         });
-        var mutationRequest = CreateAddRequest(expectedResult.expectedAppearance);
+        GraphQLRequest mutationRequest = CreateAddRequest(expectedResult.expectedAppearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<AddAppearanceResponse>(mutationRequest);
+        GraphQLResponse<AddAppearanceResponse> response = await GraphQLClient.SendMutationAsync<AddAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertAppearanceNotAddedAsync(response, expectedResult.errors);
@@ -90,7 +90,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task UpdateAppearanceShouldUpdateAppearance(Appearance expectedAppearance)
     {
         // Arrange
-        var dbAppearance = new Appearance
+        Appearance dbAppearance = new Appearance
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -109,12 +109,12 @@ public class AppearanceMutationsTests : IntegrationTestBase
         {
             await Assert.That(context.Appearances).Contains(dbAppearance);
         });
-        var mutationRequest = CreateUpdateRequest(expectedAppearance);
+        GraphQLRequest mutationRequest = CreateUpdateRequest(expectedAppearance);
 
-        var startTime = DateTime.UtcNow;
+        DateTime startTime = DateTime.UtcNow;
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
+        GraphQLResponse<UpdateAppearanceResponse> response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertUpdatedAppearanceAsync(response, expectedAppearance, startTime);
@@ -125,7 +125,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task UpdateAppearanceShouldUpdateAppearanceIfAppearancesAreNotEmpty(Appearance expectedAppearance)
     {
         // Arrange
-        var dbAppearance = new Appearance
+        Appearance dbAppearance = new Appearance
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -134,7 +134,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             TextColor = "#334455",
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbAppearance2 = new Appearance
+        Appearance dbAppearance2 = new Appearance
         {
             Id = new Guid("0609F93C-CBCC-4650-BA4C-B8D5FF93A877"),
             Title = "Title 2",
@@ -159,12 +159,12 @@ public class AppearanceMutationsTests : IntegrationTestBase
                 await Assert.That(context.Appearances).Contains(dbAppearance2);
             }
         });
-        var mutationRequest = CreateUpdateRequest(expectedAppearance);
+        GraphQLRequest mutationRequest = CreateUpdateRequest(expectedAppearance);
 
-        var startTime = DateTime.UtcNow;
+        DateTime startTime = DateTime.UtcNow;
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
+        GraphQLResponse<UpdateAppearanceResponse> response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertUpdatedAppearanceAsync(response, expectedAppearance, startTime, dbAppearance, dbAppearance2);
@@ -179,10 +179,10 @@ public class AppearanceMutationsTests : IntegrationTestBase
         {
             await Assert.That(context.Appearances).IsEmpty();
         });
-        var mutationRequest = CreateUpdateRequest(expectedResult.expectedAppearance);
+        GraphQLRequest mutationRequest = CreateUpdateRequest(expectedResult.expectedAppearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
+        GraphQLResponse<UpdateAppearanceResponse> response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertAppearanceNotUpdatedAsync(response, expectedResult.errors);
@@ -192,15 +192,15 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task UpdateAppearanceShouldNotUpdateAppearanceIfAppearanceDoesNotExist()
     {
         // Arrange
-        var appearance = CreateAppearance();
+        Appearance appearance = CreateAppearance();
         await CheckDbContentAsync(async context =>
         {
             await Assert.That(context.Appearances).IsEmpty();
         });
-        var mutationRequest = CreateUpdateRequest(appearance);
+        GraphQLRequest mutationRequest = CreateUpdateRequest(appearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
+        GraphQLResponse<UpdateAppearanceResponse> response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertAppearanceNotUpdatedAsync(response, new List<string> { $"No {nameof(Appearance)} found with id '{appearance.Id}'." });
@@ -210,8 +210,8 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task DeleteAppearanceShouldDeleteAppearance()
     {
         // Arrange
-        var appearance = CreateAppearance();
-        var dbAppearance = new Appearance
+        Appearance appearance = CreateAppearance();
+        Appearance dbAppearance = new Appearance
         {
             Id = appearance.Id,
             Title = appearance.Title,
@@ -230,10 +230,10 @@ public class AppearanceMutationsTests : IntegrationTestBase
         {
             await Assert.That(context.Appearances).Contains(dbAppearance);
         });
-        var mutationRequest = CreateDeleteRequest(appearance);
+        GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
+        GraphQLResponse<DeleteAppearanceResponse> response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertDeletedAppearanceAsync(response, appearance);
@@ -243,8 +243,8 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task DeleteAppearanceShouldDeleteAppearanceAndReferenceToVehicles()
     {
         // Arrange
-        var appearance = CreateAppearance();
-        var dbAppearance = new Appearance
+        Appearance appearance = CreateAppearance();
+        Appearance dbAppearance = new Appearance
         {
             Id = appearance.Id,
             Title = appearance.Title,
@@ -253,14 +253,14 @@ public class AppearanceMutationsTests : IntegrationTestBase
             TextColor = appearance.TextColor,
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbAppearance2 = new Appearance
+        Appearance dbAppearance2 = new Appearance
         {
             Id = new Guid("B961A621-9848-429A-8B44-B1AF1F0182CE"),
             Color = "#778899",
             TextColor = "#665544",
             Title = "Title 2"
         };
-        var dbVehicle2 = new Vehicle
+        Vehicle dbVehicle2 = new Vehicle
         {
             Id = new Guid("74AE8DD4-7669-4428-8E81-FB8A24A217A3"),
             EngineColor = EngineColor.Green,
@@ -272,7 +272,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         };
         await SeedDatabaseAsync(context =>
         {
-            var dbVehicle = new Vehicle
+            Vehicle dbVehicle = new Vehicle
             {
                 Id = new Guid("87A2F9BF-CAB7-41D3-84F9-155135FA41D7"),
                 EngineColor = EngineColor.Blue,
@@ -288,10 +288,10 @@ public class AppearanceMutationsTests : IntegrationTestBase
         {
             await Assert.That(context.Appearances).Contains(dbAppearance);
         });
-        var mutationRequest = CreateDeleteRequest(appearance);
+        GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
+        GraphQLResponse<DeleteAppearanceResponse> response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertDeletedAppearanceAsync(response, appearance);
@@ -299,8 +299,8 @@ public class AppearanceMutationsTests : IntegrationTestBase
         {
             using (Assert.Multiple())
             {
-                var dbVehicles = context.Vehicles.Include(dbVehicle => dbVehicle.Appearances).ToList();
-                foreach (var dbVehicle in dbVehicles)
+                List<Vehicle> dbVehicles = context.Vehicles.Include(dbVehicle => dbVehicle.Appearances).ToList();
+                foreach (Vehicle dbVehicle in dbVehicles)
                 {
                     await Assert.That(dbVehicle.Appearances).DoesNotContain(dbAppearance);
                 }
@@ -314,8 +314,8 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task DeleteAppearanceShouldDeleteAppearanceIfAppearancesIsNotEmpty()
     {
         // Arrange
-        var appearance = CreateAppearance();
-        var dbAppearance = new Appearance
+        Appearance appearance = CreateAppearance();
+        Appearance dbAppearance = new Appearance
         {
             Id = appearance.Id,
             Title = appearance.Title,
@@ -324,7 +324,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             TextColor = appearance.TextColor,
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbAppearance2 = new Appearance
+        Appearance dbAppearance2 = new Appearance
         {
             Id = new Guid("0609F93C-CBCC-4650-BA4C-B8D5FF93A877"),
             Title = "Title 2",
@@ -351,10 +351,10 @@ public class AppearanceMutationsTests : IntegrationTestBase
                 await Assert.That(context.Appearances).Contains(dbAppearance2);
             }
         });
-        var mutationRequest = CreateDeleteRequest(appearance);
+        GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
+        GraphQLResponse<DeleteAppearanceResponse> response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertDeletedAppearanceAsync(response, appearance, dbAppearance2);
@@ -364,15 +364,15 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task DeleteAppearanceShouldNotDeleteAppearanceIfAppearanceDoesNotExist()
     {
         // Arrange
-        var appearance = CreateAppearance();
+        Appearance appearance = CreateAppearance();
         await CheckDbContentAsync(async context =>
         {
             await Assert.That(context.Appearances).IsEmpty();
         });
-        var mutationRequest = CreateDeleteRequest(appearance);
+        GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
+        GraphQLResponse<DeleteAppearanceResponse> response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertAppearanceNotDeletedAsync(response, new List<string> { $"No {nameof(Appearance)} found with id '{appearance.Id}'." });
@@ -380,12 +380,12 @@ public class AppearanceMutationsTests : IntegrationTestBase
 
     private static GraphQLRequest CreateAddRequest(Appearance expectedAppearance)
     {
-        var descriptionParameter = expectedAppearance.Description != null
+        string descriptionParameter = expectedAppearance.Description != null
             ? $"""
                , description: "{expectedAppearance.Description}"
                """
             : string.Empty;
-        var mutationRequest = new GraphQLRequest
+        GraphQLRequest mutationRequest = new GraphQLRequest
         {
             Query = $$"""
                       mutation addAppearance
@@ -446,7 +446,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
                     await Assert.That(context.Appearances.ToList())
                         .Contains(dbAppearance1 => dbAppearance1.Id.Equals(dbAppearance.Id));
                 }
-                var addedDbAppearance = context.Appearances.First(dbAppearance1 => dbAppearance1.Id.Equals(addedAppearance.Id));
+                Appearance addedDbAppearance = context.Appearances.First(dbAppearance1 => dbAppearance1.Id.Equals(addedAppearance.Id));
                 await Assert.That(addedDbAppearance).IsNotNull();
                 await Assert.That(addedDbAppearance.Id).IsNotDefault().And.IsEqualTo(addedAppearance.Id);
                 await Assert.That(addedDbAppearance.Title).IsEqualTo(expectedAppearance.Title);
@@ -468,7 +468,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             await Assert.That(response.Data.AddAppearance.Errors).IsNotNull().And.IsNotEmpty();
             await Assert.That(response.Data.AddAppearance.Appearance).IsNull();
 
-            var resultErrors = response.Data.AddAppearance.Errors.Select(error => error.Message);
+            IEnumerable<string> resultErrors = response.Data.AddAppearance.Errors.Select(error => error.Message);
             await Assert.That(resultErrors).IsEquivalentTo(errors);
         }
 
@@ -480,12 +480,12 @@ public class AppearanceMutationsTests : IntegrationTestBase
 
     private static GraphQLRequest CreateUpdateRequest(Appearance expectedAppearance)
     {
-        var descriptionParameter = expectedAppearance.Description != null
+        string descriptionParameter = expectedAppearance.Description != null
             ? $"""
                , description: "{expectedAppearance.Description}"
                """
             : string.Empty;
-        var mutationRequest = new GraphQLRequest
+        GraphQLRequest mutationRequest = new GraphQLRequest
         {
             Query = $$"""
                       mutation updateAppearance
@@ -546,7 +546,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
                     await Assert.That(context.Appearances.ToList())
                         .Contains(dbAppearance1 => dbAppearance1.Id.Equals(dbAppearance.Id));
                 }
-                var updatedDbAppearance = context.Appearances.First(dbAppearance1 => dbAppearance1.Id.Equals(updatedAppearance.Id));
+                Appearance updatedDbAppearance = context.Appearances.First(dbAppearance1 => dbAppearance1.Id.Equals(updatedAppearance.Id));
                 await Assert.That(updatedDbAppearance).IsNotNull();
                 await Assert.That(updatedDbAppearance.Id).IsNotDefault().And.IsEqualTo(updatedAppearance.Id);
                 await Assert.That(updatedDbAppearance.Title).IsEqualTo(expectedAppearance.Title);
@@ -559,7 +559,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
 
                 if (notUpdatedAppearance is not null)
                 {
-                    var secondAppearance =
+                    Appearance? secondAppearance =
                         context.Appearances.FirstOrDefault(appearance => appearance.Id.Equals(notUpdatedAppearance.Id));
                     await Assert.That(secondAppearance).IsNotNull();
                     await Assert.That(secondAppearance!.Id).IsNotDefault().And.IsEqualTo(notUpdatedAppearance.Id);
@@ -582,7 +582,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             await Assert.That(response.Data.UpdateAppearance.Errors).IsNotNull().And.IsNotEmpty();
             await Assert.That(response.Data.UpdateAppearance.Appearance).IsNull();
 
-            var resultErrors = response.Data.UpdateAppearance.Errors.Select(error => error.Message);
+            IEnumerable<string> resultErrors = response.Data.UpdateAppearance.Errors.Select(error => error.Message);
             await Assert.That(resultErrors).IsEquivalentTo(errors);
         }
 
@@ -594,7 +594,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
 
     private static GraphQLRequest CreateDeleteRequest(Appearance expectedAppearance)
     {
-        var mutationRequest = new GraphQLRequest
+        GraphQLRequest mutationRequest = new GraphQLRequest
         {
             Query = $$"""
                       mutation deleteAppearance
@@ -632,7 +632,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         {
             await Assert.That(response).IsNotNull();
             await Assert.That(response.Errors).IsNull().Or.IsEmpty();
-            var deletedAppearance = response.Data.DeleteAppearance.Appearance;
+            Appearance deletedAppearance = response.Data.DeleteAppearance.Appearance;
             await Assert.That(deletedAppearance.Id).IsNotDefault();
             await Assert.That(deletedAppearance.Title).IsEqualTo(expectedAppearance.Title);
             await Assert.That(deletedAppearance.Description).IsEqualTo(expectedAppearance.Description);
@@ -666,7 +666,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             await Assert.That(response.Data.DeleteAppearance.Errors).IsNotNull().And.IsNotEmpty();
             await Assert.That(response.Data.DeleteAppearance.Appearance).IsNull();
 
-            var resultErrors = response.Data.DeleteAppearance.Errors.Select(error => error.Message);
+            IEnumerable<string> resultErrors = response.Data.DeleteAppearance.Errors.Select(error => error.Message);
             await Assert.That(resultErrors).IsEquivalentTo(errors);
         }
 
@@ -678,7 +678,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
 
     private static Appearance CreateAppearance()
     {
-        var faker = new Faker<Appearance>()
+        Faker<Appearance>? faker = new Faker<Appearance>()
             .RuleFor(appearance => appearance.Id, f => f.Random.Guid())
             .RuleFor(appearance => appearance.Title, f => f.Random.String2(1, 50, AllowedChars))
             .RuleFor(appearance => appearance.Description, f => f.Random.String2(0, 255, AllowedChars).OrNull(f, 0.3f))
@@ -689,12 +689,12 @@ public class AppearanceMutationsTests : IntegrationTestBase
 
     public static IEnumerable<Func<Appearance>> AddAppearanceCases()
     {
-        var faker = new Faker<Appearance>()
+        Faker<Appearance>? faker = new Faker<Appearance>()
             .RuleFor(appearance => appearance.Title, f => f.Random.String2(1, 50, AllowedChars))
             .RuleFor(appearance => appearance.Description, f => f.Random.String2(0, 255, AllowedChars).OrNull(f, 0.3f))
             .RuleFor(appearance => appearance.Color, f => "#" + f.Random.String2(6, 6, HexCodeColorChars))
             .RuleFor(appearance => appearance.TextColor, f => "#" + f.Random.String2(6, 6, HexCodeColorChars));
-        var appearances = faker.Generate(20);
+        List<Appearance>? appearances = faker.Generate(20);
         return appearances.Select<Appearance, Func<Appearance>>(appearance => () => appearance);
     }
 

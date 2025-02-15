@@ -14,7 +14,7 @@ public class SourceCodeWriter
 
     private void WriteTabs()
     {
-        for (var i = 0; i < _tabLevel; i++)
+        for (int i = 0; i < _tabLevel; i++)
         {
             _builder.Append("    ");
         }

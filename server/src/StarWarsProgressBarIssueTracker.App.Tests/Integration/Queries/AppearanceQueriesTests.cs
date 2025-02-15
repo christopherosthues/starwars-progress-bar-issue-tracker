@@ -17,10 +17,10 @@ public class AppearanceQueriesTests : IntegrationTestBase
         {
             await Assert.That(context.Appearances).IsEmpty();
         });
-        var request = CreateGetAppearancesRequest();
+        GraphQLRequest request = CreateGetAppearancesRequest();
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetAppearancesResponse>(request);
+        GraphQLResponse<GetAppearancesResponse> response = await GraphQLClient.SendQueryAsync<GetAppearancesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -42,14 +42,14 @@ public class AppearanceQueriesTests : IntegrationTestBase
     public async Task GetAppearancesShouldReturnAllAppearances()
     {
         // Arrange
-        var dbAppearance = new Appearance
+        Appearance dbAppearance = new Appearance
         {
             Color = "001122",
             TextColor = "223344",
             Title = "Appearance 1",
             Description = "Description 1"
         };
-        var dbAppearance2 = new Appearance
+        Appearance dbAppearance2 = new Appearance
         {
             Color = "112233",
             TextColor = "334455",
@@ -69,10 +69,10 @@ public class AppearanceQueriesTests : IntegrationTestBase
                 await Assert.That(context.Appearances).Contains(dbAppearance2);
             }
         });
-        var request = CreateGetAppearancesRequest();
+        GraphQLRequest request = CreateGetAppearancesRequest();
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetAppearancesResponse>(request);
+        GraphQLResponse<GetAppearancesResponse> response = await GraphQLClient.SendQueryAsync<GetAppearancesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -89,7 +89,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
             List<Appearance> appearances = response.Data.Appearances.Nodes.ToList();
             await Assert.That(appearances.Count).IsEqualTo(2);
 
-            var appearance = appearances.Single(entity => entity.Id.Equals(dbAppearance.Id));
+            Appearance appearance = appearances.Single(entity => entity.Id.Equals(dbAppearance.Id));
             await Assert.That(appearance.Id).IsEqualTo(dbAppearance.Id);
             await Assert.That(appearance.Title).IsEqualTo(dbAppearance.Title);
             await Assert.That(appearance.Description).IsEqualTo(dbAppearance.Description);
@@ -98,7 +98,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
             await Assert.That(appearance.CreatedAt).IsEqualTo(dbAppearance.CreatedAt);
             await Assert.That(appearance.LastModifiedAt).IsEqualTo(dbAppearance.LastModifiedAt);
 
-            var appearance2 = appearances.Single(entity => entity.Id.Equals(dbAppearance2.Id));
+            Appearance appearance2 = appearances.Single(entity => entity.Id.Equals(dbAppearance2.Id));
             await Assert.That(appearance2.Id).IsEqualTo(dbAppearance2.Id);
             await Assert.That(appearance2.Title).IsEqualTo(dbAppearance2.Title);
             await Assert.That(appearance2.Description).IsEqualTo(dbAppearance2.Description);
@@ -146,10 +146,10 @@ public class AppearanceQueriesTests : IntegrationTestBase
             });
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var request = CreateGetAppearanceRequest(id);
+        GraphQLRequest request = CreateGetAppearanceRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetAppearanceResponse>(request);
+        GraphQLResponse<GetAppearanceResponse> response = await GraphQLClient.SendQueryAsync<GetAppearanceResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -172,10 +172,10 @@ public class AppearanceQueriesTests : IntegrationTestBase
             await Assert.That(context.Appearances).IsEmpty();
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var request = CreateGetAppearanceRequest(id);
+        GraphQLRequest request = CreateGetAppearanceRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetAppearanceResponse>(request);
+        GraphQLResponse<GetAppearanceResponse> response = await GraphQLClient.SendQueryAsync<GetAppearanceResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -194,7 +194,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
     {
         // Arrange
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var dbAppearance = new Appearance
+        Appearance dbAppearance = new Appearance
         {
             Id = new Guid(id),
             Color = "112233",
@@ -214,10 +214,10 @@ public class AppearanceQueriesTests : IntegrationTestBase
             });
             context.Appearances.Add(dbAppearance);
         });
-        var request = CreateGetAppearanceRequest(id);
+        GraphQLRequest request = CreateGetAppearanceRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetAppearanceResponse>(request);
+        GraphQLResponse<GetAppearanceResponse> response = await GraphQLClient.SendQueryAsync<GetAppearanceResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -225,7 +225,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
             await Assert.That(response).IsNotNull();
             await Assert.That(response.Errors).IsNull();
             await Assert.That(response.Data).IsNotNull();
-            var appearance = response.Data.Appearance;
+            Appearance? appearance = response.Data.Appearance;
 
             await Assert.That(appearance).IsNotNull();
             await Assert.That(appearance!.Id).IsEqualTo(dbAppearance.Id);
@@ -240,7 +240,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
 
     private static GraphQLRequest CreateGetAppearancesRequest()
     {
-        var queryRequest = new GraphQLRequest
+        GraphQLRequest queryRequest = new GraphQLRequest
         {
             Query = """
                     query appearances
@@ -284,7 +284,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
 
     private static GraphQLRequest CreateGetAppearanceRequest(string id)
     {
-        var queryRequest = new GraphQLRequest
+        GraphQLRequest queryRequest = new GraphQLRequest
         {
             Query = $$"""
                     query appearance

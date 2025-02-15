@@ -37,7 +37,7 @@ public class MilestoneService(
 
     private static void ValidateMilestone(Milestone milestone)
     {
-        var errors = new List<Exception>();
+        List<Exception> errors = [];
         if (string.IsNullOrWhiteSpace(milestone.Title))
         {
             errors.Add(new ValueNotSetException(nameof(Milestone.Title)));

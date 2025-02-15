@@ -37,7 +37,7 @@ public partial class LabelService(ILabelRepository labelRepository, ILabelByIdDa
 
     private static void ValidateLabel(Label label)
     {
-        var errors = new List<Exception>();
+        List<Exception> errors = [];
         if (string.IsNullOrWhiteSpace(label.Title))
         {
             errors.Add(new ValueNotSetException(nameof(Label.Title)));
@@ -66,7 +66,7 @@ public partial class LabelService(ILabelRepository labelRepository, ILabelByIdDa
             errors.Add(new ValueNotSetException(nameof(Appearance.Color)));
         }
 
-        var regexMatcher = ColorHexCodeRegex();
+        Regex regexMatcher = ColorHexCodeRegex();
         if (!regexMatcher.Match(label.Color).Success)
         {
             errors.Add(new ColorFormatException(label.Color, nameof(Label.Color)));

@@ -39,7 +39,7 @@ public partial class AppearanceService(
 
     private static void ValidateAppearance(Appearance appearance)
     {
-        var errors = new List<Exception>();
+        List<Exception> errors = [];
         if (string.IsNullOrWhiteSpace(appearance.Title))
         {
             errors.Add(new ValueNotSetException(nameof(Appearance.Title)));
@@ -69,7 +69,7 @@ public partial class AppearanceService(
             errors.Add(new ValueNotSetException(nameof(Appearance.Color)));
         }
 
-        var regexMatcher = ColorHexCodeRegex();
+        Regex regexMatcher = ColorHexCodeRegex();
         if (!regexMatcher.Match(appearance.Color).Success)
         {
             errors.Add(new ColorFormatException(appearance.Color, nameof(Appearance.Color)));

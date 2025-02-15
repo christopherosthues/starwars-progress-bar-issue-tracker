@@ -20,10 +20,10 @@ public class MilestoneQueriesTests : IntegrationTestBase
         {
             await Assert.That(context.Milestones).IsEmpty();
         });
-        var request = CreateGetMilestonesRequest();
+        GraphQLRequest request = CreateGetMilestonesRequest();
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetMilestonesResponse>(request);
+        GraphQLResponse<GetMilestonesResponse> response = await GraphQLClient.SendQueryAsync<GetMilestonesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -45,13 +45,13 @@ public class MilestoneQueriesTests : IntegrationTestBase
     public async Task GetMilestonesShouldReturnAllMilestones()
     {
         // Arrange
-        var dbMilestone = new Milestone
+        Milestone dbMilestone = new Milestone
         {
             Title = "Milestone 1",
             State = MilestoneState.Open
         };
 
-        var dbIssue = new Issue
+        Issue dbIssue = new Issue
         {
             Title = "issue title",
             State = IssueState.Closed,
@@ -66,7 +66,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
                 Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbMilestone2 = new Milestone
+        Milestone dbMilestone2 = new Milestone
         {
             Title = "Milestone 2",
             Description = "Notes 2",
@@ -85,8 +85,8 @@ public class MilestoneQueriesTests : IntegrationTestBase
         });
         await CheckDbContentAsync(async context =>
         {
-            var dbMilestones = context.Milestones.ToList();
-            var dbIssues = context.Issues.ToList();
+            List<Milestone> dbMilestones = context.Milestones.ToList();
+            List<Issue> dbIssues = context.Issues.ToList();
             using (Assert.Multiple())
             {
                 await Assert.That(dbMilestones).Contains(milestone => milestone.Id.Equals(dbMilestone.Id));
@@ -94,10 +94,10 @@ public class MilestoneQueriesTests : IntegrationTestBase
                 await Assert.That(dbIssues).Contains(issue => issue.Id.Equals(dbIssue.Id));
             }
         });
-        var request = CreateGetMilestonesRequest();
+        GraphQLRequest request = CreateGetMilestonesRequest();
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetMilestonesResponse>(request);
+        GraphQLResponse<GetMilestonesResponse> response = await GraphQLClient.SendQueryAsync<GetMilestonesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -189,10 +189,10 @@ public class MilestoneQueriesTests : IntegrationTestBase
             });
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var request = CreateGetMilestoneRequest(id);
+        GraphQLRequest request = CreateGetMilestoneRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetMilestoneResponse>(request);
+        GraphQLResponse<GetMilestoneResponse> response = await GraphQLClient.SendQueryAsync<GetMilestoneResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -214,10 +214,10 @@ public class MilestoneQueriesTests : IntegrationTestBase
             await Assert.That(context.Milestones).IsEmpty();
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var request = CreateGetMilestoneRequest(id);
+        GraphQLRequest request = CreateGetMilestoneRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetMilestoneResponse>(request);
+        GraphQLResponse<GetMilestoneResponse> response = await GraphQLClient.SendQueryAsync<GetMilestoneResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -235,7 +235,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
     {
         // Arrange
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var dbIssue = new Issue
+        Issue dbIssue = new Issue
         {
             Id = new Guid("CB547CF5-CB28-412E-8DA4-2A7F10E3A5FE"),
             Title = "issue title",
@@ -251,7 +251,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
                 Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbMilestone = new Milestone
+        Milestone dbMilestone = new Milestone
         {
             Id = new Guid(id),
             Title = "Milestone 2",
@@ -270,10 +270,10 @@ public class MilestoneQueriesTests : IntegrationTestBase
             });
             context.Milestones.Add(dbMilestone);
         });
-        var request = CreateGetMilestoneRequest(id);
+        GraphQLRequest request = CreateGetMilestoneRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetMilestoneResponse>(request);
+        GraphQLResponse<GetMilestoneResponse> response = await GraphQLClient.SendQueryAsync<GetMilestoneResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -281,7 +281,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
             await Assert.That(response).IsNotNull();
             await Assert.That(response.Errors).IsNull();
             await Assert.That(response.Data).IsNotNull();
-            var milestone = response.Data.Milestone;
+            Milestone? milestone = response.Data.Milestone;
 
             await Assert.That(milestone).IsNotNull();
             await Assert.That(milestone!.Id).IsEqualTo(dbMilestone.Id);
@@ -292,7 +292,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
             await Assert.That(milestone.LastModifiedAt).IsEqualTo(dbMilestone.LastModifiedAt);
             await Assert.That(milestone.Issues).IsNotEmpty();
             await Assert.That(milestone.Issues.Count).IsEqualTo(1);
-            var issue = milestone.Issues.First();
+            Issue issue = milestone.Issues.First();
             await Assert.That(issue.Id).IsEqualTo(dbIssue.Id);
             await Assert.That(issue.Release).IsNotNull();
             await Assert.That(issue.Release!.Id).IsEqualTo(dbIssue.Release.Id);
@@ -305,7 +305,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
 
     private static GraphQLRequest CreateGetMilestonesRequest()
     {
-        var queryRequest = new GraphQLRequest
+        GraphQLRequest queryRequest = new GraphQLRequest
         {
             Query = """
                     query milestones
@@ -389,7 +389,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
 
     private static GraphQLRequest CreateGetMilestoneRequest(string id)
     {
-        var queryRequest = new GraphQLRequest
+        GraphQLRequest queryRequest = new GraphQLRequest
         {
             Query = $$"""
                     query milestone

@@ -35,7 +35,7 @@ public class ReleaseService(IReleaseRepository releaseRepository, IReleaseByIdDa
 
     private static void ValidateRelease(Release release)
     {
-        var errors = new List<Exception>();
+        List<Exception> errors = [];
         if (string.IsNullOrWhiteSpace(release.Title))
         {
             errors.Add(new ValueNotSetException(nameof(Release.Title)));

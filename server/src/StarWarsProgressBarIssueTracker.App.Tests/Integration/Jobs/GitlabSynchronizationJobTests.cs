@@ -41,9 +41,9 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
     public async Task ExecuteAsyncShouldUpdateLabels()
     {
         // Arrange
-        var expectedDbLabels = GitlabMockData.AddedLabels();
-        var dbIssue = new Issue { Title = "NotDeleted", };
-        var deletedLabel = new Label
+        IList<Label> expectedDbLabels = GitlabMockData.AddedLabels();
+        Issue dbIssue = new Issue { Title = "NotDeleted", };
+        Label deletedLabel = new Label
         {
             Title = "Deleted",
             Color = "#fffff1",
@@ -52,7 +52,7 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
             Issues = [dbIssue]
         };
         dbIssue.Labels.Add(deletedLabel);
-        var githubLabel = new Label { Title = "GitHub", Color = "#fffffe", TextColor = "#fffffe", GitHubId = "gid://github/ProjectLabel/5" };
+        Label githubLabel = new Label { Title = "GitHub", Color = "#fffffe", TextColor = "#fffffe", GitHubId = "gid://github/ProjectLabel/5" };
         expectedDbLabels.Add(githubLabel);
         await SeedDatabaseAsync(context =>
         {
@@ -61,8 +61,8 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
             context.Labels.Add(githubLabel);
             context.Issues.Add(dbIssue);
         });
-        using var scope = ApiFactory.Services.CreateScope();
-        var job = scope.ServiceProvider.GetRequiredService<GitlabSynchronizationJob>();
+        using IServiceScope scope = ApiFactory.Services.CreateScope();
+        GitlabSynchronizationJob job = scope.ServiceProvider.GetRequiredService<GitlabSynchronizationJob>();
         _server.Given(Request.Create().WithPath("/api/graphql").UsingPost())
             .RespondWith(Response.Create().WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
@@ -96,8 +96,8 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
         // Assert
         await CheckDbContentAsync(async context =>
         {
-            var resultLabels = context.Labels.ToList();
-            var issues = context.Issues.Include(issue => issue.Labels).ToList();
+            List<Label> resultLabels = context.Labels.ToList();
+            List<Issue> issues = context.Issues.Include(issue => issue.Labels).ToList();
             using (Assert.Multiple())
             {
                 await Assert.That(context.Labels).IsNotEmpty();
@@ -121,21 +121,21 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
     public async Task ExecuteAsyncShouldUpdateAppearances()
     {
         // Arrange
-        var expectedAppearances = GitlabMockData.AddedAppearances();
-        var dbIssue = new Issue { Title = "NotDeleted", };
-        var deletedAppearance = new Appearance
+        IList<Appearance> expectedAppearances = GitlabMockData.AddedAppearances();
+        Issue dbIssue = new Issue { Title = "NotDeleted", };
+        Appearance deletedAppearance = new Appearance
         {
             Title = "Deleted",
             Color = "#fffff1",
             TextColor = "#fffff1",
             GitlabId = "gid://gitlab/ProjectLabel/7",
         };
-        var dbVehicle = new Vehicle
+        Vehicle dbVehicle = new Vehicle
         {
             Appearances = [deletedAppearance]
         };
         dbIssue.Vehicle = dbVehicle;
-        var githubAppearance = new Appearance { Title = "GitHub", Color = "#fffffe", TextColor = "#fffffe", GitHubId = "gid://github/ProjectLabel/8" };
+        Appearance githubAppearance = new Appearance { Title = "GitHub", Color = "#fffffe", TextColor = "#fffffe", GitHubId = "gid://github/ProjectLabel/8" };
         expectedAppearances.Add(githubAppearance);
         await SeedDatabaseAsync(context =>
         {
@@ -144,8 +144,8 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
             context.Appearances.Add(githubAppearance);
             context.Issues.Add(dbIssue);
         });
-        using var scope = ApiFactory.Services.CreateScope();
-        var job = scope.ServiceProvider.GetRequiredService<GitlabSynchronizationJob>();
+        using IServiceScope scope = ApiFactory.Services.CreateScope();
+        GitlabSynchronizationJob job = scope.ServiceProvider.GetRequiredService<GitlabSynchronizationJob>();
         _server.Given(Request.Create().WithPath("/api/graphql").UsingPost())
             .RespondWith(Response.Create().WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
@@ -153,8 +153,8 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
 
         await CheckDbContentAsync(async context =>
         {
-            var resultAppearances = context.Appearances.ToList();
-            var dbIssues = context.Issues.Include(entity => entity.Vehicle).ThenInclude(entity => entity!.Appearances).ToList();
+            List<Appearance> resultAppearances = context.Appearances.ToList();
+            List<Issue> dbIssues = context.Issues.Include(entity => entity.Vehicle).ThenInclude(entity => entity!.Appearances).ToList();
             using (Assert.Multiple())
             {
                 await Assert.That(resultAppearances).Contains(deletedAppearance);
@@ -181,8 +181,8 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
         // Assert
         await CheckDbContentAsync(async context =>
         {
-            var resultAppearances = context.Appearances.ToList();
-            var issues = context.Issues.Include(issue => issue.Vehicle).ThenInclude(vehicle => vehicle!.Appearances).ToList();
+            List<Appearance> resultAppearances = context.Appearances.ToList();
+            List<Issue> issues = context.Issues.Include(issue => issue.Vehicle).ThenInclude(vehicle => vehicle!.Appearances).ToList();
 
             using (Assert.Multiple())
             {
@@ -207,9 +207,9 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
     public async Task ExecuteAsyncShouldUpdateMilestones()
     {
         // Arrange
-        var expectedMilestones = GitlabMockData.AddedMilestones();
-        var dbIssue = new Issue { Title = "NotDeleted", };
-        var deletedMilestone = new Milestone
+        IList<Milestone> expectedMilestones = GitlabMockData.AddedMilestones();
+        Issue dbIssue = new Issue { Title = "NotDeleted", };
+        Milestone deletedMilestone = new Milestone
         {
             Title = "Deleted",
             GitlabId = "gid://gitlab/Milestone/4",
@@ -217,7 +217,7 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
             Issues = [dbIssue]
         };
         dbIssue.Milestone = deletedMilestone;
-        var githubMilestone = new Milestone { Title = "GitHub", GitHubId = "gid://github/Milestone/5", };
+        Milestone githubMilestone = new Milestone { Title = "GitHub", GitHubId = "gid://github/Milestone/5", };
         expectedMilestones.Add(githubMilestone);
         await SeedDatabaseAsync(context =>
         {
@@ -226,8 +226,8 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
             context.Milestones.Add(githubMilestone);
             context.Issues.Add(dbIssue);
         });
-        using var scope = ApiFactory.Services.CreateScope();
-        var job = scope.ServiceProvider.GetRequiredService<GitlabSynchronizationJob>();
+        using IServiceScope scope = ApiFactory.Services.CreateScope();
+        GitlabSynchronizationJob job = scope.ServiceProvider.GetRequiredService<GitlabSynchronizationJob>();
         _server.Given(Request.Create().WithPath("/api/graphql").UsingPost())
             .RespondWith(Response.Create().WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
@@ -235,8 +235,8 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
 
         await CheckDbContentAsync(async context =>
         {
-            var milestones = context.Milestones.ToList();
-            var issues = context.Issues.Include(entity => entity.Milestone);
+            List<Milestone> milestones = context.Milestones.ToList();
+            List<Issue> issues = context.Issues.Include(entity => entity.Milestone).ToList();
             await Assert.That(milestones).Contains(deletedMilestone);
             // milestones.Should().ContainEquivalentOf(deletedMilestone,
             // options => options.Excluding(dbMilestone => dbMilestone.Id).Excluding(dbMilestone => dbMilestone.CreatedAt)
@@ -260,8 +260,8 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
         // Assert
         await CheckDbContentAsync(async context =>
         {
-            var resultMilestones = context.Milestones.ToList();
-            var issues = context.Issues.Include(issue => issue.Milestone).ToList();
+            List<Milestone> resultMilestones = context.Milestones.ToList();
+            List<Issue> issues = context.Issues.Include(issue => issue.Milestone).ToList();
 
             using (Assert.Multiple())
             {
@@ -287,9 +287,9 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
     public async Task ExecuteAsyncShouldUpdateReleases()
     {
         // Arrange
-        var expectedReleases = GitlabMockData.AddedReleases();
-        var dbIssue = new Issue { Title = "NotDeleted", };
-        var deletedRelease = new Release
+        IList<Release> expectedReleases = GitlabMockData.AddedReleases();
+        Issue dbIssue = new Issue { Title = "NotDeleted", };
+        Release deletedRelease = new Release
         {
             Title = "Deleted",
             GitlabId = "gid://gitlab/Issue/4",
@@ -297,7 +297,7 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
             Issues = [dbIssue]
         };
         dbIssue.Release = deletedRelease;
-        var githubRelease = new Release { Title = "GitHub", GitHubId = "gid://github/Issue/5", };
+        Release githubRelease = new Release { Title = "GitHub", GitHubId = "gid://github/Issue/5", };
         expectedReleases.Add(githubRelease);
         await SeedDatabaseAsync(context =>
         {
@@ -306,8 +306,8 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
             context.Releases.Add(githubRelease);
             context.Issues.Add(dbIssue);
         });
-        using var scope = ApiFactory.Services.CreateScope();
-        var job = scope.ServiceProvider.GetRequiredService<GitlabSynchronizationJob>();
+        using IServiceScope scope = ApiFactory.Services.CreateScope();
+        GitlabSynchronizationJob job = scope.ServiceProvider.GetRequiredService<GitlabSynchronizationJob>();
         _server.Given(Request.Create().WithPath("/api/graphql").UsingPost())
             .RespondWith(Response.Create().WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
@@ -315,8 +315,8 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
 
         await CheckDbContentAsync(async context =>
         {
-            var releases = context.Releases.ToList();
-            var issues = context.Issues.Include(entity => entity.Release);
+            List<Release> releases = context.Releases.ToList();
+            List<Issue> issues = context.Issues.Include(entity => entity.Release).ToList();
             using (Assert.Multiple())
             {
                 await Assert.That(releases).Contains(deletedRelease);
@@ -343,8 +343,8 @@ public class GitlabSynchronizationJobTests : IntegrationTestBase
         // Assert
         await CheckDbContentAsync(async context =>
         {
-            var resultReleases = context.Releases.ToList();
-            var issues = context.Issues.Include(issue => issue.Release).ToList();
+            List<Release> resultReleases = context.Releases.ToList();
+            List<Issue> issues = context.Issues.Include(issue => issue.Release).ToList();
             using (Assert.Multiple())
             {
                 await Assert.That(resultReleases).IsNotEmpty();

@@ -7,6 +7,7 @@ using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.GraphQL;
 using StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Models;
 using StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Networking;
+using StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.Networking.Models;
 using IssueState = StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.GraphQL.IssueState;
 
 namespace StarWarsProgressBarIssueTracker.App.Jobs;
@@ -27,7 +28,7 @@ public class GitlabSynchronizationJob(
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var all = await graphQlService.GetAllAsync(cancellationToken);
+        IGetAll_Project? all = await graphQlService.GetAllAsync(cancellationToken);
 
         if (all == null)
         {
@@ -48,7 +49,7 @@ public class GitlabSynchronizationJob(
             .Where(gitlabLabel => gitlabLabel != null).Cast<IGetAll_Project_Labels_Nodes>();
         IList<Label> labels = [];
         IList<Appearance> appearances = [];
-        foreach (var gitlabLabel in gitlabLabels)
+        foreach (IGetAll_Project_Labels_Nodes gitlabLabel in gitlabLabels)
         {
             if (gitlabLabel.Title.StartsWith("appearance: ", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -110,9 +111,9 @@ public class GitlabSynchronizationJob(
     private async Task SynchronizeIssuesAsync(string projectId, IGetAll_Project_Issues? gitlabIssueData,
         CancellationToken cancellationToken)
     {
-        var currentPageInfo = gitlabIssueData?.PageInfo;
+        IGetAll_Project_Issues_PageInfo? currentPageInfo = gitlabIssueData?.PageInfo;
 
-        var gitlabFurtherIssues = await LoadAllRemainingIssues(currentPageInfo, cancellationToken);
+        List<IGetFurtherIssues_Project_Issues_Nodes> gitlabFurtherIssues = await LoadAllRemainingIssues(currentPageInfo, cancellationToken);
 
         IEnumerable<IGetAll_Project_Issues_Nodes> gitlabFirstIssues = (gitlabIssueData?.Nodes ?? [])
             .Where(issue => issue != null).Cast<IGetAll_Project_Issues_Nodes>();
@@ -129,7 +130,7 @@ public class GitlabSynchronizationJob(
         IEnumerable<IGetAll_Project_Issues_Nodes> gitlabFirstIssues,
         ICollection<Release> releases, ICollection<Issue> issues)
     {
-        foreach (var gitlabIssue in gitlabFirstIssues)
+        foreach (IGetAll_Project_Issues_Nodes gitlabIssue in gitlabFirstIssues)
         {
             if (gitlabIssue.Title.Contains(ReleaseTitle, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -148,8 +149,8 @@ public class GitlabSynchronizationJob(
             }
             else
             {
-                var links = await restService.GetIssueLinksAsync(projectId, gitlabIssue.Iid);
-                var gitlabIssueDescription = ParseDescription(gitlabIssue.Description);
+                IList<LinkIssue>? links = await restService.GetIssueLinksAsync(projectId, gitlabIssue.Iid);
+                IssueDescription gitlabIssueDescription = ParseDescription(gitlabIssue.Description);
                 issues.Add(new Issue
                 {
                     GitlabId = gitlabIssue.Id,
@@ -211,7 +212,7 @@ public class GitlabSynchronizationJob(
         List<IGetFurtherIssues_Project_Issues_Nodes> gitlabFurtherIssues,
         IList<Release> releases, IList<Issue> issues)
     {
-        foreach (var gitlabIssue in gitlabFurtherIssues)
+        foreach (IGetFurtherIssues_Project_Issues_Nodes gitlabIssue in gitlabFurtherIssues)
         {
             if (gitlabIssue.Title.Contains(ReleaseTitle, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -230,8 +231,8 @@ public class GitlabSynchronizationJob(
             }
             else
             {
-                var links = await restService.GetIssueLinksAsync(projectId, gitlabIssue.Iid);
-                var gitlabIssueDescription = ParseDescription(gitlabIssue.Description);
+                IList<LinkIssue>? links = await restService.GetIssueLinksAsync(projectId, gitlabIssue.Iid);
+                IssueDescription gitlabIssueDescription = ParseDescription(gitlabIssue.Description);
                 issues.Add(new Issue
                 {
                     GitlabId = gitlabIssue.Id,
@@ -359,7 +360,7 @@ public class GitlabSynchronizationJob(
 
         if (HasNextPage(currentPageInfo))
         {
-            var nextIssuesResult =
+            IGetFurtherIssues_Project_Issues? nextIssuesResult =
                 await graphQlService.GetFurtherIssuesAsync(currentPageInfo!.EndCursor!, cancellationToken);
 
             gitlabFurtherIssues.AddRange(nextIssuesResult?.Nodes?.Where(issue => issue != null)
@@ -407,14 +408,14 @@ public class GitlabSynchronizationJob(
 
     private static IssueDescription ParseDescription(string? description)
     {
-        var issueDescription = new IssueDescription();
+        IssueDescription issueDescription = new IssueDescription();
         if (description != null)
         {
-            var fieldsBeginning = description.IndexOf('{');
+            int fieldsBeginning = description.IndexOf('{');
             if (fieldsBeginning != -1)
             {
-                var fieldsText = description[fieldsBeginning..];
-                var parsedDescription = JsonSerializer.Deserialize<IssueDescription>(fieldsText);
+                string fieldsText = description[fieldsBeginning..];
+                IssueDescription? parsedDescription = JsonSerializer.Deserialize<IssueDescription>(fieldsText);
 
                 if (parsedDescription != null)
                 {

@@ -20,10 +20,10 @@ public class ReleaseQueriesTests : IntegrationTestBase
         {
             await Assert.That(context.Releases).IsEmpty();
         });
-        var request = CreateGetReleasesRequest();
+        GraphQLRequest request = CreateGetReleasesRequest();
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetReleasesResponse>(request);
+        GraphQLResponse<GetReleasesResponse> response = await GraphQLClient.SendQueryAsync<GetReleasesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -45,13 +45,13 @@ public class ReleaseQueriesTests : IntegrationTestBase
     public async Task GetReleasesShouldReturnAllReleases()
     {
         // Arrange
-        var dbRelease = new Release
+        Release dbRelease = new Release
         {
             Title = "Release 1",
             State = ReleaseState.Planned
         };
 
-        var dbIssue = new Issue
+        Issue dbIssue = new Issue
         {
             Title = "issue title",
             State = IssueState.Closed,
@@ -66,7 +66,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
                 Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbRelease2 = new Release
+        Release dbRelease2 = new Release
         {
             Title = "Release 2",
             Notes = "Notes 2",
@@ -86,8 +86,8 @@ public class ReleaseQueriesTests : IntegrationTestBase
         });
         await CheckDbContentAsync(async context =>
         {
-            var dbReleases = context.Releases.ToList();
-            var dbIssues = context.Issues.ToList();
+            List<Release> dbReleases = context.Releases.ToList();
+            List<Issue> dbIssues = context.Issues.ToList();
             using (Assert.Multiple())
             {
                 await Assert.That(dbReleases).Contains(release => release.Id.Equals(dbRelease.Id));
@@ -95,10 +95,10 @@ public class ReleaseQueriesTests : IntegrationTestBase
                 await Assert.That(dbIssues).Contains(issue => issue.Id.Equals(dbIssue.Id));
             }
         });
-        var request = CreateGetReleasesRequest();
+        GraphQLRequest request = CreateGetReleasesRequest();
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetReleasesResponse>(request);
+        GraphQLResponse<GetReleasesResponse> response = await GraphQLClient.SendQueryAsync<GetReleasesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -196,10 +196,10 @@ public class ReleaseQueriesTests : IntegrationTestBase
             });
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var request = CreateGetReleaseRequest(id);
+        GraphQLRequest request = CreateGetReleaseRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
+        GraphQLResponse<GetReleaseResponse> response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -221,10 +221,10 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(context.Releases).IsEmpty();
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var request = CreateGetReleaseRequest(id);
+        GraphQLRequest request = CreateGetReleaseRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
+        GraphQLResponse<GetReleaseResponse> response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -242,7 +242,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
     {
         // Arrange
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var dbIssue = new Issue
+        Issue dbIssue = new Issue
         {
             Title = "issue title",
             State = IssueState.Closed,
@@ -257,7 +257,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
                 Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbRelease = new Release
+        Release dbRelease = new Release
         {
             Id = new Guid(id),
             Title = "Release 2",
@@ -277,10 +277,10 @@ public class ReleaseQueriesTests : IntegrationTestBase
             });
             context.Releases.Add(dbRelease);
         });
-        var request = CreateGetReleaseRequest(id);
+        GraphQLRequest request = CreateGetReleaseRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
+        GraphQLResponse<GetReleaseResponse> response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -288,7 +288,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(response).IsNotNull();
             await Assert.That(response.Errors).IsNull();
             await Assert.That(response.Data).IsNotNull();
-            var release = response.Data.Release;
+            Release? release = response.Data.Release;
 
             await Assert.That(release).IsNotNull();
             await Assert.That(release!.Id).IsEqualTo(dbRelease.Id);
@@ -300,7 +300,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(release.LastModifiedAt).IsEqualTo(dbRelease.LastModifiedAt);
             await Assert.That(release.Issues).IsNotEmpty();
             await Assert.That(release.Issues.Count).IsEqualTo(1);
-            var issue = release.Issues.First();
+            Issue issue = release.Issues.First();
             await Assert.That(issue.Id).IsEqualTo(dbIssue.Id);
             await Assert.That(issue.Milestone).IsNotNull();
             await Assert.That(issue.Milestone!.Id).IsEqualTo(dbIssue.Milestone.Id);
@@ -313,7 +313,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
 
     private static GraphQLRequest CreateGetReleasesRequest()
     {
-        var queryRequest = new GraphQLRequest
+        GraphQLRequest queryRequest = new GraphQLRequest
         {
             Query = """
                     query releases
@@ -399,7 +399,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
 
     private static GraphQLRequest CreateGetReleaseRequest(string id)
     {
-        var queryRequest = new GraphQLRequest
+        GraphQLRequest queryRequest = new GraphQLRequest
         {
             Query = $$"""
                     query release
