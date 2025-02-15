@@ -4,5 +4,5 @@ namespace StarWarsProgressBarIssueTracker.TestHelpers;
 
 public record IssueTrackerParallelLimit : IParallelLimit
 {
-    public int Limit => 1;
+    public int Limit => 5;
 }

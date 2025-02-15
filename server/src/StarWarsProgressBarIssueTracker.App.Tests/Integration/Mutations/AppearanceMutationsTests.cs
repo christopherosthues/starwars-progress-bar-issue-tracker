@@ -1,6 +1,7 @@
 using Bogus;
 using GraphQL;
 using Microsoft.EntityFrameworkCore;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Appearances;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using StarWarsProgressBarIssueTracker.TestHelpers;
@@ -8,7 +9,7 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Mutations;
 
 [Category(TestCategory.Integration)]
-[NotInParallel]
+[NotInParallel(NotInParallelTests.AppearanceMutation)]
 public class AppearanceMutationsTests : IntegrationTestBase
 {
     private const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ß_#%";
@@ -28,7 +29,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         DateTime startTime = DateTime.UtcNow;
 
         // Act
-        GraphQLResponse<AddAppearanceResponse> response = await GraphQLClient.SendMutationAsync<AddAppearanceResponse>(mutationRequest);
+        GraphQLResponse<AddAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<AddAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertAddedAppearanceAsync(response, expectedAppearance, startTime);
@@ -61,7 +62,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         DateTime startTime = DateTime.UtcNow;
 
         // Act
-        GraphQLResponse<AddAppearanceResponse> response = await GraphQLClient.SendMutationAsync<AddAppearanceResponse>(mutationRequest);
+        GraphQLResponse<AddAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<AddAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertAddedAppearanceAsync(response, expectedAppearance, startTime, dbAppearance);
@@ -79,7 +80,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateAddRequest(expectedResult.expectedAppearance);
 
         // Act
-        GraphQLResponse<AddAppearanceResponse> response = await GraphQLClient.SendMutationAsync<AddAppearanceResponse>(mutationRequest);
+        GraphQLResponse<AddAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<AddAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertAppearanceNotAddedAsync(response, expectedResult.errors);
@@ -114,7 +115,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         DateTime startTime = DateTime.UtcNow;
 
         // Act
-        GraphQLResponse<UpdateAppearanceResponse> response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
+        GraphQLResponse<UpdateAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertUpdatedAppearanceAsync(response, expectedAppearance, startTime);
@@ -164,7 +165,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         DateTime startTime = DateTime.UtcNow;
 
         // Act
-        GraphQLResponse<UpdateAppearanceResponse> response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
+        GraphQLResponse<UpdateAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertUpdatedAppearanceAsync(response, expectedAppearance, startTime, dbAppearance, dbAppearance2);
@@ -182,7 +183,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedResult.expectedAppearance);
 
         // Act
-        GraphQLResponse<UpdateAppearanceResponse> response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
+        GraphQLResponse<UpdateAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertAppearanceNotUpdatedAsync(response, expectedResult.errors);
@@ -200,7 +201,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateUpdateRequest(appearance);
 
         // Act
-        GraphQLResponse<UpdateAppearanceResponse> response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
+        GraphQLResponse<UpdateAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertAppearanceNotUpdatedAsync(response, new List<string> { $"No {nameof(Appearance)} found with id '{appearance.Id}'." });
@@ -233,7 +234,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
         // Act
-        GraphQLResponse<DeleteAppearanceResponse> response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
+        GraphQLResponse<DeleteAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertDeletedAppearanceAsync(response, appearance);
@@ -291,7 +292,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
         // Act
-        GraphQLResponse<DeleteAppearanceResponse> response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
+        GraphQLResponse<DeleteAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertDeletedAppearanceAsync(response, appearance);
@@ -354,7 +355,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
         // Act
-        GraphQLResponse<DeleteAppearanceResponse> response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
+        GraphQLResponse<DeleteAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertDeletedAppearanceAsync(response, appearance, dbAppearance2);
@@ -372,7 +373,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
         // Act
-        GraphQLResponse<DeleteAppearanceResponse> response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
+        GraphQLResponse<DeleteAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
 
         // Assert
         await AssertAppearanceNotDeletedAsync(response, new List<string> { $"No {nameof(Appearance)} found with id '{appearance.Id}'." });

@@ -1,4 +1,5 @@
 using GraphQL;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Appearances;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
@@ -7,6 +8,7 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
 [Category(TestCategory.Integration)]
+[NotInParallel(NotInParallelTests.AppearanceRetrieval)]
 public class AppearanceQueriesTests : IntegrationTestBase
 {
     [Test]
@@ -20,7 +22,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetAppearancesRequest();
 
         // Act
-        GraphQLResponse<GetAppearancesResponse> response = await GraphQLClient.SendQueryAsync<GetAppearancesResponse>(request);
+        GraphQLResponse<GetAppearancesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearancesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -72,7 +74,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetAppearancesRequest();
 
         // Act
-        GraphQLResponse<GetAppearancesResponse> response = await GraphQLClient.SendQueryAsync<GetAppearancesResponse>(request);
+        GraphQLResponse<GetAppearancesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearancesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -149,7 +151,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetAppearanceRequest(id);
 
         // Act
-        GraphQLResponse<GetAppearanceResponse> response = await GraphQLClient.SendQueryAsync<GetAppearanceResponse>(request);
+        GraphQLResponse<GetAppearanceResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearanceResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -175,7 +177,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetAppearanceRequest(id);
 
         // Act
-        GraphQLResponse<GetAppearanceResponse> response = await GraphQLClient.SendQueryAsync<GetAppearanceResponse>(request);
+        GraphQLResponse<GetAppearanceResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearanceResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -217,7 +219,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetAppearanceRequest(id);
 
         // Act
-        GraphQLResponse<GetAppearanceResponse> response = await GraphQLClient.SendQueryAsync<GetAppearanceResponse>(request);
+        GraphQLResponse<GetAppearanceResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearanceResponse>(request);
 
         // Assert
         using (Assert.Multiple())

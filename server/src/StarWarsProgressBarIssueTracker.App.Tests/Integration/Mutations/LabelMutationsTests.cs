@@ -2,6 +2,7 @@ using Bogus;
 using GraphQL;
 using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.App.Labels;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
@@ -10,6 +11,7 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Mutations;
 
 [Category(TestCategory.Integration)]
+[NotInParallel(NotInParallelTests.LabelMutation)]
 public class LabelMutationsTests : IntegrationTestBase
 {
     private const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ß_#%";
@@ -29,7 +31,7 @@ public class LabelMutationsTests : IntegrationTestBase
         DateTime startTime = DateTime.UtcNow;
 
         // Act
-        GraphQLResponse<AddLabelResponse> response = await GraphQLClient.SendMutationAsync<AddLabelResponse>(mutationRequest);
+        GraphQLResponse<AddLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<AddLabelResponse>(mutationRequest);
 
         // Assert
         await AssertAddedLabelAsync(response, expectedLabel, startTime);
@@ -62,7 +64,7 @@ public class LabelMutationsTests : IntegrationTestBase
         DateTime startTime = DateTime.UtcNow;
 
         // Act
-        GraphQLResponse<AddLabelResponse> response = await GraphQLClient.SendMutationAsync<AddLabelResponse>(mutationRequest);
+        GraphQLResponse<AddLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<AddLabelResponse>(mutationRequest);
 
         // Assert
         await AssertAddedLabelAsync(response, expectedLabel, startTime, dbLabel);
@@ -80,7 +82,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateAddRequest(expectedResult.expectedLabel);
 
         // Act
-        GraphQLResponse<AddLabelResponse> response = await GraphQLClient.SendMutationAsync<AddLabelResponse>(mutationRequest);
+        GraphQLResponse<AddLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<AddLabelResponse>(mutationRequest);
 
         // Assert
         await AssertLabelNotAddedAsync(response, expectedResult.errors);
@@ -115,7 +117,7 @@ public class LabelMutationsTests : IntegrationTestBase
         DateTime startTime = DateTime.UtcNow;
 
         // Act
-        GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
+        GraphQLResponse<UpdateLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
         await AssertUpdatedLabelAsync(response, expectedLabel, startTime);
@@ -155,7 +157,7 @@ public class LabelMutationsTests : IntegrationTestBase
         DateTime startTime = DateTime.UtcNow;
 
         // Act
-        GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
+        GraphQLResponse<UpdateLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
         await AssertUpdatedLabelAsync(response, expectedLabel, startTime, emptyIssues: false);
@@ -209,7 +211,7 @@ public class LabelMutationsTests : IntegrationTestBase
         DateTime startTime = DateTime.UtcNow;
 
         // Act
-        GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
+        GraphQLResponse<UpdateLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
         await AssertUpdatedLabelAsync(response, expectedLabel, startTime, dbLabel, dbLabel2);
@@ -227,7 +229,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedResult.expectedLabel);
 
         // Act
-        GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
+        GraphQLResponse<UpdateLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
         await AssertLabelNotUpdatedAsync(response, expectedResult.errors);
@@ -245,7 +247,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateUpdateRequest(label);
 
         // Act
-        GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
+        GraphQLResponse<UpdateLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
         await AssertLabelNotUpdatedAsync(response, new List<string> { $"No {nameof(Label)} found with id '{label.Id}'." });
@@ -278,7 +280,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateDeleteRequest(label);
 
         // Act
-        GraphQLResponse<DeleteLabelResponse> response = await GraphQLClient.SendMutationAsync<DeleteLabelResponse>(mutationRequest);
+        GraphQLResponse<DeleteLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteLabelResponse>(mutationRequest);
 
         // Assert
         await AssertDeletedLabelAsync(response, label);
@@ -339,7 +341,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateDeleteRequest(label);
 
         // Act
-        GraphQLResponse<DeleteLabelResponse> response = await GraphQLClient.SendMutationAsync<DeleteLabelResponse>(mutationRequest);
+        GraphQLResponse<DeleteLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteLabelResponse>(mutationRequest);
 
         // Assert
         await AssertDeletedLabelAsync(response, label);
@@ -402,7 +404,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateDeleteRequest(label);
 
         // Act
-        GraphQLResponse<DeleteLabelResponse> response = await GraphQLClient.SendMutationAsync<DeleteLabelResponse>(mutationRequest);
+        GraphQLResponse<DeleteLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteLabelResponse>(mutationRequest);
 
         // Assert
         await AssertDeletedLabelAsync(response, label, dbLabel2);
@@ -420,7 +422,7 @@ public class LabelMutationsTests : IntegrationTestBase
         GraphQLRequest mutationRequest = CreateDeleteRequest(label);
 
         // Act
-        GraphQLResponse<DeleteLabelResponse> response = await GraphQLClient.SendMutationAsync<DeleteLabelResponse>(mutationRequest);
+        GraphQLResponse<DeleteLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteLabelResponse>(mutationRequest);
 
         // Assert
         await AssertLabelNotDeletedAsync(response, new List<string> { $"No {nameof(Label)} found with id '{label.Id}'." });

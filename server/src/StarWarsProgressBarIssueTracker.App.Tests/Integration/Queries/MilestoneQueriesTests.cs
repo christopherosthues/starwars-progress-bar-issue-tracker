@@ -1,4 +1,5 @@
 using GraphQL;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
@@ -10,6 +11,7 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
 [Category(TestCategory.Integration)]
+[NotInParallel(NotInParallelTests.MilestoneRetrieval)]
 public class MilestoneQueriesTests : IntegrationTestBase
 {
     [Test]
@@ -23,7 +25,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetMilestonesRequest();
 
         // Act
-        GraphQLResponse<GetMilestonesResponse> response = await GraphQLClient.SendQueryAsync<GetMilestonesResponse>(request);
+        GraphQLResponse<GetMilestonesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestonesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -97,7 +99,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetMilestonesRequest();
 
         // Act
-        GraphQLResponse<GetMilestonesResponse> response = await GraphQLClient.SendQueryAsync<GetMilestonesResponse>(request);
+        GraphQLResponse<GetMilestonesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestonesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -192,7 +194,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetMilestoneRequest(id);
 
         // Act
-        GraphQLResponse<GetMilestoneResponse> response = await GraphQLClient.SendQueryAsync<GetMilestoneResponse>(request);
+        GraphQLResponse<GetMilestoneResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestoneResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -217,7 +219,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetMilestoneRequest(id);
 
         // Act
-        GraphQLResponse<GetMilestoneResponse> response = await GraphQLClient.SendQueryAsync<GetMilestoneResponse>(request);
+        GraphQLResponse<GetMilestoneResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestoneResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -273,7 +275,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetMilestoneRequest(id);
 
         // Act
-        GraphQLResponse<GetMilestoneResponse> response = await GraphQLClient.SendQueryAsync<GetMilestoneResponse>(request);
+        GraphQLResponse<GetMilestoneResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestoneResponse>(request);
 
         // Assert
         using (Assert.Multiple())

@@ -14,38 +14,29 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Integration;
 /// </summary>
 public class IntegrationTestBase
 {
-    [ClassDataSource<IssueTrackerWebApplicationFactory>(Shared = SharedType.None)]
+    [ClassDataSource<IssueTrackerWebApplicationFactory>(Shared = SharedType.PerClass)]
     public required IssueTrackerWebApplicationFactory ApiFactory { get; set; }
 
-    protected GraphQLHttpClient GraphQLClient = null!;
+    // protected GraphQLHttpClient GraphQLClient = null!;
+    //
+    // [Before(Class)]
+    // public static async Task SetUpOnceBase()
+    // {
+    //
+    // }
 
-    [Before(Test)]
-    public async Task SetUpOnceBase()
+    protected GraphQLHttpClient CreateGraphQLClient()
     {
         HttpClient httpClient = ApiFactory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
-        GraphQLClient =
-            new GraphQLHttpClient(new GraphQLHttpClientOptions { EndPoint = new Uri("http://localhost:8080/graphql"), },
+        GraphQLHttpClient graphQLClient =
+            new(new GraphQLHttpClientOptions { EndPoint = new Uri("http://localhost:8080/graphql"), },
                 new SystemTextJsonSerializer(new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
                     Converters = { new JsonStringEnumConverter() }
                 }),
                 httpClient);
-        using IServiceScope scope = ApiFactory.Services.CreateScope();
-        IServiceProvider serviceProvider = scope.ServiceProvider;
-        IssueTrackerContext dbContext = serviceProvider.GetRequiredService<IssueTrackerContext>();
-        await SeedInitialDatabase(dbContext);
-    }
-
-    /// <summary>
-    /// This method seeds the database before each test. This is the place where you can provide test specific data
-    /// with which the database is seeded. The default implementation seeds the database with some mocked data.
-    /// </summary>
-    /// <param name="dbContext">The database context used to seed the database</param>
-    protected virtual async Task SeedInitialDatabase(IssueTrackerContext dbContext)
-    {
-        // TODO: seed db with data
-        await dbContext.SaveChangesAsync();
+        return graphQLClient;
     }
 
     protected async Task SeedDatabaseAsync(Action<IssueTrackerContext> seed)
@@ -73,8 +64,8 @@ public class IntegrationTestBase
         IssueTrackerContext dbContext = serviceProvider.GetRequiredService<IssueTrackerContext>();
         await ResetDatabase(dbContext);
 
-        GraphQLClient.Dispose();
-        await ApiFactory.DisposeAsync();
+        // GraphQLClient.Dispose();
+        // await ApiFactory.DisposeAsync();
     }
 
     /// <summary>
@@ -82,7 +73,7 @@ public class IntegrationTestBase
     /// implementation deletes all data from the database.
     /// </summary>
     /// <param name="dbContext">The database context used to reset the database</param>
-    protected virtual async Task ResetDatabase(IssueTrackerContext dbContext)
+    private static async Task ResetDatabase(IssueTrackerContext dbContext)
     {
         dbContext.Issues.RemoveRange(dbContext.Issues);
         dbContext.IssueLinks.RemoveRange(dbContext.IssueLinks);

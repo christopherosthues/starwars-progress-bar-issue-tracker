@@ -1,4 +1,5 @@
 using GraphQL;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Releases;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
@@ -10,6 +11,7 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
 [Category(TestCategory.Integration)]
+[NotInParallel(NotInParallelTests.ReleaseRetrieval)]
 public class ReleaseQueriesTests : IntegrationTestBase
 {
     [Test]
@@ -23,7 +25,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetReleasesRequest();
 
         // Act
-        GraphQLResponse<GetReleasesResponse> response = await GraphQLClient.SendQueryAsync<GetReleasesResponse>(request);
+        GraphQLResponse<GetReleasesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleasesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -98,7 +100,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetReleasesRequest();
 
         // Act
-        GraphQLResponse<GetReleasesResponse> response = await GraphQLClient.SendQueryAsync<GetReleasesResponse>(request);
+        GraphQLResponse<GetReleasesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleasesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -199,7 +201,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetReleaseRequest(id);
 
         // Act
-        GraphQLResponse<GetReleaseResponse> response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
+        GraphQLResponse<GetReleaseResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -224,7 +226,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetReleaseRequest(id);
 
         // Act
-        GraphQLResponse<GetReleaseResponse> response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
+        GraphQLResponse<GetReleaseResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -280,7 +282,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetReleaseRequest(id);
 
         // Act
-        GraphQLResponse<GetReleaseResponse> response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
+        GraphQLResponse<GetReleaseResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
         using (Assert.Multiple())

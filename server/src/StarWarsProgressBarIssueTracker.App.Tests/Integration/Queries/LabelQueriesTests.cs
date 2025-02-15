@@ -1,5 +1,6 @@
 using GraphQL;
 using StarWarsProgressBarIssueTracker.App.Labels;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
@@ -11,6 +12,7 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
 [Category(TestCategory.Integration)]
+[NotInParallel(NotInParallelTests.LabelRetrieval)]
 public class LabelQueriesTests : IntegrationTestBase
 {
     [Test]
@@ -24,7 +26,7 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetLabelsRequest();
 
         // Act
-        GraphQLResponse<GetLabelsResponse> response = await GraphQLClient.SendQueryAsync<GetLabelsResponse>(request);
+        GraphQLResponse<GetLabelsResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelsResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -76,7 +78,7 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetLabelsRequest();
 
         // Act
-        GraphQLResponse<GetLabelsResponse> response = await GraphQLClient.SendQueryAsync<GetLabelsResponse>(request);
+        GraphQLResponse<GetLabelsResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelsResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -153,7 +155,7 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetLabelRequest(id);
 
         // Act
-        GraphQLResponse<GetLabelResponse> response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
+        GraphQLResponse<GetLabelResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -178,7 +180,7 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetLabelRequest(id);
 
         // Act
-        GraphQLResponse<GetLabelResponse> response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
+        GraphQLResponse<GetLabelResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -240,7 +242,7 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetLabelRequest(id);
 
         // Act
-        GraphQLResponse<GetLabelResponse> response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
+        GraphQLResponse<GetLabelResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
         using (Assert.Multiple())
