@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using StarWarsProgressBarIssueTracker.Domain.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using StarWarsProgressBarIssueTracker.TestHelpers.TUnit;
 using TUnit.Assertions.AssertConditions.Chronology;
@@ -22,6 +23,22 @@ public static class TUnitAssertExtensions
                                              (value.GitHubId?.Equals(appearance.GitHubId) ?? appearance.GitHubId == null) &&
                                              DateTimeEquals(value.CreatedAt, appearance.CreatedAt) &&
                                              DateTimeEquals(value.LastModifiedAt, appearance.LastModifiedAt));
+    }
+
+    public static InvokableValueAssertionBuilder<IEnumerable<Label>> ContainsEquivalentOf(
+        this IValueSource<List<Label>> valueSource, Label label)
+    {
+        return valueSource.Contains(value => value.Id.Equals(label.Id) &&
+                                             value.Title.Equals(label.Title) &&
+                                             (value.Description?.Equals(label.Description) ??
+                                              label.Description == null) &&
+                                             value.TextColor.Equals(label.TextColor) &&
+                                             value.Color.Equals(label.Color) &&
+                                             (value.GitlabId?.Equals(label.GitlabId) ?? label.GitlabId == null) &&
+                                             (value.GitHubId?.Equals(label.GitHubId) ?? label.GitHubId == null) &&
+                                             value.Issues.Intersect(label.Issues).Count() == value.Issues.Count &&
+                                             DateTimeEquals(value.CreatedAt, label.CreatedAt) &&
+                                             DateTimeEquals(value.LastModifiedAt, label.LastModifiedAt));
     }
 
     public static InvokableValueAssertionBuilder<DateTime> IsEquivalentTo(this IValueSource<DateTime> valueSource,

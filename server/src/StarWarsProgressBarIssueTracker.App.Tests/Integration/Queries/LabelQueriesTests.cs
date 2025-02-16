@@ -72,8 +72,9 @@ public class LabelQueriesTests : IntegrationTestBase
         {
             using (Assert.Multiple())
             {
-                await Assert.That(context.Labels).Contains(dbLabel);
-                await Assert.That(context.Labels).Contains(dbLabel2);
+                List<Label> labels = context.Labels.ToList();
+                await Assert.That(labels).ContainsEquivalentOf(dbLabel);
+                await Assert.That(labels).ContainsEquivalentOf(dbLabel2);
             }
         });
         GraphQLRequest request = CreateGetLabelsRequest();

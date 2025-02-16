@@ -23,13 +23,12 @@ public class LabelMutationsTests : IntegrationTestBase
     public async Task AddLabelShouldAddLabel(Label expectedLabel)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         await CheckDbContentAsync(async context =>
         {
             await Assert.That(context.Labels).IsEmpty();
         });
         GraphQLRequest mutationRequest = CreateAddRequest(expectedLabel);
-
-        DateTime startTime = DateTime.UtcNow;
 
         // Act
         GraphQLResponse<AddLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<AddLabelResponse>(mutationRequest);
@@ -43,6 +42,7 @@ public class LabelMutationsTests : IntegrationTestBase
     public async Task AddLabelShouldAddLabelIfLabelsAreNotEmpty(Label expectedLabel)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Label dbLabel = new Label
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -58,11 +58,9 @@ public class LabelMutationsTests : IntegrationTestBase
         });
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Labels).Contains(dbLabel);
+            await Assert.That(context.Labels.ToList()).ContainsEquivalentOf(dbLabel);
         });
         GraphQLRequest mutationRequest = CreateAddRequest(expectedLabel);
-
-        DateTime startTime = DateTime.UtcNow;
 
         // Act
         GraphQLResponse<AddLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<AddLabelResponse>(mutationRequest);
@@ -94,6 +92,7 @@ public class LabelMutationsTests : IntegrationTestBase
     public async Task UpdateLabelShouldUpdateLabel(Label expectedLabel)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Label dbLabel = new Label
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -111,11 +110,9 @@ public class LabelMutationsTests : IntegrationTestBase
         expectedLabel.CreatedAt = dbLabel.CreatedAt;
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Labels).Contains(dbLabel);
+            await Assert.That(context.Labels.ToList()).ContainsEquivalentOf(dbLabel);
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedLabel);
-
-        DateTime startTime = DateTime.UtcNow;
 
         // Act
         GraphQLResponse<UpdateLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateLabelResponse>(mutationRequest);
@@ -129,6 +126,7 @@ public class LabelMutationsTests : IntegrationTestBase
     public async Task UpdateLabelShouldUpdateLabelWithIssues(Label expectedLabel)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Label dbLabel = new Label
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -150,12 +148,10 @@ public class LabelMutationsTests : IntegrationTestBase
         await CheckDbContentAsync(async context =>
         {
             List<Label> labels = context.Labels.Include(label => label.Issues).ToList();
-            await Assert.That(labels).Contains(dbLabel);
-            await Assert.That(labels.First().Issues).Contains(dbIssue);
+            await Assert.That(labels).ContainsEquivalentOf(dbLabel);
+            await Assert.That(labels.First().Issues.ToList()).Contains(dbIssue);
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedLabel);
-
-        DateTime startTime = DateTime.UtcNow;
 
         // Act
         GraphQLResponse<UpdateLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateLabelResponse>(mutationRequest);
@@ -175,6 +171,7 @@ public class LabelMutationsTests : IntegrationTestBase
     public async Task UpdateLabelShouldUpdateLabelIfLabelsAreNotEmpty(Label expectedLabel)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Label dbLabel = new Label
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -204,12 +201,11 @@ public class LabelMutationsTests : IntegrationTestBase
         expectedLabel.CreatedAt = dbLabel.CreatedAt;
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Labels).Contains(dbLabel);
-            await Assert.That(context.Labels).Contains(dbLabel2);
+            List<Label> labels = context.Labels.ToList();
+            await Assert.That(labels).ContainsEquivalentOf(dbLabel);
+            await Assert.That(labels).ContainsEquivalentOf(dbLabel2);
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedLabel);
-
-        DateTime startTime = DateTime.UtcNow;
 
         // Act
         GraphQLResponse<UpdateLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateLabelResponse>(mutationRequest);
@@ -276,7 +272,7 @@ public class LabelMutationsTests : IntegrationTestBase
         label.LastModifiedAt = dbLabel.LastModifiedAt;
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Labels).Contains(dbLabel);
+            await Assert.That(context.Labels.ToList()).ContainsEquivalentOf(dbLabel);
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(label);
 
@@ -337,7 +333,7 @@ public class LabelMutationsTests : IntegrationTestBase
         label.LastModifiedAt = dbLabel.LastModifiedAt;
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Labels).Contains(dbLabel);
+            await Assert.That(context.Labels.ToList()).ContainsEquivalentOf(dbLabel);
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(label);
 
@@ -357,7 +353,9 @@ public class LabelMutationsTests : IntegrationTestBase
                 {
                     await Assert.That(dbIssue.Labels.ToList()).DoesNotContain(l => l.Id.Equals(entity.Id));
                 }
-                await Assert.That(dbIssues.First(entity => entity.Id.Equals(dbIssue2.Id)).Labels).Contains(dbLabel2);
+
+                await Assert.That(dbIssues.First(entity => entity.Id.Equals(dbIssue2.Id)).Labels.ToList())
+                    .ContainsEquivalentOf(dbLabel2);
             }
         });
     }
@@ -398,8 +396,9 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             using (Assert.Multiple())
             {
-                await Assert.That(context.Labels).Contains(dbLabel);
-                await Assert.That(context.Labels).Contains(dbLabel2);
+                List<Label> labels = context.Labels.ToList();
+                await Assert.That(labels).ContainsEquivalentOf(dbLabel);
+                await Assert.That(labels).ContainsEquivalentOf(dbLabel2);
             }
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(label);
@@ -476,7 +475,7 @@ public class LabelMutationsTests : IntegrationTestBase
         using (Assert.Multiple())
         {
             await Assert.That(response).IsNotNull();
-            await Assert.That(response.Errors).IsNotNull().And.IsNotEmpty();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             addedLabel = response.Data.AddLabel.Label;
             await Assert.That(addedLabel.Id).IsNotDefault();
             await Assert.That(addedLabel.Title).IsEqualTo(expectedLabel.Title);
@@ -514,7 +513,7 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             await Assert.That(response).IsNotNull();
             await Assert.That(response.Data.AddLabel.Errors).IsNotNull().And.IsNotEmpty();
-            await Assert.That(response.Data.AddLabel.Label).IsNotNull();
+            await Assert.That(response.Data.AddLabel.Label).IsNull();
 
             IEnumerable<string> resultErrors = response.Data.AddLabel.Errors.Select(error => error.Message);
             await Assert.That(resultErrors).IsEquivalentTo(errors);
@@ -573,14 +572,14 @@ public class LabelMutationsTests : IntegrationTestBase
         using (Assert.Multiple())
         {
             await Assert.That(response).IsNotNull();
-            await Assert.That(response.Errors).IsNotNull().And.IsNotEmpty();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             updatedLabel = response.Data.UpdateLabel.Label;
-            await Assert.That(updatedLabel.Id).IsEqualTo(expectedLabel.Id);
+            await Assert.That(updatedLabel.Id).IsNotDefault().And.IsEqualTo(expectedLabel.Id);
             await Assert.That(updatedLabel.Title).IsEqualTo(expectedLabel.Title);
             await Assert.That(updatedLabel.Description).IsEqualTo(expectedLabel.Description);
             await Assert.That(updatedLabel.Color).IsEqualTo(expectedLabel.Color);
             await Assert.That(updatedLabel.TextColor).IsEqualTo(expectedLabel.TextColor);
-            await Assert.That(updatedLabel.CreatedAt).IsEqualTo(expectedLabel.CreatedAt);
+            await Assert.That(updatedLabel.CreatedAt).IsEquivalentTo(expectedLabel.CreatedAt);
             await Assert.That(updatedLabel.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
         }
 
@@ -595,12 +594,12 @@ public class LabelMutationsTests : IntegrationTestBase
                 Label updatedDbLabel = context.Labels.Include(label => label.Issues)
                     .First(dbLabel1 => dbLabel1.Id.Equals(updatedLabel.Id));
                 await Assert.That(updatedDbLabel).IsNotNull();
-                await Assert.That(updatedDbLabel.Id).IsEqualTo(updatedLabel.Id);
+                await Assert.That(updatedDbLabel.Id).IsNotDefault().And.IsEqualTo(updatedLabel.Id);
                 await Assert.That(updatedDbLabel.Title).IsEqualTo(updatedLabel.Title);
                 await Assert.That(updatedDbLabel.Description).IsEqualTo(updatedLabel.Description);
                 await Assert.That(updatedDbLabel.Color).IsEqualTo(updatedLabel.Color);
                 await Assert.That(updatedDbLabel.TextColor).IsEqualTo(updatedLabel.TextColor);
-                await Assert.That(updatedDbLabel.CreatedAt).IsEqualTo(updatedLabel.CreatedAt);
+                await Assert.That(updatedDbLabel.CreatedAt).IsEquivalentTo(updatedLabel.CreatedAt);
                 await Assert.That(updatedLabel.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
                 if (emptyIssues)
                 {
@@ -618,13 +617,13 @@ public class LabelMutationsTests : IntegrationTestBase
                             .FirstOrDefault(label => label.Id.Equals(notUpdatedLabel.Id));
 
                     await Assert.That(secondLabel).IsNotNull();
-                    await Assert.That(secondLabel!.Id).IsEqualTo(notUpdatedLabel.Id);
+                    await Assert.That(secondLabel!.Id).IsNotDefault().And.IsEqualTo(notUpdatedLabel.Id);
                     await Assert.That(secondLabel.Title).IsEqualTo(notUpdatedLabel.Title);
                     await Assert.That(secondLabel.Description).IsEqualTo(notUpdatedLabel.Description);
                     await Assert.That(secondLabel.Color).IsEqualTo(notUpdatedLabel.Color);
                     await Assert.That(secondLabel.TextColor).IsEqualTo(notUpdatedLabel.TextColor);
-                    await Assert.That(secondLabel.CreatedAt).IsEqualTo(notUpdatedLabel.CreatedAt);
-                    await Assert.That(secondLabel.LastModifiedAt).IsEqualTo(notUpdatedLabel.LastModifiedAt);
+                    await Assert.That(secondLabel.CreatedAt).IsEquivalentTo(notUpdatedLabel.CreatedAt);
+                    await Assert.That(secondLabel.LastModifiedAt).IsEquivalentTo(notUpdatedLabel.LastModifiedAt);
 
                     if (emptyIssues)
                     {
@@ -645,7 +644,7 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             await Assert.That(response).IsNotNull();
             await Assert.That(response.Data.UpdateLabel.Errors).IsNotNull().And.IsNotEmpty();
-            await Assert.That(response.Data.UpdateLabel.Label).IsNotNull();
+            await Assert.That(response.Data.UpdateLabel.Label).IsNull();
 
             IEnumerable<string> resultErrors = response.Data.UpdateLabel.Errors.Select(error => error.Message);
             await Assert.That(resultErrors).IsEquivalentTo(errors);
@@ -653,7 +652,7 @@ public class LabelMutationsTests : IntegrationTestBase
 
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Labels).IsNotEmpty();
+            await Assert.That(context.Labels).IsEmpty();
         });
     }
 
@@ -696,15 +695,15 @@ public class LabelMutationsTests : IntegrationTestBase
         using (Assert.Multiple())
         {
             await Assert.That(response).IsNotNull();
-            await Assert.That(response.Errors).IsNotNull().And.IsNotEmpty();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             LabelDto deletedLabel = response.Data.DeleteLabel.Label;
             await Assert.That(deletedLabel.Id).IsNotDefault();
             await Assert.That(deletedLabel.Title).IsEqualTo(expectedLabel.Title);
             await Assert.That(deletedLabel.Description).IsEqualTo(expectedLabel.Description);
             await Assert.That(deletedLabel.Color).IsEqualTo(expectedLabel.Color);
             await Assert.That(deletedLabel.TextColor).IsEqualTo(expectedLabel.TextColor);
-            await Assert.That(deletedLabel.CreatedAt).IsEqualTo(expectedLabel.CreatedAt);
-            await Assert.That(deletedLabel.LastModifiedAt).IsEqualTo(expectedLabel.LastModifiedAt);
+            await Assert.That(deletedLabel.CreatedAt).IsEquivalentTo(expectedLabel.CreatedAt);
+            await Assert.That(deletedLabel.LastModifiedAt).IsEquivalentTo(expectedLabel.LastModifiedAt);
         }
 
         await CheckDbContentAsync(async context =>
@@ -727,7 +726,7 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             await Assert.That(response).IsNotNull();
             await Assert.That(response.Data.DeleteLabel.Errors).IsNotNull().And.IsNotEmpty();
-            await Assert.That(response.Data.DeleteLabel.Label).IsNotNull();
+            await Assert.That(response.Data.DeleteLabel.Label).IsNull();
 
             IEnumerable<string> resultErrors = response.Data.DeleteLabel.Errors.Select(error => error.Message);
             await Assert.That(resultErrors).IsEquivalentTo(errors);

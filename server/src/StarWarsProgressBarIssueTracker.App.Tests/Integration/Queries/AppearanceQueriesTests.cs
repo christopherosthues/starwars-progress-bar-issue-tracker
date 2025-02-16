@@ -68,7 +68,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
         {
             using (Assert.Multiple())
             {
-                var appearances = context.Appearances.ToList();
+                List<Appearance> appearances = context.Appearances.ToList();
                 await Assert.That(appearances).ContainsEquivalentOf(dbAppearance);
                 await Assert.That(appearances).ContainsEquivalentOf(dbAppearance2);
             }
