@@ -1,5 +1,5 @@
 * [x] Appearances
-* [ ] Labels
+* [x] Labels
 * [ ] Issues
 * [ ] Milestones
 * [ ] Releases

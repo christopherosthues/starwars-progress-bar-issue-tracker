@@ -149,7 +149,8 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             List<Label> labels = context.Labels.Include(label => label.Issues).ToList();
             await Assert.That(labels).ContainsEquivalentOf(dbLabel);
-            await Assert.That(labels.First().Issues.ToList()).Contains(dbIssue);
+            List<Issue> issues = labels.First().Issues.ToList();
+            await Assert.That(issues).ContainsEquivalentOf(dbIssue);
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedLabel);
 
@@ -161,8 +162,9 @@ public class LabelMutationsTests : IntegrationTestBase
         await CheckDbContentAsync(async context =>
         {
             Label resultLabel = context.Labels.Include(label => label.Issues).First(label => label.Id == dbLabel.Id);
-            await Assert.That(resultLabel.Issues).IsNotEmpty();
-            await Assert.That(resultLabel.Issues).Contains(dbIssue);
+            List<Issue> issues = resultLabel.Issues.ToList();
+            await Assert.That(issues).IsNotEmpty();
+            await Assert.That(issues).ContainsEquivalentOf(dbIssue);
         });
     }
 
@@ -354,7 +356,8 @@ public class LabelMutationsTests : IntegrationTestBase
                     await Assert.That(dbIssue.Labels.ToList()).DoesNotContain(l => l.Id.Equals(entity.Id));
                 }
 
-                await Assert.That(dbIssues.First(entity => entity.Id.Equals(dbIssue2.Id)).Labels.ToList())
+                List<Label> labels = dbIssues.First(entity => entity.Id.Equals(dbIssue2.Id)).Labels.ToList();
+                await Assert.That(labels)
                     .ContainsEquivalentOf(dbLabel2);
             }
         });

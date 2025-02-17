@@ -1,11 +1,10 @@
 using System.Runtime.CompilerServices;
+using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using StarWarsProgressBarIssueTracker.TestHelpers.TUnit;
-using TUnit.Assertions.AssertConditions.Chronology;
 using TUnit.Assertions.AssertConditions.Interfaces;
 using TUnit.Assertions.AssertionBuilders;
-using TUnit.Assertions.AssertionBuilders.Wrappers;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 
@@ -25,6 +24,26 @@ public static class TUnitAssertExtensions
                                              DateTimeEquals(value.LastModifiedAt, appearance.LastModifiedAt));
     }
 
+    public static InvokableValueAssertionBuilder<IEnumerable<Issue>> ContainsEquivalentOf(
+        this IValueSource<List<Issue>> valueSource, Issue issue)
+    {
+        return valueSource.Contains(value => value.Id.Equals(issue.Id) &&
+                                             value.Title.Equals(issue.Title) &&
+                                             (value.Description?.Equals(issue.Description) ??
+                                              issue.Description == null) &&
+                                             value.Priority.Equals(issue.Priority) &&
+                                             value.State.Equals(issue.State) &&
+                                             (value.Milestone?.Id.Equals(issue.Milestone?.Id) ?? issue.Milestone == null) &&
+                                             (value.Release?.Id.Equals(issue.Release?.Id) ?? issue.Release == null) &&
+                                             (value.Vehicle?.Id.Equals(issue.Vehicle?.Id) ?? issue.Vehicle == null) &&
+                                             value.Labels.Select(label => label.Id).Intersect(issue.Labels.Select(label => label.Id)).Count() == value.Labels.Count &&
+                                             value.LinkedIssues.Select(linkedIssue => linkedIssue.Id).Intersect(issue.LinkedIssues.Select(linkedIssue => linkedIssue.Id)).Count() == value.LinkedIssues.Count &&
+                                             (value.GitlabId?.Equals(issue.GitlabId) ?? issue.GitlabId == null) &&
+                                             (value.GitHubId?.Equals(issue.GitHubId) ?? issue.GitHubId == null) &&
+                                             DateTimeEquals(value.CreatedAt, issue.CreatedAt) &&
+                                             DateTimeEquals(value.LastModifiedAt, issue.LastModifiedAt));
+    }
+
     public static InvokableValueAssertionBuilder<IEnumerable<Label>> ContainsEquivalentOf(
         this IValueSource<List<Label>> valueSource, Label label)
     {
@@ -36,7 +55,7 @@ public static class TUnitAssertExtensions
                                              value.Color.Equals(label.Color) &&
                                              (value.GitlabId?.Equals(label.GitlabId) ?? label.GitlabId == null) &&
                                              (value.GitHubId?.Equals(label.GitHubId) ?? label.GitHubId == null) &&
-                                             value.Issues.Intersect(label.Issues).Count() == value.Issues.Count &&
+                                             value.Issues.Select(issue => issue.Id).Intersect(label.Issues.Select(issue => issue.Id)).Count() == value.Issues.Count &&
                                              DateTimeEquals(value.CreatedAt, label.CreatedAt) &&
                                              DateTimeEquals(value.LastModifiedAt, label.LastModifiedAt));
     }
