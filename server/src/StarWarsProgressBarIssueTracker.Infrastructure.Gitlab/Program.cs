@@ -2,5 +2,5 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-var serviceCollection = new ServiceCollection();
+ServiceCollection serviceCollection = new ServiceCollection();
 serviceCollection.AddGitlabClient();

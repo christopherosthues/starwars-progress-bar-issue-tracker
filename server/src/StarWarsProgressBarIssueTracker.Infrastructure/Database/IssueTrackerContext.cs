@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
@@ -42,8 +43,8 @@ public class IssueTrackerContext(DbContextOptions<IssueTrackerContext> options) 
 
     private void UpdateAuditProperties()
     {
-        var entries = ChangeTracker.Entries<DomainBase>();
-        foreach (var entry in entries)
+        IEnumerable<EntityEntry<DomainBase>> entries = ChangeTracker.Entries<DomainBase>();
+        foreach (EntityEntry<DomainBase> entry in entries)
         {
             DateTime utcNow = DateTime.UtcNow;
             if (entry.State == EntityState.Added)

@@ -3,7 +3,7 @@ using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 namespace StarWarsProgressBarIssueTracker.App.Labels;
 
-public class IssueDto : DtoBase
+public class LabelIssueDto : DtoBase
 {
     public required string Title { get; set; }
 
@@ -11,11 +11,11 @@ public class IssueDto : DtoBase
 
     public Priority Priority { get; set; }
 
-    public MilestoneDto? Milestone { get; set; }
+    public LabelMilestoneDto? Milestone { get; set; }
 
-    public ReleaseDto? Release { get; set; }
+    public LabelReleaseDto? Release { get; set; }
 
-    public IList<IssueLabelDto> Labels { get; set; } = [];
+    public IList<LabelIssueLabelDto> Labels { get; set; } = [];
 
     public string? Description { get; set; }
 

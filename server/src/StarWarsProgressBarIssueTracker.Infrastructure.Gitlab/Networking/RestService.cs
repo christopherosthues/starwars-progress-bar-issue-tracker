@@ -13,8 +13,8 @@ public class RestService
 
     public RestService(HttpClient client, IOptions<GitlabConfiguration> configuration)
     {
-        var restUri = configuration.Value.RestURL ?? throw new ArgumentException("The REST API Uri must not be null!");
-        var token = configuration.Value.Token ?? throw new ArgumentException("The token must not be null!");
+        string restUri = configuration.Value.RestURL ?? throw new ArgumentException("The REST API Uri must not be null!");
+        string token = configuration.Value.Token ?? throw new ArgumentException("The token must not be null!");
         _client = client;
         _client.BaseAddress = new Uri(restUri);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.TrimEnd());
@@ -53,12 +53,12 @@ public class RestService
 
     public async Task<IList<LinkIssue>?> GetIssueLinksAsync(int projectId, string issueIid)
     {
-        var response = await _client.GetAsync($"projects/{projectId}/issues/{issueIid}/links", CancellationToken.None);
+        HttpResponseMessage response = await _client.GetAsync($"projects/{projectId}/issues/{issueIid}/links", CancellationToken.None);
         response.EnsureSuccessStatusCode();
 
-        var responseContent = await response.Content.ReadAsStreamAsync();
+        Stream responseContent = await response.Content.ReadAsStreamAsync();
 
-        var issueLinks = await JsonSerializer.DeserializeAsync<IList<LinkIssue>>(responseContent, _jsonSerializerOptions);
+        IList<LinkIssue>? issueLinks = await JsonSerializer.DeserializeAsync<IList<LinkIssue>>(responseContent, _jsonSerializerOptions);
 
         return issueLinks;
     }

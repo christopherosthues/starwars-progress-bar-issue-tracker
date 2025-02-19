@@ -19,7 +19,7 @@ public partial class IssueTrackerQueries
         IReleaseService releaseService,
         CancellationToken cancellationToken)
     {
-        var page = await releaseService.GetAllReleasesAsync(pagingArguments, cancellationToken);
+        Page<Release> page = await releaseService.GetAllReleasesAsync(pagingArguments, cancellationToken);
         return page.ToConnectionWithTotalCount();
     }
 

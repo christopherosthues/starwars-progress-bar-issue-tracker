@@ -81,7 +81,7 @@ jobs:
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
 
-      - name: Cache SonarQube Cloud dotCover
+      - name: Cache SonarQube Cloud .NET coverage
         id: cache-sonar-dotcover
         uses: actions/cache@v4
         with:
@@ -95,22 +95,22 @@ jobs:
           mkdir -p .sonar/scanner
           dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
 
-      - name: Install SonarQube Cloud dotCover
+      - name: Install SonarQube Cloud .NET coverage
         if: steps.cache-sonar-dotcover.outputs.cache-hit != 'true'
         run: |
           mkdir -p .sonar/dotcover
-          dotnet tool update JetBrains.dotCover.GlobalTool --tool-path ./.sonar/dotcover
+          dotnet tool update dotnet-coverage --tool-path ./.sonar/dotcover
 
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          ./.sonar/scanner/dotnet-sonarscanner begin /k:"christopherosthues_starwars-progress-bar-issue-tracker-server" /o:"christopherosthues" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.dotcover.reportsPaths=dotCover.Output.html
+          ./.sonar/scanner/dotnet-sonarscanner begin /k:"christopherosthues_starwars-progress-bar-issue-tracker-server" /o:"christopherosthues" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
           dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.GitHub/StarWarsProgressBarIssueTracker.Infrastructure.GitHub.csproj --no-restore
           dotnet build server/src/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab/StarWarsProgressBarIssueTracker.Infrastructure.Gitlab.csproj --no-restore
           dotnet build server/src/StarWarsProgressBarIssueTracker.sln --no-restore
-          ./.sonar/dotcover/dotnet-dotcover test --dcReportType=HTML --dcAttributeFilters="StarWarsProgressBarIssueTracker.TestHelpers.ErrorAttribute" server/src/StarWarsProgressBarIssueTracker.sln
+          ./.sonar/dotcover/dotnet-coverage collect "dotnet test server/src/StarWarsProgressBarIssueTracker.sln --filter 'TestCategory!=Error'" -f xml -o "coverage.xml"
           ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
   tests:

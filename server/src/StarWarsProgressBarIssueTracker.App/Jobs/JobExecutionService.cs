@@ -1,4 +1,5 @@
-﻿using Polly.Registry;
+﻿using Polly;
+using Polly.Registry;
 using StarWarsProgressBarIssueTracker.Infrastructure.Database;
 using StarWarsProgressBarIssueTracker.Infrastructure.Models;
 using StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
@@ -22,20 +23,20 @@ public class JobExecutionService
 
     public async Task ExecuteTask(JobType jobType, CancellationToken cancellationToken)
     {
-        var tasks = await _taskRepository.GetScheduledTasksAsync(jobType, cancellationToken);
+        IEnumerable<DbTask> tasks = await _taskRepository.GetScheduledTasksAsync(jobType, cancellationToken);
 
-        foreach (var task in tasks)
+        foreach (DbTask task in tasks)
         {
             if (task.Status == Infrastructure.Models.TaskStatus.Planned)
             {
                 task.Status = Infrastructure.Models.TaskStatus.Running;
                 await _taskRepository.UpdateAsync(task, cancellationToken);
 
-                var job = _jobFactory.CreateJob(jobType);
+                IJob job = _jobFactory.CreateJob(jobType);
 
                 try
                 {
-                    var pipeline = _pipelineProvider.GetPipeline("job-pipeline");
+                    ResiliencePipeline pipeline = _pipelineProvider.GetPipeline("job-pipeline");
 
                     await pipeline.ExecuteAsync(async _ =>
                     {

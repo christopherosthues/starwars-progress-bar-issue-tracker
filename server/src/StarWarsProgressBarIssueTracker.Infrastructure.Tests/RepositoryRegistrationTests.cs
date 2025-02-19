@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
+using NSubstitute;
 using StarWarsProgressBarIssueTracker.Domain;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
@@ -13,7 +13,6 @@ using StarWarsProgressBarIssueTracker.TestHelpers.Extensions;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Tests;
 
-[TestFixture(TestOf = typeof(RepositoryRegistration))]
 [Category(TestCategory.Unit)]
 public class RepositoryRegistrationTests
 {
@@ -21,10 +20,10 @@ public class RepositoryRegistrationTests
     public void AddRepositoriesShouldRegisterRepositories()
     {
         // Arrange
-        var serviceCollectionMock = new Mock<IServiceCollection>();
+        IServiceCollection? serviceCollectionMock = Substitute.For<IServiceCollection>();
 
         // Act
-        serviceCollectionMock.Object.AddRepositories();
+        serviceCollectionMock.AddRepositories();
 
         // Assert
         serviceCollectionMock.VerifyServiceRegistered(typeof(IAppearanceRepository), typeof(AppearanceRepository), ServiceLifetime.Scoped);

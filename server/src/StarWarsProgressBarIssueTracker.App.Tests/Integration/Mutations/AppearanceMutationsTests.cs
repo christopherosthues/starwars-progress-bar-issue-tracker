@@ -1,46 +1,48 @@
 using Bogus;
-using FluentAssertions;
-using FluentAssertions.Execution;
 using GraphQL;
 using Microsoft.EntityFrameworkCore;
-using StarWarsProgressBarIssueTracker.App.Mutations;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Appearances;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using StarWarsProgressBarIssueTracker.TestHelpers;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Mutations;
 
-[TestFixture(TestOf = typeof(IssueTrackerMutations))]
 [Category(TestCategory.Integration)]
+[NotInParallel(NotInParallelTests.AppearanceMutation)]
 public class AppearanceMutationsTests : IntegrationTestBase
 {
+    // TODO: Check DoesNotContain and Contains
     private const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ß_#%";
     private const string HexCodeColorChars = "0123456789abcdef";
 
-    [TestCaseSource(nameof(AddAppearanceCases))]
+    [Test]
+    [MethodDataSource(nameof(AddAppearanceCases))]
     public async Task AddAppearanceShouldAddAppearance(Appearance expectedAppearance)
     {
         // Arrange
-        CheckDbContent(context =>
+        DateTime startTime = DateTime.UtcNow;
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().BeEmpty();
+            await Assert.That(context.Appearances).IsEmpty();
         });
-        var mutationRequest = CreateAddRequest(expectedAppearance);
+        GraphQLRequest mutationRequest = CreateAddRequest(expectedAppearance);
 
-        var startTime = DateTime.UtcNow;
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<AddAppearanceResponse>(mutationRequest);
+        GraphQLResponse<AddAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<AddAppearanceResponse>(mutationRequest);
 
         // Assert
-        AssertAddedAppearance(response, expectedAppearance, startTime);
+        await AssertAddedAppearanceAsync(response, expectedAppearance, startTime);
     }
 
-    [TestCaseSource(nameof(AddAppearanceCases))]
+    [Test]
+    [MethodDataSource(nameof(AddAppearanceCases))]
     public async Task AddAppearanceShouldAddAppearanceIfAppearancesAreNotEmpty(Appearance expectedAppearance)
     {
         // Arrange
-        var dbAppearance = new Appearance
+        DateTime startTime = DateTime.UtcNow;
+        Appearance dbAppearance = new Appearance
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -53,43 +55,44 @@ public class AppearanceMutationsTests : IntegrationTestBase
         {
             context.Appearances.Add(dbAppearance);
         });
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().ContainEquivalentOf(dbAppearance);
+            await Assert.That(context.Appearances.ToList()).ContainsEquivalentOf(dbAppearance);
         });
-        var mutationRequest = CreateAddRequest(expectedAppearance);
-
-        var startTime = DateTime.UtcNow;
+        GraphQLRequest mutationRequest = CreateAddRequest(expectedAppearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<AddAppearanceResponse>(mutationRequest);
+        GraphQLResponse<AddAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<AddAppearanceResponse>(mutationRequest);
 
         // Assert
-        AssertAddedAppearance(response, expectedAppearance, startTime, dbAppearance);
+        await AssertAddedAppearanceAsync(response, expectedAppearance, startTime, dbAppearance);
     }
 
-    [TestCaseSource(nameof(InvalidAddAppearanceCases))]
+    [Test]
+    [MethodDataSource(nameof(InvalidAddAppearanceCases))]
     public async Task AddAppearanceShouldNotAddAppearance((Appearance expectedAppearance, IEnumerable<string> errors) expectedResult)
     {
         // Arrange
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().BeEmpty();
+            await Assert.That(context.Appearances).IsEmpty();
         });
-        var mutationRequest = CreateAddRequest(expectedResult.expectedAppearance);
+        GraphQLRequest mutationRequest = CreateAddRequest(expectedResult.expectedAppearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<AddAppearanceResponse>(mutationRequest);
+        GraphQLResponse<AddAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<AddAppearanceResponse>(mutationRequest);
 
         // Assert
-        AssertAppearanceNotAdded(response, expectedResult.errors);
+        await AssertAppearanceNotAddedAsync(response, expectedResult.errors);
     }
 
-    [TestCaseSource(nameof(AddAppearanceCases))]
+    [Test]
+    [MethodDataSource(nameof(AddAppearanceCases))]
     public async Task UpdateAppearanceShouldUpdateAppearance(Appearance expectedAppearance)
     {
         // Arrange
-        var dbAppearance = new Appearance
+        DateTime startTime = DateTime.UtcNow;
+        Appearance dbAppearance = new Appearance
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -104,26 +107,26 @@ public class AppearanceMutationsTests : IntegrationTestBase
         });
         expectedAppearance.Id = dbAppearance.Id;
         expectedAppearance.CreatedAt = dbAppearance.CreatedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().ContainEquivalentOf(dbAppearance);
+            await Assert.That(context.Appearances.ToList()).ContainsEquivalentOf(dbAppearance);
         });
-        var mutationRequest = CreateUpdateRequest(expectedAppearance);
-
-        var startTime = DateTime.UtcNow;
+        GraphQLRequest mutationRequest = CreateUpdateRequest(expectedAppearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
+        GraphQLResponse<UpdateAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
 
         // Assert
-        AssertUpdatedAppearance(response, expectedAppearance, startTime);
+        await AssertUpdatedAppearanceAsync(response, expectedAppearance, startTime);
     }
 
-    [TestCaseSource(nameof(AddAppearanceCases))]
+    [Test]
+    [MethodDataSource(nameof(AddAppearanceCases))]
     public async Task UpdateAppearanceShouldUpdateAppearanceIfAppearancesAreNotEmpty(Appearance expectedAppearance)
     {
         // Arrange
-        var dbAppearance = new Appearance
+        DateTime startTime = DateTime.UtcNow;
+        Appearance dbAppearance = new Appearance
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -132,7 +135,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             TextColor = "#334455",
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbAppearance2 = new Appearance
+        Appearance dbAppearance2 = new Appearance
         {
             Id = new Guid("0609F93C-CBCC-4650-BA4C-B8D5FF93A877"),
             Title = "Title 2",
@@ -142,7 +145,6 @@ public class AppearanceMutationsTests : IntegrationTestBase
             LastModifiedAt = DateTime.UtcNow.AddDays(2)
         };
 
-
         await SeedDatabaseAsync(context =>
         {
             context.Appearances.Add(dbAppearance);
@@ -150,63 +152,66 @@ public class AppearanceMutationsTests : IntegrationTestBase
         });
         expectedAppearance.Id = dbAppearance.Id;
         expectedAppearance.CreatedAt = dbAppearance.CreatedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().ContainEquivalentOf(dbAppearance);
-            context.Appearances.Should().ContainEquivalentOf(dbAppearance2);
+            using (Assert.Multiple())
+            {
+                List<Appearance> appearances = context.Appearances.ToList();
+                await Assert.That(appearances).ContainsEquivalentOf(dbAppearance);
+                await Assert.That(appearances).ContainsEquivalentOf(dbAppearance2);
+            }
         });
-        var mutationRequest = CreateUpdateRequest(expectedAppearance);
-
-        var startTime = DateTime.UtcNow;
+        GraphQLRequest mutationRequest = CreateUpdateRequest(expectedAppearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
+        GraphQLResponse<UpdateAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
 
         // Assert
-        AssertUpdatedAppearance(response, expectedAppearance, startTime, dbAppearance, dbAppearance2);
+        await AssertUpdatedAppearanceAsync(response, expectedAppearance, startTime, dbAppearance, dbAppearance2);
     }
 
-    [TestCaseSource(nameof(InvalidAddAppearanceCases))]
+    [Test]
+    [MethodDataSource(nameof(InvalidAddAppearanceCases))]
     public async Task UpdateAppearanceShouldNotUpdateAppearance((Appearance expectedAppearance, IEnumerable<string> errors) expectedResult)
     {
         // Arrange
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().BeEmpty();
+            await Assert.That(context.Appearances).IsEmpty();
         });
-        var mutationRequest = CreateUpdateRequest(expectedResult.expectedAppearance);
+        GraphQLRequest mutationRequest = CreateUpdateRequest(expectedResult.expectedAppearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
+        GraphQLResponse<UpdateAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
 
         // Assert
-        AssertAppearanceNotUpdated(response, expectedResult.errors);
+        await AssertAppearanceNotUpdatedAsync(response, expectedResult.errors);
     }
 
     [Test]
     public async Task UpdateAppearanceShouldNotUpdateAppearanceIfAppearanceDoesNotExist()
     {
         // Arrange
-        var appearance = CreateAppearance();
-        CheckDbContent(context =>
+        Appearance appearance = CreateAppearance();
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().BeEmpty();
+            await Assert.That(context.Appearances).IsEmpty();
         });
-        var mutationRequest = CreateUpdateRequest(appearance);
+        GraphQLRequest mutationRequest = CreateUpdateRequest(appearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
+        GraphQLResponse<UpdateAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateAppearanceResponse>(mutationRequest);
 
         // Assert
-        AssertAppearanceNotUpdated(response, new List<string> { $"No {nameof(Appearance)} found with id '{appearance.Id}'." });
+        await AssertAppearanceNotUpdatedAsync(response, new List<string> { $"No {nameof(Appearance)} found with id '{appearance.Id}'." });
     }
 
     [Test]
     public async Task DeleteAppearanceShouldDeleteAppearance()
     {
         // Arrange
-        var appearance = CreateAppearance();
-        var dbAppearance = new Appearance
+        Appearance appearance = CreateAppearance();
+        Appearance dbAppearance = new Appearance
         {
             Id = appearance.Id,
             Title = appearance.Title,
@@ -221,25 +226,25 @@ public class AppearanceMutationsTests : IntegrationTestBase
         });
         appearance.CreatedAt = dbAppearance.CreatedAt;
         appearance.LastModifiedAt = dbAppearance.LastModifiedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().ContainEquivalentOf(dbAppearance);
+            await Assert.That(context.Appearances.ToList()).ContainsEquivalentOf(dbAppearance);
         });
-        var mutationRequest = CreateDeleteRequest(appearance);
+        GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
+        GraphQLResponse<DeleteAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
 
         // Assert
-        AssertDeletedAppearance(response, appearance);
+        await AssertDeletedAppearanceAsync(response, appearance);
     }
 
     [Test]
     public async Task DeleteAppearanceShouldDeleteAppearanceAndReferenceToVehicles()
     {
         // Arrange
-        var appearance = CreateAppearance();
-        var dbAppearance = new Appearance
+        Appearance appearance = CreateAppearance();
+        Appearance dbAppearance = new Appearance
         {
             Id = appearance.Id,
             Title = appearance.Title,
@@ -248,14 +253,14 @@ public class AppearanceMutationsTests : IntegrationTestBase
             TextColor = appearance.TextColor,
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbAppearance2 = new Appearance
+        Appearance dbAppearance2 = new Appearance
         {
             Id = new Guid("B961A621-9848-429A-8B44-B1AF1F0182CE"),
             Color = "#778899",
             TextColor = "#665544",
             Title = "Title 2"
         };
-        var dbVehicle2 = new Vehicle
+        Vehicle dbVehicle2 = new Vehicle
         {
             Id = new Guid("74AE8DD4-7669-4428-8E81-FB8A24A217A3"),
             EngineColor = EngineColor.Green,
@@ -267,7 +272,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         };
         await SeedDatabaseAsync(context =>
         {
-            var dbVehicle = new Vehicle
+            Vehicle dbVehicle = new Vehicle
             {
                 Id = new Guid("87A2F9BF-CAB7-41D3-84F9-155135FA41D7"),
                 EngineColor = EngineColor.Blue,
@@ -279,26 +284,31 @@ public class AppearanceMutationsTests : IntegrationTestBase
         });
         appearance.CreatedAt = dbAppearance.CreatedAt;
         appearance.LastModifiedAt = dbAppearance.LastModifiedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().ContainEquivalentOf(dbAppearance);
+            await Assert.That(context.Appearances.ToList()).ContainsEquivalentOf(dbAppearance);
         });
-        var mutationRequest = CreateDeleteRequest(appearance);
+        GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
+        GraphQLResponse<DeleteAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
 
         // Assert
-        AssertDeletedAppearance(response, appearance);
-        CheckDbContent(context =>
+        await AssertDeletedAppearanceAsync(response, appearance);
+        await CheckDbContentAsync(async context =>
         {
-            var dbVehicles = context.Vehicles.Include(dbVehicle => dbVehicle.Appearances).ToList();
-            foreach (var dbVehicle in dbVehicles)
+            using (Assert.Multiple())
             {
-                dbVehicle.Appearances.Should().NotContain(dbAppearance);
-            }
+                List<Vehicle> dbVehicles = context.Vehicles.Include(dbVehicle => dbVehicle.Appearances).ToList();
+                foreach (Vehicle dbVehicle in dbVehicles)
+                {
+                    await Assert.That(dbVehicle.Appearances).DoesNotContain(dbAppearance);
+                }
 
-            dbVehicles.First(dbVehicle => dbVehicle.Id.Equals(dbVehicle2.Id)).Appearances.Should().ContainEquivalentOf(dbAppearance2);
+                await Assert
+                    .That(dbVehicles.First(dbVehicle => dbVehicle.Id.Equals(dbVehicle2.Id)).Appearances.ToList())
+                    .ContainsEquivalentOf(dbAppearance2);
+            }
         });
     }
 
@@ -306,8 +316,8 @@ public class AppearanceMutationsTests : IntegrationTestBase
     public async Task DeleteAppearanceShouldDeleteAppearanceIfAppearancesIsNotEmpty()
     {
         // Arrange
-        var appearance = CreateAppearance();
-        var dbAppearance = new Appearance
+        Appearance appearance = CreateAppearance();
+        Appearance dbAppearance = new Appearance
         {
             Id = appearance.Id,
             Title = appearance.Title,
@@ -316,7 +326,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
             TextColor = appearance.TextColor,
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbAppearance2 = new Appearance
+        Appearance dbAppearance2 = new Appearance
         {
             Id = new Guid("0609F93C-CBCC-4650-BA4C-B8D5FF93A877"),
             Title = "Title 2",
@@ -335,46 +345,50 @@ public class AppearanceMutationsTests : IntegrationTestBase
         });
         appearance.CreatedAt = dbAppearance.CreatedAt;
         appearance.LastModifiedAt = dbAppearance.LastModifiedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().ContainEquivalentOf(dbAppearance);
-            context.Appearances.Should().ContainEquivalentOf(dbAppearance2);
+            using (Assert.Multiple())
+            {
+                List<Appearance> appearances = context.Appearances.ToList();
+                await Assert.That(appearances).ContainsEquivalentOf(dbAppearance);
+                await Assert.That(appearances).ContainsEquivalentOf(dbAppearance2);
+            }
         });
-        var mutationRequest = CreateDeleteRequest(appearance);
+        GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
+        GraphQLResponse<DeleteAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
 
         // Assert
-        AssertDeletedAppearance(response, appearance, dbAppearance2);
+        await AssertDeletedAppearanceAsync(response, appearance, dbAppearance2);
     }
 
     [Test]
     public async Task DeleteAppearanceShouldNotDeleteAppearanceIfAppearanceDoesNotExist()
     {
         // Arrange
-        var appearance = CreateAppearance();
-        CheckDbContent(context =>
+        Appearance appearance = CreateAppearance();
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().BeEmpty();
+            await Assert.That(context.Appearances).IsEmpty();
         });
-        var mutationRequest = CreateDeleteRequest(appearance);
+        GraphQLRequest mutationRequest = CreateDeleteRequest(appearance);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
+        GraphQLResponse<DeleteAppearanceResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteAppearanceResponse>(mutationRequest);
 
         // Assert
-        AssertAppearanceNotDeleted(response, new List<string> { $"No {nameof(Appearance)} found with id '{appearance.Id}'." });
+        await AssertAppearanceNotDeletedAsync(response, new List<string> { $"No {nameof(Appearance)} found with id '{appearance.Id}'." });
     }
 
     private static GraphQLRequest CreateAddRequest(Appearance expectedAppearance)
     {
-        var descriptionParameter = expectedAppearance.Description != null
+        string descriptionParameter = expectedAppearance.Description != null
             ? $"""
                , description: "{expectedAppearance.Description}"
                """
             : string.Empty;
-        var mutationRequest = new GraphQLRequest
+        GraphQLRequest mutationRequest = new GraphQLRequest
         {
             Query = $$"""
                       mutation addAppearance
@@ -406,74 +420,73 @@ public class AppearanceMutationsTests : IntegrationTestBase
         return mutationRequest;
     }
 
-    private void AssertAddedAppearance(GraphQLResponse<AddAppearanceResponse> response, Appearance expectedAppearance,
+    private async Task AssertAddedAppearanceAsync(GraphQLResponse<AddAppearanceResponse> response, Appearance expectedAppearance,
         DateTime startTime, Appearance? dbAppearance = null)
     {
         DateTime endTime = DateTime.UtcNow;
         Appearance? addedAppearance;
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             addedAppearance = response.Data.AddAppearance.Appearance;
-            addedAppearance.Id.Should().NotBeEmpty();
-            addedAppearance.Title.Should().Be(expectedAppearance.Title);
-            addedAppearance.Description.Should().Be(expectedAppearance.Description);
-            addedAppearance.Color.Should().Be(expectedAppearance.Color);
-            addedAppearance.TextColor.Should().Be(expectedAppearance.TextColor);
-            addedAppearance.CreatedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
-                .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
-            addedAppearance.LastModifiedAt.Should().BeNull();
+            await Assert.That(addedAppearance.Id).IsNotDefault();
+            await Assert.That(addedAppearance.Title).IsEqualTo(expectedAppearance.Title);
+            await Assert.That(addedAppearance.Description).IsEqualTo(expectedAppearance.Description);
+            await Assert.That(addedAppearance.Color).IsEqualTo(expectedAppearance.Color);
+            await Assert.That(addedAppearance.TextColor).IsEqualTo(expectedAppearance.TextColor);
+            await Assert.That(addedAppearance.CreatedAt).IsBetween(startTime, endTime).WithInclusiveBounds();
+            await Assert.That(addedAppearance.LastModifiedAt).IsNull();
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            using (new AssertionScope())
+            using (Assert.Multiple())
             {
                 if (dbAppearance is not null)
                 {
-                    context.Appearances.Any(dbAppearance1 => dbAppearance1.Id.Equals(dbAppearance.Id)).Should().BeTrue();
+                    await Assert.That(context.Appearances.ToList())
+                        .Contains(dbAppearance1 => dbAppearance1.Id.Equals(dbAppearance.Id));
                 }
-                var addedDbAppearance = context.Appearances.First(dbAppearance1 => dbAppearance1.Id.Equals(addedAppearance.Id));
-                addedDbAppearance.Should().NotBeNull();
-                addedDbAppearance.Id.Should().NotBeEmpty().And.Be(addedAppearance.Id);
-                addedDbAppearance.Title.Should().Be(expectedAppearance.Title);
-                addedDbAppearance.Description.Should().Be(expectedAppearance.Description);
-                addedDbAppearance.Color.Should().Be(expectedAppearance.Color);
-                addedDbAppearance.TextColor.Should().Be(expectedAppearance.TextColor);
-                addedDbAppearance.CreatedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
-                    .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
-                addedDbAppearance.LastModifiedAt.Should().BeNull();
+                Appearance addedDbAppearance = context.Appearances.First(dbAppearance1 => dbAppearance1.Id.Equals(addedAppearance.Id));
+                await Assert.That(addedDbAppearance).IsNotNull();
+                await Assert.That(addedDbAppearance.Id).IsNotDefault().And.IsEqualTo(addedAppearance.Id);
+                await Assert.That(addedDbAppearance.Title).IsEqualTo(expectedAppearance.Title);
+                await Assert.That(addedDbAppearance.Description).IsEqualTo(expectedAppearance.Description);
+                await Assert.That(addedDbAppearance.Color).IsEqualTo(expectedAppearance.Color);
+                await Assert.That(addedDbAppearance.TextColor).IsEqualTo(expectedAppearance.TextColor);
+                await Assert.That(addedDbAppearance.CreatedAt).IsBetween(startTime, endTime).WithInclusiveBounds();
+                await Assert.That(addedDbAppearance.LastModifiedAt).IsNull();
             }
         });
     }
 
-    private void AssertAppearanceNotAdded(GraphQLResponse<AddAppearanceResponse> response, IEnumerable<string> errors)
+    private async Task AssertAppearanceNotAddedAsync(GraphQLResponse<AddAppearanceResponse> response, IEnumerable<string> errors)
     {
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Data.AddAppearance.Errors.Should().NotBeNullOrEmpty();
-            response.Data.AddAppearance.Appearance.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Data.AddAppearance.Errors).IsNotNull().And.IsNotEmpty();
+            await Assert.That(response.Data.AddAppearance.Appearance).IsNull();
 
-            var resultErrors = response.Data.AddAppearance.Errors.Select(error => error.Message);
-            resultErrors.Should().BeEquivalentTo(errors);
+            IEnumerable<string> resultErrors = response.Data.AddAppearance.Errors.Select(error => error.Message);
+            await Assert.That(resultErrors).IsEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().BeEmpty();
+            await Assert.That(context.Appearances).IsEmpty();
         });
     }
 
     private static GraphQLRequest CreateUpdateRequest(Appearance expectedAppearance)
     {
-        var descriptionParameter = expectedAppearance.Description != null
+        string descriptionParameter = expectedAppearance.Description != null
             ? $"""
                , description: "{expectedAppearance.Description}"
                """
             : string.Empty;
-        var mutationRequest = new GraphQLRequest
+        GraphQLRequest mutationRequest = new GraphQLRequest
         {
             Query = $$"""
                       mutation updateAppearance
@@ -505,83 +518,82 @@ public class AppearanceMutationsTests : IntegrationTestBase
         return mutationRequest;
     }
 
-    private void AssertUpdatedAppearance(GraphQLResponse<UpdateAppearanceResponse> response, Appearance expectedAppearance,
+    private async Task AssertUpdatedAppearanceAsync(GraphQLResponse<UpdateAppearanceResponse> response, Appearance expectedAppearance,
         DateTime startTime, Appearance? dbAppearance = null, Appearance? notUpdatedAppearance = null)
     {
         DateTime endTime = DateTime.UtcNow;
         Appearance? updatedAppearance;
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             updatedAppearance = response.Data.UpdateAppearance.Appearance;
-            updatedAppearance.Id.Should().Be(expectedAppearance.Id);
-            updatedAppearance.Title.Should().Be(expectedAppearance.Title);
-            updatedAppearance.Description.Should().Be(expectedAppearance.Description);
-            updatedAppearance.Color.Should().Be(expectedAppearance.Color);
-            updatedAppearance.TextColor.Should().Be(expectedAppearance.TextColor);
-            updatedAppearance.CreatedAt.Should().BeCloseTo(expectedAppearance.CreatedAt, TimeSpan.FromSeconds(1));
-            updatedAppearance.LastModifiedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
-                .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
+            await Assert.That(updatedAppearance.Id).IsEqualTo(expectedAppearance.Id);
+            await Assert.That(updatedAppearance.Title).IsEqualTo(expectedAppearance.Title);
+            await Assert.That(updatedAppearance.Description).IsEqualTo(expectedAppearance.Description);
+            await Assert.That(updatedAppearance.Color).IsEqualTo(expectedAppearance.Color);
+            await Assert.That(updatedAppearance.TextColor).IsEqualTo(expectedAppearance.TextColor);
+            await Assert.That(updatedAppearance.CreatedAt).IsEquivalentTo(expectedAppearance.CreatedAt);
+            await Assert.That(updatedAppearance.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            using (new AssertionScope())
+            using (Assert.Multiple())
             {
                 if (dbAppearance is not null)
                 {
-                    context.Appearances.Any(dbAppearance1 => dbAppearance1.Id.Equals(dbAppearance.Id)).Should().BeTrue();
+                    await Assert.That(context.Appearances.ToList())
+                        .Contains(dbAppearance1 => dbAppearance1.Id.Equals(dbAppearance.Id));
                 }
-                var updatedDbAppearance = context.Appearances.First(dbAppearance1 => dbAppearance1.Id.Equals(updatedAppearance.Id));
-                updatedDbAppearance.Should().NotBeNull();
-                updatedDbAppearance.Id.Should().NotBeEmpty().And.Be(updatedAppearance.Id);
-                updatedDbAppearance.Title.Should().Be(expectedAppearance.Title);
-                updatedDbAppearance.Description.Should().Be(expectedAppearance.Description);
-                updatedDbAppearance.Color.Should().Be(expectedAppearance.Color);
-                updatedDbAppearance.TextColor.Should().Be(expectedAppearance.TextColor);
-                updatedDbAppearance.CreatedAt.Should().BeCloseTo(expectedAppearance.CreatedAt, TimeSpan.FromSeconds(1));
-                updatedDbAppearance.LastModifiedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
-                    .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
+                Appearance updatedDbAppearance = context.Appearances.First(dbAppearance1 => dbAppearance1.Id.Equals(updatedAppearance.Id));
+                await Assert.That(updatedDbAppearance).IsNotNull();
+                await Assert.That(updatedDbAppearance.Id).IsNotDefault().And.IsEqualTo(updatedAppearance.Id);
+                await Assert.That(updatedDbAppearance.Title).IsEqualTo(expectedAppearance.Title);
+                await Assert.That(updatedDbAppearance.Description).IsEqualTo(expectedAppearance.Description);
+                await Assert.That(updatedDbAppearance.Color).IsEqualTo(expectedAppearance.Color);
+                await Assert.That(updatedDbAppearance.TextColor).IsEqualTo(expectedAppearance.TextColor);
+                await Assert.That(updatedDbAppearance.CreatedAt).IsEquivalentTo(expectedAppearance.CreatedAt);
+                await Assert.That(updatedDbAppearance.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
 
                 if (notUpdatedAppearance is not null)
                 {
-                    var secondAppearance =
+                    Appearance? secondAppearance =
                         context.Appearances.FirstOrDefault(appearance => appearance.Id.Equals(notUpdatedAppearance.Id));
-                    secondAppearance.Should().NotBeNull();
-                    secondAppearance!.Id.Should().NotBeEmpty().And.Be(notUpdatedAppearance.Id);
-                    secondAppearance.Title.Should().Be(notUpdatedAppearance.Title);
-                    secondAppearance.Description.Should().Be(notUpdatedAppearance.Description);
-                    secondAppearance.Color.Should().Be(notUpdatedAppearance.Color);
-                    secondAppearance.TextColor.Should().Be(notUpdatedAppearance.TextColor);
-                    secondAppearance.CreatedAt.Should().BeCloseTo(notUpdatedAppearance.CreatedAt, TimeSpan.FromSeconds(1));
-                    secondAppearance.LastModifiedAt.Should().BeCloseTo(notUpdatedAppearance.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
+                    await Assert.That(secondAppearance).IsNotNull();
+                    await Assert.That(secondAppearance!.Id).IsNotDefault().And.IsEqualTo(notUpdatedAppearance.Id);
+                    await Assert.That(secondAppearance.Title).IsEqualTo(notUpdatedAppearance.Title);
+                    await Assert.That(secondAppearance.Description).IsEqualTo(notUpdatedAppearance.Description);
+                    await Assert.That(secondAppearance.Color).IsEqualTo(notUpdatedAppearance.Color);
+                    await Assert.That(secondAppearance.TextColor).IsEqualTo(notUpdatedAppearance.TextColor);
+                    await Assert.That(secondAppearance.CreatedAt).IsEquivalentTo(notUpdatedAppearance.CreatedAt);
+                    await Assert.That(secondAppearance.LastModifiedAt).IsEquivalentTo(notUpdatedAppearance.LastModifiedAt!.Value);
                 }
             }
         });
     }
 
-    private void AssertAppearanceNotUpdated(GraphQLResponse<UpdateAppearanceResponse> response, IEnumerable<string> errors)
+    private async Task AssertAppearanceNotUpdatedAsync(GraphQLResponse<UpdateAppearanceResponse> response, IEnumerable<string> errors)
     {
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Data.UpdateAppearance.Errors.Should().NotBeNullOrEmpty();
-            response.Data.UpdateAppearance.Appearance.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Data.UpdateAppearance.Errors).IsNotNull().And.IsNotEmpty();
+            await Assert.That(response.Data.UpdateAppearance.Appearance).IsNull();
 
-            var resultErrors = response.Data.UpdateAppearance.Errors.Select(error => error.Message);
-            resultErrors.Should().BeEquivalentTo(errors);
+            IEnumerable<string> resultErrors = response.Data.UpdateAppearance.Errors.Select(error => error.Message);
+            await Assert.That(resultErrors).IsEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().BeEmpty();
+            await Assert.That(context.Appearances).IsEmpty();
         });
     }
 
     private static GraphQLRequest CreateDeleteRequest(Appearance expectedAppearance)
     {
-        var mutationRequest = new GraphQLRequest
+        GraphQLRequest mutationRequest = new GraphQLRequest
         {
             Query = $$"""
                       mutation deleteAppearance
@@ -613,58 +625,59 @@ public class AppearanceMutationsTests : IntegrationTestBase
         return mutationRequest;
     }
 
-    private void AssertDeletedAppearance(GraphQLResponse<DeleteAppearanceResponse> response, Appearance expectedAppearance, Appearance? dbAppearance = null)
+    private async Task AssertDeletedAppearanceAsync(GraphQLResponse<DeleteAppearanceResponse> response, Appearance expectedAppearance, Appearance? dbAppearance = null)
     {
-        Appearance? deletedAppearance;
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
-            deletedAppearance = response.Data.DeleteAppearance.Appearance;
-            deletedAppearance.Id.Should().NotBeEmpty();
-            deletedAppearance.Title.Should().Be(expectedAppearance.Title);
-            deletedAppearance.Description.Should().Be(expectedAppearance.Description);
-            deletedAppearance.Color.Should().Be(expectedAppearance.Color);
-            deletedAppearance.TextColor.Should().Be(expectedAppearance.TextColor);
-            deletedAppearance.CreatedAt.Should().BeCloseTo(expectedAppearance.CreatedAt, TimeSpan.FromSeconds(1));
-            deletedAppearance.LastModifiedAt.Should().BeCloseTo(expectedAppearance.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
+            Appearance deletedAppearance = response.Data.DeleteAppearance.Appearance;
+            await Assert.That(deletedAppearance.Id).IsNotDefault();
+            await Assert.That(deletedAppearance.Title).IsEqualTo(expectedAppearance.Title);
+            await Assert.That(deletedAppearance.Description).IsEqualTo(expectedAppearance.Description);
+            await Assert.That(deletedAppearance.Color).IsEqualTo(expectedAppearance.Color);
+            await Assert.That(deletedAppearance.TextColor).IsEqualTo(expectedAppearance.TextColor);
+            await Assert.That(deletedAppearance.CreatedAt).IsEquivalentTo(expectedAppearance.CreatedAt);
+            await Assert.That(deletedAppearance.LastModifiedAt).IsEquivalentTo(expectedAppearance.LastModifiedAt!.Value);
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            using (new AssertionScope())
+            using (Assert.Multiple())
             {
-                context.Appearances.Any(dbAppearance1 => dbAppearance1.Id.Equals(expectedAppearance.Id)).Should().BeFalse();
+                await Assert.That(context.Appearances.ToList())
+                    .DoesNotContain(dbAppearance1 => dbAppearance1.Id.Equals(expectedAppearance.Id));
 
                 if (dbAppearance is not null)
                 {
-                    context.Appearances.Any(dbAppearance1 => dbAppearance1.Id.Equals(dbAppearance.Id)).Should().BeTrue();
+                    await Assert.That(context.Appearances.ToList())
+                        .Contains(dbAppearance1 => dbAppearance1.Id.Equals(dbAppearance.Id));
                 }
             }
         });
     }
 
-    private void AssertAppearanceNotDeleted(GraphQLResponse<DeleteAppearanceResponse> response, IEnumerable<string> errors)
+    private async Task AssertAppearanceNotDeletedAsync(GraphQLResponse<DeleteAppearanceResponse> response, IEnumerable<string> errors)
     {
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Data.DeleteAppearance.Errors.Should().NotBeNullOrEmpty();
-            response.Data.DeleteAppearance.Appearance.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Data.DeleteAppearance.Errors).IsNotNull().And.IsNotEmpty();
+            await Assert.That(response.Data.DeleteAppearance.Appearance).IsNull();
 
-            var resultErrors = response.Data.DeleteAppearance.Errors.Select(error => error.Message);
-            resultErrors.Should().BeEquivalentTo(errors);
+            IEnumerable<string> resultErrors = response.Data.DeleteAppearance.Errors.Select(error => error.Message);
+            await Assert.That(resultErrors).IsEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Appearances.Should().BeEmpty();
+            await Assert.That(context.Appearances).IsEmpty();
         });
     }
 
     private static Appearance CreateAppearance()
     {
-        var faker = new Faker<Appearance>()
+        Faker<Appearance>? faker = new Faker<Appearance>()
             .RuleFor(appearance => appearance.Id, f => f.Random.Guid())
             .RuleFor(appearance => appearance.Title, f => f.Random.String2(1, 50, AllowedChars))
             .RuleFor(appearance => appearance.Description, f => f.Random.String2(0, 255, AllowedChars).OrNull(f, 0.3f))
@@ -673,36 +686,37 @@ public class AppearanceMutationsTests : IntegrationTestBase
         return faker.Generate();
     }
 
-    private static IEnumerable<Appearance> AddAppearanceCases()
+    public static IEnumerable<Func<Appearance>> AddAppearanceCases()
     {
-        var faker = new Faker<Appearance>()
+        Faker<Appearance>? faker = new Faker<Appearance>()
             .RuleFor(appearance => appearance.Title, f => f.Random.String2(1, 50, AllowedChars))
             .RuleFor(appearance => appearance.Description, f => f.Random.String2(0, 255, AllowedChars).OrNull(f, 0.3f))
             .RuleFor(appearance => appearance.Color, f => "#" + f.Random.String2(6, 6, HexCodeColorChars))
             .RuleFor(appearance => appearance.TextColor, f => "#" + f.Random.String2(6, 6, HexCodeColorChars));
-        return faker.Generate(20);
+        List<Appearance>? appearances = faker.Generate(20);
+        return appearances.Select<Appearance, Func<Appearance>>(appearance => () => appearance);
     }
 
-    private static IEnumerable<(Appearance, IEnumerable<string>)> InvalidAddAppearanceCases()
+    public static IEnumerable<Func<(Appearance, IEnumerable<string>)>> InvalidAddAppearanceCases()
     {
-        yield return (new Appearance { Title = null!, Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Title)} is not set.", $"The value '' for {nameof(Appearance.Title)} is too short. The length of {nameof(Appearance.Title)} has to be between 1 and 50." });
-        yield return (new Appearance { Title = "", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Title)} is not set.", $"The value '' for {nameof(Appearance.Title)} is too short. The length of {nameof(Appearance.Title)} has to be between 1 and 50." });
-        yield return (new Appearance { Title = "  \t ", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Title)} is not set." });
-        yield return (new Appearance { Title = new string('a', 51), Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Appearance.Title)} is long short. The length of {nameof(Appearance.Title)} has to be between 1 and 50." });
-        yield return (new Appearance { Title = "Valid", Description = new string('a', 256), Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Appearance.Description)} is long short. The length of {nameof(Appearance.Description)} has to be less than 256." });
-        yield return (new Appearance { Title = "Valid", Description = null, Color = null!, TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Color)} is not set.", $"The value '' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Appearance { Title = "Valid", Description = null, Color = "01122", TextColor = "#334455" }, new List<string> { $"The value '01122' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Appearance { Title = "Valid", Description = null, Color = "#01122", TextColor = "#334455" }, new List<string> { $"The value '#01122' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Appearance { Title = "Valid", Description = null, Color = "001122", TextColor = "#334455" }, new List<string> { $"The value '001122' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Appearance { Title = "Valid", Description = null, Color = "", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Color)} is not set.", $"The value '' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Appearance { Title = "Valid", Description = null, Color = " ", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Color)} is not set.", $"The value ' ' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Appearance { Title = "Valid", Description = null, Color = "g", TextColor = "#334455" }, new List<string> { $"The value 'g' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Appearance { Title = "Valid", Description = null, TextColor = null!, Color = "#334455" }, new List<string> { $"The value for {nameof(Appearance.TextColor)} is not set.", $"The value '' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Appearance { Title = "Valid", Description = null, TextColor = "01122", Color = "#334455" }, new List<string> { $"The value '01122' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Appearance { Title = "Valid", Description = null, TextColor = "#01122", Color = "#334455" }, new List<string> { $"The value '#01122' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Appearance { Title = "Valid", Description = null, TextColor = "001122", Color = "#334455" }, new List<string> { $"The value '001122' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Appearance { Title = "Valid", Description = null, TextColor = "", Color = "#334455" }, new List<string> { $"The value for {nameof(Appearance.TextColor)} is not set.", $"The value '' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Appearance { Title = "Valid", Description = null, TextColor = " ", Color = "#334455" }, new List<string> { $"The value for {nameof(Appearance.TextColor)} is not set.", $"The value ' ' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Appearance { Title = "Valid", Description = null, TextColor = "g", Color = "#334455" }, new List<string> { $"The value 'g' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = null!, Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Title)} is not set.", $"The value '' for {nameof(Appearance.Title)} is too short. The length of {nameof(Appearance.Title)} has to be between 1 and 50." });
+        yield return () => (new Appearance { Title = "", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Title)} is not set.", $"The value '' for {nameof(Appearance.Title)} is too short. The length of {nameof(Appearance.Title)} has to be between 1 and 50." });
+        yield return () => (new Appearance { Title = "  \t ", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Title)} is not set." });
+        yield return () => (new Appearance { Title = new string('a', 51), Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Appearance.Title)} is long short. The length of {nameof(Appearance.Title)} has to be between 1 and 50." });
+        yield return () => (new Appearance { Title = "Valid", Description = new string('a', 256), Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Appearance.Description)} is long short. The length of {nameof(Appearance.Description)} has to be less than 256." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, Color = null!, TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Color)} is not set.", $"The value '' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, Color = "01122", TextColor = "#334455" }, new List<string> { $"The value '01122' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, Color = "#01122", TextColor = "#334455" }, new List<string> { $"The value '#01122' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, Color = "001122", TextColor = "#334455" }, new List<string> { $"The value '001122' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, Color = "", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Color)} is not set.", $"The value '' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, Color = " ", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Appearance.Color)} is not set.", $"The value ' ' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, Color = "g", TextColor = "#334455" }, new List<string> { $"The value 'g' for field {nameof(Appearance.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, TextColor = null!, Color = "#334455" }, new List<string> { $"The value for {nameof(Appearance.TextColor)} is not set.", $"The value '' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, TextColor = "01122", Color = "#334455" }, new List<string> { $"The value '01122' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, TextColor = "#01122", Color = "#334455" }, new List<string> { $"The value '#01122' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, TextColor = "001122", Color = "#334455" }, new List<string> { $"The value '001122' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, TextColor = "", Color = "#334455" }, new List<string> { $"The value for {nameof(Appearance.TextColor)} is not set.", $"The value '' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, TextColor = " ", Color = "#334455" }, new List<string> { $"The value for {nameof(Appearance.TextColor)} is not set.", $"The value ' ' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Appearance { Title = "Valid", Description = null, TextColor = "g", Color = "#334455" }, new List<string> { $"The value 'g' for field {nameof(Appearance.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
     }
 }

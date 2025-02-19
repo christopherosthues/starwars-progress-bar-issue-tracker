@@ -1,10 +1,8 @@
 using Bogus;
-using FluentAssertions;
-using FluentAssertions.Execution;
 using GraphQL;
 using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.App.Labels;
-using StarWarsProgressBarIssueTracker.App.Mutations;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
@@ -12,36 +10,39 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Mutations;
 
-[TestFixture(TestOf = typeof(IssueTrackerMutations))]
 [Category(TestCategory.Integration)]
+[NotInParallel(NotInParallelTests.LabelMutation)]
 public class LabelMutationsTests : IntegrationTestBase
 {
+    // TODO: Check DoesNotContain and Contains
     private const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ß_#%";
     private const string HexCodeColorChars = "0123456789abcdef";
 
-    [TestCaseSource(nameof(AddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(AddLabelCases))]
     public async Task AddLabelShouldAddLabel(Label expectedLabel)
     {
         // Arrange
-        CheckDbContent(context =>
+        DateTime startTime = DateTime.UtcNow;
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().BeEmpty();
+            await Assert.That(context.Labels).IsEmpty();
         });
         GraphQLRequest mutationRequest = CreateAddRequest(expectedLabel);
 
-        DateTime startTime = DateTime.UtcNow;
-
         // Act
-        GraphQLResponse<AddLabelResponse> response = await GraphQLClient.SendMutationAsync<AddLabelResponse>(mutationRequest);
+        GraphQLResponse<AddLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<AddLabelResponse>(mutationRequest);
 
         // Assert
-        AssertAddedLabel(response, expectedLabel, startTime);
+        await AssertAddedLabelAsync(response, expectedLabel, startTime);
     }
 
-    [TestCaseSource(nameof(AddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(AddLabelCases))]
     public async Task AddLabelShouldAddLabelIfLabelsAreNotEmpty(Label expectedLabel)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Label dbLabel = new Label
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -55,42 +56,43 @@ public class LabelMutationsTests : IntegrationTestBase
         {
             context.Labels.Add(dbLabel);
         });
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().ContainEquivalentOf(dbLabel);
+            await Assert.That(context.Labels.ToList()).ContainsEquivalentOf(dbLabel);
         });
         GraphQLRequest mutationRequest = CreateAddRequest(expectedLabel);
 
-        DateTime startTime = DateTime.UtcNow;
-
         // Act
-        GraphQLResponse<AddLabelResponse> response = await GraphQLClient.SendMutationAsync<AddLabelResponse>(mutationRequest);
+        GraphQLResponse<AddLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<AddLabelResponse>(mutationRequest);
 
         // Assert
-        AssertAddedLabel(response, expectedLabel, startTime, dbLabel);
+        await AssertAddedLabelAsync(response, expectedLabel, startTime, dbLabel);
     }
 
-    [TestCaseSource(nameof(InvalidAddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(InvalidAddLabelCases))]
     public async Task AddLabelShouldNotAddLabel((Label expectedLabel, IEnumerable<string> errors) expectedResult)
     {
         // Arrange
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().BeEmpty();
+            await Assert.That(context.Labels).IsEmpty();
         });
         GraphQLRequest mutationRequest = CreateAddRequest(expectedResult.expectedLabel);
 
         // Act
-        GraphQLResponse<AddLabelResponse> response = await GraphQLClient.SendMutationAsync<AddLabelResponse>(mutationRequest);
+        GraphQLResponse<AddLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<AddLabelResponse>(mutationRequest);
 
         // Assert
-        AssertLabelNotAdded(response, expectedResult.errors);
+        await AssertLabelNotAddedAsync(response, expectedResult.errors);
     }
 
-    [TestCaseSource(nameof(AddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(AddLabelCases))]
     public async Task UpdateLabelShouldUpdateLabel(Label expectedLabel)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Label dbLabel = new Label
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -106,25 +108,25 @@ public class LabelMutationsTests : IntegrationTestBase
         });
         expectedLabel.Id = dbLabel.Id;
         expectedLabel.CreatedAt = dbLabel.CreatedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().ContainEquivalentOf(dbLabel);
+            await Assert.That(context.Labels.ToList()).ContainsEquivalentOf(dbLabel);
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedLabel);
 
-        DateTime startTime = DateTime.UtcNow;
-
         // Act
-        GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
+        GraphQLResponse<UpdateLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
-        AssertUpdatedLabel(response, expectedLabel, startTime);
+        await AssertUpdatedLabelAsync(response, expectedLabel, startTime);
     }
 
-    [TestCaseSource(nameof(AddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(AddLabelCases))]
     public async Task UpdateLabelShouldUpdateLabelWithIssues(Label expectedLabel)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Label dbLabel = new Label
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -143,34 +145,35 @@ public class LabelMutationsTests : IntegrationTestBase
         });
         expectedLabel.Id = dbLabel.Id;
         expectedLabel.CreatedAt = dbLabel.CreatedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
             List<Label> labels = context.Labels.Include(label => label.Issues).ToList();
-            labels.Should().ContainEquivalentOf(dbLabel, config => config.Excluding(label => label.Issues));
-            labels.First().Issues.Should()
-                .ContainEquivalentOf(dbIssue, config => config.Excluding(issue => issue.Labels));
+            await Assert.That(labels).ContainsEquivalentOf(dbLabel);
+            List<Issue> issues = labels.First().Issues.ToList();
+            await Assert.That(issues).ContainsEquivalentOf(dbIssue);
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedLabel);
 
-        DateTime startTime = DateTime.UtcNow;
-
         // Act
-        GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
+        GraphQLResponse<UpdateLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
-        AssertUpdatedLabel(response, expectedLabel, startTime, emptyIssues: false);
-        CheckDbContent(context =>
+        await AssertUpdatedLabelAsync(response, expectedLabel, startTime, emptyIssues: false);
+        await CheckDbContentAsync(async context =>
         {
             Label resultLabel = context.Labels.Include(label => label.Issues).First(label => label.Id == dbLabel.Id);
-            resultLabel.Issues.Should().NotBeEmpty();
-            resultLabel.Issues.Should().ContainEquivalentOf(dbIssue, config => config.Excluding(issue => issue.Labels));
+            List<Issue> issues = resultLabel.Issues.ToList();
+            await Assert.That(issues).IsNotEmpty();
+            await Assert.That(issues).ContainsEquivalentOf(dbIssue);
         });
     }
 
-    [TestCaseSource(nameof(AddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(AddLabelCases))]
     public async Task UpdateLabelShouldUpdateLabelIfLabelsAreNotEmpty(Label expectedLabel)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Label dbLabel = new Label
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -198,37 +201,37 @@ public class LabelMutationsTests : IntegrationTestBase
         });
         expectedLabel.Id = dbLabel.Id;
         expectedLabel.CreatedAt = dbLabel.CreatedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().ContainEquivalentOf(dbLabel);
-            context.Labels.Should().ContainEquivalentOf(dbLabel2);
+            List<Label> labels = context.Labels.ToList();
+            await Assert.That(labels).ContainsEquivalentOf(dbLabel);
+            await Assert.That(labels).ContainsEquivalentOf(dbLabel2);
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedLabel);
 
-        DateTime startTime = DateTime.UtcNow;
-
         // Act
-        GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
+        GraphQLResponse<UpdateLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
-        AssertUpdatedLabel(response, expectedLabel, startTime, dbLabel, dbLabel2);
+        await AssertUpdatedLabelAsync(response, expectedLabel, startTime, dbLabel, dbLabel2);
     }
 
-    [TestCaseSource(nameof(InvalidAddLabelCases))]
+    [Test]
+    [MethodDataSource(nameof(InvalidAddLabelCases))]
     public async Task UpdateLabelShouldNotUpdateLabel((Label expectedLabel, IEnumerable<string> errors) expectedResult)
     {
         // Arrange
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().BeEmpty();
+            await Assert.That(context.Labels).IsEmpty();
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedResult.expectedLabel);
 
         // Act
-        GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
+        GraphQLResponse<UpdateLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
-        AssertLabelNotUpdated(response, expectedResult.errors);
+        await AssertLabelNotUpdatedAsync(response, expectedResult.errors);
     }
 
     [Test]
@@ -236,17 +239,17 @@ public class LabelMutationsTests : IntegrationTestBase
     {
         // Arrange
         Label label = CreateLabel();
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().BeEmpty();
+            await Assert.That(context.Labels).IsEmpty();
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(label);
 
         // Act
-        GraphQLResponse<UpdateLabelResponse> response = await GraphQLClient.SendMutationAsync<UpdateLabelResponse>(mutationRequest);
+        GraphQLResponse<UpdateLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateLabelResponse>(mutationRequest);
 
         // Assert
-        AssertLabelNotUpdated(response, new List<string> { $"No {nameof(Label)} found with id '{label.Id}'." });
+        await AssertLabelNotUpdatedAsync(response, new List<string> { $"No {nameof(Label)} found with id '{label.Id}'." });
     }
 
     [Test]
@@ -269,17 +272,17 @@ public class LabelMutationsTests : IntegrationTestBase
         });
         label.CreatedAt = dbLabel.CreatedAt;
         label.LastModifiedAt = dbLabel.LastModifiedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().ContainEquivalentOf(dbLabel);
+            await Assert.That(context.Labels.ToList()).ContainsEquivalentOf(dbLabel);
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(label);
 
         // Act
-        GraphQLResponse<DeleteLabelResponse> response = await GraphQLClient.SendMutationAsync<DeleteLabelResponse>(mutationRequest);
+        GraphQLResponse<DeleteLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteLabelResponse>(mutationRequest);
 
         // Assert
-        AssertDeletedLabel(response, label);
+        await AssertDeletedLabelAsync(response, label);
     }
 
     [Test]
@@ -330,28 +333,33 @@ public class LabelMutationsTests : IntegrationTestBase
         });
         label.CreatedAt = dbLabel.CreatedAt;
         label.LastModifiedAt = dbLabel.LastModifiedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().ContainEquivalentOf(dbLabel, config => config.Excluding(l => l.Issues));
+            await Assert.That(context.Labels.ToList()).ContainsEquivalentOf(dbLabel);
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(label);
 
         // Act
-        GraphQLResponse<DeleteLabelResponse> response = await GraphQLClient.SendMutationAsync<DeleteLabelResponse>(mutationRequest);
+        GraphQLResponse<DeleteLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteLabelResponse>(mutationRequest);
 
         // Assert
-        AssertDeletedLabel(response, label);
-        CheckDbContent(context =>
+        await AssertDeletedLabelAsync(response, label);
+        await CheckDbContentAsync(async context =>
         {
             List<Issue> dbIssues = context.Issues.Include(entity => entity.Labels).ToList();
-            dbIssues.Should().Contain(i => i.Id.Equals(dbIssue.Id));
-            dbIssues.Should().Contain(i => i.Id.Equals(dbIssue2.Id));
-            foreach (Issue entity in dbIssues)
+            using (Assert.Multiple())
             {
-                dbIssue.Labels.Should().NotContain(l => l.Id.Equals(entity.Id));
-            }
+                await Assert.That(dbIssues).Contains(i => i.Id.Equals(dbIssue.Id));
+                await Assert.That(dbIssues).Contains(i => i.Id.Equals(dbIssue2.Id));
+                foreach (Issue entity in dbIssues)
+                {
+                    await Assert.That(dbIssue.Labels.ToList()).DoesNotContain(l => l.Id.Equals(entity.Id));
+                }
 
-            dbIssues.First(entity => entity.Id.Equals(dbIssue2.Id)).Labels.Should().ContainEquivalentOf(dbLabel2, config => config.Excluding(l => l.Issues));
+                List<Label> labels = dbIssues.First(entity => entity.Id.Equals(dbIssue2.Id)).Labels.ToList();
+                await Assert.That(labels)
+                    .ContainsEquivalentOf(dbLabel2);
+            }
         });
     }
 
@@ -387,18 +395,22 @@ public class LabelMutationsTests : IntegrationTestBase
         });
         label.CreatedAt = dbLabel.CreatedAt;
         label.LastModifiedAt = dbLabel.LastModifiedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().ContainEquivalentOf(dbLabel);
-            context.Labels.Should().ContainEquivalentOf(dbLabel2);
+            using (Assert.Multiple())
+            {
+                List<Label> labels = context.Labels.ToList();
+                await Assert.That(labels).ContainsEquivalentOf(dbLabel);
+                await Assert.That(labels).ContainsEquivalentOf(dbLabel2);
+            }
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(label);
 
         // Act
-        GraphQLResponse<DeleteLabelResponse> response = await GraphQLClient.SendMutationAsync<DeleteLabelResponse>(mutationRequest);
+        GraphQLResponse<DeleteLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteLabelResponse>(mutationRequest);
 
         // Assert
-        AssertDeletedLabel(response, label, dbLabel2);
+        await AssertDeletedLabelAsync(response, label, dbLabel2);
     }
 
     [Test]
@@ -406,17 +418,17 @@ public class LabelMutationsTests : IntegrationTestBase
     {
         // Arrange
         Label label = CreateLabel();
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().BeEmpty();
+            await Assert.That(context.Labels).IsEmpty();
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(label);
 
         // Act
-        GraphQLResponse<DeleteLabelResponse> response = await GraphQLClient.SendMutationAsync<DeleteLabelResponse>(mutationRequest);
+        GraphQLResponse<DeleteLabelResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteLabelResponse>(mutationRequest);
 
         // Assert
-        AssertLabelNotDeleted(response, new List<string> { $"No {nameof(Label)} found with id '{label.Id}'." });
+        await AssertLabelNotDeletedAsync(response, new List<string> { $"No {nameof(Label)} found with id '{label.Id}'." });
     }
 
     private static GraphQLRequest CreateAddRequest(Label expectedLabel)
@@ -458,63 +470,61 @@ public class LabelMutationsTests : IntegrationTestBase
         return mutationRequest;
     }
 
-    private void AssertAddedLabel(GraphQLResponse<AddLabelResponse> response, Label expectedLabel,
+    private async Task AssertAddedLabelAsync(GraphQLResponse<AddLabelResponse> response, Label expectedLabel,
         DateTime startTime, Label? dbLabel = null)
     {
         DateTime endTime = DateTime.UtcNow;
         LabelDto? addedLabel;
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             addedLabel = response.Data.AddLabel.Label;
-            addedLabel.Id.Should().NotBeEmpty();
-            addedLabel.Title.Should().Be(expectedLabel.Title);
-            addedLabel.Description.Should().Be(expectedLabel.Description);
-            addedLabel.Color.Should().Be(expectedLabel.Color);
-            addedLabel.TextColor.Should().Be(expectedLabel.TextColor);
-            addedLabel.CreatedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
-                .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
-            addedLabel.LastModifiedAt.Should().BeNull();
+            await Assert.That(addedLabel.Id).IsNotDefault();
+            await Assert.That(addedLabel.Title).IsEqualTo(expectedLabel.Title);
+            await Assert.That(addedLabel.Description).IsEqualTo(expectedLabel.Description);
+            await Assert.That(addedLabel.Color).IsEqualTo(expectedLabel.Color);
+            await Assert.That(addedLabel.TextColor).IsEqualTo(expectedLabel.TextColor);
+            await Assert.That(addedLabel.CreatedAt).IsBetween(startTime, endTime).WithInclusiveBounds();
+            await Assert.That(addedLabel.LastModifiedAt).IsNull();
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            using (new AssertionScope())
+            using (Assert.Multiple())
             {
                 if (dbLabel is not null)
                 {
-                    context.Labels.Any(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id)).Should().BeTrue();
+                    await Assert.That(context.Labels.ToList()).Contains(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
                 }
                 Label addedDbLabel = context.Labels.First(dbLabel1 => dbLabel1.Id.Equals(addedLabel.Id));
-                addedDbLabel.Should().NotBeNull();
-                addedDbLabel.Id.Should().NotBeEmpty().And.Be(addedLabel.Id);
-                addedDbLabel.Title.Should().Be(expectedLabel.Title);
-                addedDbLabel.Description.Should().Be(expectedLabel.Description);
-                addedDbLabel.Color.Should().Be(expectedLabel.Color);
-                addedDbLabel.TextColor.Should().Be(expectedLabel.TextColor);
-                addedDbLabel.CreatedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
-                    .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
-                addedDbLabel.LastModifiedAt.Should().BeNull();
+                await Assert.That(addedLabel).IsNotNull();
+                await Assert.That(addedLabel.Id).IsNotDefault().And.IsEqualTo(addedDbLabel.Id);
+                await Assert.That(addedLabel.Title).IsEqualTo(expectedLabel.Title);
+                await Assert.That(addedLabel.Description).IsEqualTo(expectedLabel.Description);
+                await Assert.That(addedLabel.Color).IsEqualTo(expectedLabel.Color);
+                await Assert.That(addedLabel.TextColor).IsEqualTo(expectedLabel.TextColor);
+                await Assert.That(addedLabel.CreatedAt).IsBetween(startTime, endTime).WithInclusiveBounds();
+                await Assert.That(addedLabel.LastModifiedAt).IsNull();
             }
         });
     }
 
-    private void AssertLabelNotAdded(GraphQLResponse<AddLabelResponse> response, IEnumerable<string> errors)
+    private async Task AssertLabelNotAddedAsync(GraphQLResponse<AddLabelResponse> response, IEnumerable<string> errors)
     {
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Data.AddLabel.Errors.Should().NotBeNullOrEmpty();
-            response.Data.AddLabel.Label.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Data.AddLabel.Errors).IsNotNull().And.IsNotEmpty();
+            await Assert.That(response.Data.AddLabel.Label).IsNull();
 
             IEnumerable<string> resultErrors = response.Data.AddLabel.Errors.Select(error => error.Message);
-            resultErrors.Should().BeEquivalentTo(errors);
+            await Assert.That(resultErrors).IsEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().BeEmpty();
+            await Assert.That(context.Labels).IsEmpty();
         });
     }
 
@@ -557,52 +567,50 @@ public class LabelMutationsTests : IntegrationTestBase
         return mutationRequest;
     }
 
-    private void AssertUpdatedLabel(GraphQLResponse<UpdateLabelResponse> response, Label expectedLabel,
+    private async Task AssertUpdatedLabelAsync(GraphQLResponse<UpdateLabelResponse> response, Label expectedLabel,
         DateTime startTime, Label? dbLabel = null, Label? notUpdatedLabel = null, bool emptyIssues = true)
     {
         DateTime endTime = DateTime.UtcNow;
         LabelDto? updatedLabel;
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             updatedLabel = response.Data.UpdateLabel.Label;
-            updatedLabel.Id.Should().Be(expectedLabel.Id);
-            updatedLabel.Title.Should().Be(expectedLabel.Title);
-            updatedLabel.Description.Should().Be(expectedLabel.Description);
-            updatedLabel.Color.Should().Be(expectedLabel.Color);
-            updatedLabel.TextColor.Should().Be(expectedLabel.TextColor);
-            updatedLabel.CreatedAt.Should().BeCloseTo(expectedLabel.CreatedAt, TimeSpan.FromSeconds(1));
-            updatedLabel.LastModifiedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
-                .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
+            await Assert.That(updatedLabel.Id).IsNotDefault().And.IsEqualTo(expectedLabel.Id);
+            await Assert.That(updatedLabel.Title).IsEqualTo(expectedLabel.Title);
+            await Assert.That(updatedLabel.Description).IsEqualTo(expectedLabel.Description);
+            await Assert.That(updatedLabel.Color).IsEqualTo(expectedLabel.Color);
+            await Assert.That(updatedLabel.TextColor).IsEqualTo(expectedLabel.TextColor);
+            await Assert.That(updatedLabel.CreatedAt).IsEquivalentTo(expectedLabel.CreatedAt);
+            await Assert.That(updatedLabel.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            using (new AssertionScope())
+            using (Assert.Multiple())
             {
                 if (dbLabel is not null)
                 {
-                    context.Labels.Any(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id)).Should().BeTrue();
+                    await Assert.That(context.Labels.ToList()).Contains(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
                 }
                 Label updatedDbLabel = context.Labels.Include(label => label.Issues)
                     .First(dbLabel1 => dbLabel1.Id.Equals(updatedLabel.Id));
-                updatedDbLabel.Should().NotBeNull();
-                updatedDbLabel.Id.Should().NotBeEmpty().And.Be(updatedLabel.Id);
-                updatedDbLabel.Title.Should().Be(expectedLabel.Title);
-                updatedDbLabel.Description.Should().Be(expectedLabel.Description);
-                updatedDbLabel.Color.Should().Be(expectedLabel.Color);
-                updatedDbLabel.TextColor.Should().Be(expectedLabel.TextColor);
-                updatedDbLabel.CreatedAt.Should().BeCloseTo(expectedLabel.CreatedAt, TimeSpan.FromSeconds(1));
-                updatedDbLabel.LastModifiedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
-                    .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
+                await Assert.That(updatedDbLabel).IsNotNull();
+                await Assert.That(updatedDbLabel.Id).IsNotDefault().And.IsEqualTo(updatedLabel.Id);
+                await Assert.That(updatedDbLabel.Title).IsEqualTo(updatedLabel.Title);
+                await Assert.That(updatedDbLabel.Description).IsEqualTo(updatedLabel.Description);
+                await Assert.That(updatedDbLabel.Color).IsEqualTo(updatedLabel.Color);
+                await Assert.That(updatedDbLabel.TextColor).IsEqualTo(updatedLabel.TextColor);
+                await Assert.That(updatedDbLabel.CreatedAt).IsEquivalentTo(updatedLabel.CreatedAt);
+                await Assert.That(updatedLabel.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
                 if (emptyIssues)
                 {
-                    updatedDbLabel.Issues.Should().BeEmpty();
+                    await Assert.That(context.Issues).IsEmpty();
                 }
                 else
                 {
-                    updatedDbLabel.Issues.Should().NotBeEmpty();
+                    await Assert.That(context.Issues).IsNotEmpty();
                 }
 
                 if (notUpdatedLabel is not null)
@@ -610,42 +618,44 @@ public class LabelMutationsTests : IntegrationTestBase
                     Label? secondLabel =
                         context.Labels.Include(label => label.Issues)
                             .FirstOrDefault(label => label.Id.Equals(notUpdatedLabel.Id));
-                    secondLabel.Should().NotBeNull();
-                    secondLabel!.Id.Should().NotBeEmpty().And.Be(notUpdatedLabel.Id);
-                    secondLabel.Title.Should().Be(notUpdatedLabel.Title);
-                    secondLabel.Description.Should().Be(notUpdatedLabel.Description);
-                    secondLabel.Color.Should().Be(notUpdatedLabel.Color);
-                    secondLabel.TextColor.Should().Be(notUpdatedLabel.TextColor);
-                    secondLabel.CreatedAt.Should().BeCloseTo(notUpdatedLabel.CreatedAt, TimeSpan.FromSeconds(1));
-                    secondLabel.LastModifiedAt.Should().BeCloseTo(notUpdatedLabel.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
+
+                    await Assert.That(secondLabel).IsNotNull();
+                    await Assert.That(secondLabel!.Id).IsNotDefault().And.IsEqualTo(notUpdatedLabel.Id);
+                    await Assert.That(secondLabel.Title).IsEqualTo(notUpdatedLabel.Title);
+                    await Assert.That(secondLabel.Description).IsEqualTo(notUpdatedLabel.Description);
+                    await Assert.That(secondLabel.Color).IsEqualTo(notUpdatedLabel.Color);
+                    await Assert.That(secondLabel.TextColor).IsEqualTo(notUpdatedLabel.TextColor);
+                    await Assert.That(secondLabel.CreatedAt).IsEquivalentTo(notUpdatedLabel.CreatedAt);
+                    await Assert.That(secondLabel.LastModifiedAt).IsEquivalentTo(notUpdatedLabel.LastModifiedAt);
+
                     if (emptyIssues)
                     {
-                        secondLabel.Issues.Should().BeEmpty();
+                        await Assert.That(secondLabel.Issues).IsEmpty();
                     }
                     else
                     {
-                        secondLabel.Issues.Should().NotBeEmpty();
+                        await Assert.That(secondLabel.Issues).IsNotEmpty();
                     }
                 }
             }
         });
     }
 
-    private void AssertLabelNotUpdated(GraphQLResponse<UpdateLabelResponse> response, IEnumerable<string> errors)
+    private async Task AssertLabelNotUpdatedAsync(GraphQLResponse<UpdateLabelResponse> response, IEnumerable<string> errors)
     {
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Data.UpdateLabel.Errors.Should().NotBeNullOrEmpty();
-            response.Data.UpdateLabel.Label.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Data.UpdateLabel.Errors).IsNotNull().And.IsNotEmpty();
+            await Assert.That(response.Data.UpdateLabel.Label).IsNull();
 
             IEnumerable<string> resultErrors = response.Data.UpdateLabel.Errors.Select(error => error.Message);
-            resultErrors.Should().BeEquivalentTo(errors);
+            await Assert.That(resultErrors).IsEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().BeEmpty();
+            await Assert.That(context.Labels).IsEmpty();
         });
     }
 
@@ -683,51 +693,51 @@ public class LabelMutationsTests : IntegrationTestBase
         return mutationRequest;
     }
 
-    private void AssertDeletedLabel(GraphQLResponse<DeleteLabelResponse> response, Label expectedLabel, Label? dbLabel = null)
+    private async Task AssertDeletedLabelAsync(GraphQLResponse<DeleteLabelResponse> response, Label expectedLabel, Label? dbLabel = null)
     {
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             LabelDto deletedLabel = response.Data.DeleteLabel.Label;
-            deletedLabel.Id.Should().NotBeEmpty();
-            deletedLabel.Title.Should().Be(expectedLabel.Title);
-            deletedLabel.Description.Should().Be(expectedLabel.Description);
-            deletedLabel.Color.Should().Be(expectedLabel.Color);
-            deletedLabel.TextColor.Should().Be(expectedLabel.TextColor);
-            deletedLabel.CreatedAt.Should().BeCloseTo(expectedLabel.CreatedAt, TimeSpan.FromSeconds(1));
-            deletedLabel.LastModifiedAt.Should().BeCloseTo(expectedLabel.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
+            await Assert.That(deletedLabel.Id).IsNotDefault();
+            await Assert.That(deletedLabel.Title).IsEqualTo(expectedLabel.Title);
+            await Assert.That(deletedLabel.Description).IsEqualTo(expectedLabel.Description);
+            await Assert.That(deletedLabel.Color).IsEqualTo(expectedLabel.Color);
+            await Assert.That(deletedLabel.TextColor).IsEqualTo(expectedLabel.TextColor);
+            await Assert.That(deletedLabel.CreatedAt).IsEquivalentTo(expectedLabel.CreatedAt);
+            await Assert.That(deletedLabel.LastModifiedAt).IsEquivalentTo(expectedLabel.LastModifiedAt);
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            using (new AssertionScope())
+            using (Assert.Multiple())
             {
-                context.Labels.Any(dbLabel1 => dbLabel1.Id.Equals(expectedLabel.Id)).Should().BeFalse();
+                await Assert.That(context.Labels.ToList()).DoesNotContain(dbLabel1 => dbLabel1.Id.Equals(expectedLabel.Id));
 
                 if (dbLabel is not null)
                 {
-                    context.Labels.Any(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id)).Should().BeTrue();
+                    await Assert.That(context.Labels.ToList()).Contains(dbLabel1 => dbLabel1.Id.Equals(dbLabel.Id));
                 }
             }
         });
     }
 
-    private void AssertLabelNotDeleted(GraphQLResponse<DeleteLabelResponse> response, IEnumerable<string> errors)
+    private async Task AssertLabelNotDeletedAsync(GraphQLResponse<DeleteLabelResponse> response, IEnumerable<string> errors)
     {
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Data.DeleteLabel.Errors.Should().NotBeNullOrEmpty();
-            response.Data.DeleteLabel.Label.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Data.DeleteLabel.Errors).IsNotNull().And.IsNotEmpty();
+            await Assert.That(response.Data.DeleteLabel.Label).IsNull();
 
             IEnumerable<string> resultErrors = response.Data.DeleteLabel.Errors.Select(error => error.Message);
-            resultErrors.Should().BeEquivalentTo(errors);
+            await Assert.That(resultErrors).IsEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().BeEmpty();
+            await Assert.That(context.Labels).IsEmpty();
         });
     }
 
@@ -742,36 +752,37 @@ public class LabelMutationsTests : IntegrationTestBase
         return faker.Generate();
     }
 
-    private static IEnumerable<Label> AddLabelCases()
+    public static IEnumerable<Func<Label>> AddLabelCases()
     {
         Faker<Label>? faker = new Faker<Label>()
             .RuleFor(label => label.Title, f => f.Random.String2(1, 50, AllowedChars))
             .RuleFor(label => label.Description, f => f.Random.String2(0, 255, AllowedChars).OrNull(f, 0.3f))
             .RuleFor(label => label.Color, f => "#" + f.Random.String2(6, 6, HexCodeColorChars))
             .RuleFor(label => label.TextColor, f => "#" + f.Random.String2(6, 6, HexCodeColorChars));
-        return faker.Generate(20);
+        IEnumerable<Label> labels = faker.Generate(20);
+        return labels.Select<Label, Func<Label>>(label => () => label);
     }
 
-    private static IEnumerable<(Label, IEnumerable<string>)> InvalidAddLabelCases()
+    public static IEnumerable<Func<(Label, IEnumerable<string>)>> InvalidAddLabelCases()
     {
-        yield return (new Label { Title = null!, Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set.", $"The value '' for {nameof(Label.Title)} is too short. The length of {nameof(Label.Title)} has to be between 1 and 50." });
-        yield return (new Label { Title = "", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set.", $"The value '' for {nameof(Label.Title)} is too short. The length of {nameof(Label.Title)} has to be between 1 and 50." });
-        yield return (new Label { Title = "  \t ", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set." });
-        yield return (new Label { Title = new string('a', 51), Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Label.Title)} is long short. The length of {nameof(Label.Title)} has to be between 1 and 50." });
-        yield return (new Label { Title = "Valid", Description = new string('a', 256), Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Label.Description)} is long short. The length of {nameof(Label.Description)} has to be less than 256." });
-        yield return (new Label { Title = "Valid", Description = null, Color = null!, TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Color)} is not set.", $"The value '' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, Color = "01122", TextColor = "#334455" }, new List<string> { $"The value '01122' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, Color = "001122", TextColor = "#334455" }, new List<string> { $"The value '001122' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, Color = "#01122", TextColor = "#334455" }, new List<string> { $"The value '#01122' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, Color = "", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Color)} is not set.", $"The value '' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, Color = " ", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Color)} is not set.", $"The value ' ' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, Color = "g", TextColor = "#334455" }, new List<string> { $"The value 'g' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = null!, Color = "#334455" }, new List<string> { $"The value for {nameof(Label.TextColor)} is not set.", $"The value '' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = "01122", Color = "#334455" }, new List<string> { $"The value '01122' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = "001122", Color = "#334455" }, new List<string> { $"The value '001122' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = "#01122", Color = "#334455" }, new List<string> { $"The value '#01122' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = "", Color = "#334455" }, new List<string> { $"The value for {nameof(Label.TextColor)} is not set.", $"The value '' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = " ", Color = "#334455" }, new List<string> { $"The value for {nameof(Label.TextColor)} is not set.", $"The value ' ' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
-        yield return (new Label { Title = "Valid", Description = null, TextColor = "g", Color = "#334455" }, new List<string> { $"The value 'g' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = null!, Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set.", $"The value '' for {nameof(Label.Title)} is too short. The length of {nameof(Label.Title)} has to be between 1 and 50." });
+        yield return () => (new Label { Title = "", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set.", $"The value '' for {nameof(Label.Title)} is too short. The length of {nameof(Label.Title)} has to be between 1 and 50." });
+        yield return () => (new Label { Title = "  \t ", Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Title)} is not set." });
+        yield return () => (new Label { Title = new string('a', 51), Description = null, Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Label.Title)} is long short. The length of {nameof(Label.Title)} has to be between 1 and 50." });
+        yield return () => (new Label { Title = "Valid", Description = new string('a', 256), Color = "#001122", TextColor = "#334455" }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Label.Description)} is long short. The length of {nameof(Label.Description)} has to be less than 256." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = null!, TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Color)} is not set.", $"The value '' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = "01122", TextColor = "#334455" }, new List<string> { $"The value '01122' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = "001122", TextColor = "#334455" }, new List<string> { $"The value '001122' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = "#01122", TextColor = "#334455" }, new List<string> { $"The value '#01122' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = "", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Color)} is not set.", $"The value '' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = " ", TextColor = "#334455" }, new List<string> { $"The value for {nameof(Label.Color)} is not set.", $"The value ' ' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, Color = "g", TextColor = "#334455" }, new List<string> { $"The value 'g' for field {nameof(Label.Color)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = null!, Color = "#334455" }, new List<string> { $"The value for {nameof(Label.TextColor)} is not set.", $"The value '' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = "01122", Color = "#334455" }, new List<string> { $"The value '01122' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = "001122", Color = "#334455" }, new List<string> { $"The value '001122' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = "#01122", Color = "#334455" }, new List<string> { $"The value '#01122' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = "", Color = "#334455" }, new List<string> { $"The value for {nameof(Label.TextColor)} is not set.", $"The value '' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = " ", Color = "#334455" }, new List<string> { $"The value for {nameof(Label.TextColor)} is not set.", $"The value ' ' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
+        yield return () => (new Label { Title = "Valid", Description = null, TextColor = "g", Color = "#334455" }, new List<string> { $"The value 'g' for field {nameof(Label.TextColor)} has a wrong format. Only colors in RGB hex format with 6 digits are allowed." });
     }
 }

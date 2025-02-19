@@ -1,8 +1,6 @@
-using FluentAssertions;
-using FluentAssertions.Execution;
 using GraphQL;
 using StarWarsProgressBarIssueTracker.App.Labels;
-using StarWarsProgressBarIssueTracker.App.Queries;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
@@ -13,36 +11,37 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
-[TestFixture(TestOf = typeof(IssueTrackerQueries))]
 [Category(TestCategory.Integration)]
+[NotInParallel(NotInParallelTests.LabelRetrieval)]
 public class LabelQueriesTests : IntegrationTestBase
 {
+    // TODO: Check DoesNotContain and Contains
     [Test]
     public async Task GetLabelsShouldReturnEmptyListIfNoLabelExist()
     {
         // Arrange
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().BeEmpty();
+            await Assert.That(context.Labels).IsEmpty();
         });
         GraphQLRequest request = CreateGetLabelsRequest();
 
         // Act
-        GraphQLResponse<GetLabelsResponse> response = await GraphQLClient.SendQueryAsync<GetLabelsResponse>(request);
+        GraphQLResponse<GetLabelsResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelsResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
-            response.Data.Should().NotBeNull();
-            response.Data.Labels.TotalCount.Should().Be(0);
-            response.Data.Labels.PageInfo.HasNextPage.Should().BeFalse();
-            response.Data.Labels.PageInfo.HasPreviousPage.Should().BeFalse();
-            response.Data.Labels.PageInfo.StartCursor.Should().BeNull();
-            response.Data.Labels.PageInfo.EndCursor.Should().BeNull();
-            response.Data.Labels.Edges.Should().BeEmpty();
-            response.Data.Labels.Nodes.Should().BeEmpty();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Labels.TotalCount).IsEqualTo(0);
+            await Assert.That(response.Data.Labels.PageInfo.HasNextPage).IsFalse();
+            await Assert.That(response.Data.Labels.PageInfo.HasPreviousPage).IsFalse();
+            await Assert.That(response.Data.Labels.PageInfo.StartCursor).IsNull();
+            await Assert.That(response.Data.Labels.PageInfo.EndCursor).IsNull();
+            await Assert.That(response.Data.Labels.Edges).IsEmpty();
+            await Assert.That(response.Data.Labels.Nodes).IsEmpty();
         }
     }
 
@@ -69,69 +68,73 @@ public class LabelQueriesTests : IntegrationTestBase
             context.Labels.Add(dbLabel);
             context.Labels.Add(dbLabel2);
         });
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().ContainEquivalentOf(dbLabel);
-            context.Labels.Should().ContainEquivalentOf(dbLabel2);
+            using (Assert.Multiple())
+            {
+                List<Label> labels = context.Labels.ToList();
+                await Assert.That(labels).ContainsEquivalentOf(dbLabel);
+                await Assert.That(labels).ContainsEquivalentOf(dbLabel2);
+            }
         });
         GraphQLRequest request = CreateGetLabelsRequest();
 
         // Act
-        GraphQLResponse<GetLabelsResponse> response = await GraphQLClient.SendQueryAsync<GetLabelsResponse>(request);
+        GraphQLResponse<GetLabelsResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelsResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
-            response.Data.Should().NotBeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
+            await Assert.That(response.Data).IsNotNull();
 
-            response.Data.Labels.TotalCount.Should().Be(2);
-            response.Data.Labels.PageInfo.HasNextPage.Should().BeFalse();
-            response.Data.Labels.PageInfo.HasPreviousPage.Should().BeFalse();
-            response.Data.Labels.PageInfo.StartCursor.Should().NotBeNull();
-            response.Data.Labels.PageInfo.EndCursor.Should().NotBeNull();
+            await Assert.That(response.Data.Labels.TotalCount).IsEqualTo(2);
+            await Assert.That(response.Data.Labels.PageInfo.HasNextPage).IsFalse();
+            await Assert.That(response.Data.Labels.PageInfo.HasPreviousPage).IsFalse();
+            await Assert.That(response.Data.Labels.PageInfo.StartCursor).IsNotNull();
+            await Assert.That(response.Data.Labels.PageInfo.EndCursor).IsNotNull();
             List<LabelDto> labels = response.Data.Labels.Nodes.ToList();
-            labels.Count.Should().Be(2);
+            await Assert.That(labels.Count).IsEqualTo(2);
 
             LabelDto label = labels.Single(entity => entity.Id.Equals(dbLabel.Id));
-            label.Id.Should().Be(dbLabel.Id);
-            label.Title.Should().Be(dbLabel.Title);
-            label.Description.Should().Be(dbLabel.Description);
-            label.Color.Should().Be(dbLabel.Color);
-            label.TextColor.Should().Be(dbLabel.TextColor);
-            label.CreatedAt.Should().BeCloseTo(dbLabel.CreatedAt, TimeSpan.FromMilliseconds(300));
-            label.LastModifiedAt.Should().Be(dbLabel.LastModifiedAt);
+            await Assert.That(label.Id).IsEqualTo(dbLabel.Id);
+            await Assert.That(label.Title).IsEqualTo(dbLabel.Title);
+            await Assert.That(label.Description).IsEqualTo(dbLabel.Description);
+            await Assert.That(label.Color).IsEqualTo(dbLabel.Color);
+            await Assert.That(label.TextColor).IsEqualTo(dbLabel.TextColor);
+            await Assert.That(label.CreatedAt).IsEquivalentTo(dbLabel.CreatedAt);
+            await Assert.That(label.LastModifiedAt).IsEquivalentTo(dbLabel.LastModifiedAt);
 
             LabelDto label2 = labels.Single(entity => entity.Id.Equals(dbLabel2.Id));
-            label2.Id.Should().Be(dbLabel2.Id);
-            label2.Title.Should().Be(dbLabel2.Title);
-            label2.Description.Should().Be(dbLabel2.Description);
-            label2.Color.Should().Be(dbLabel2.Color);
-            label2.TextColor.Should().Be(dbLabel2.TextColor);
-            label2.CreatedAt.Should().BeCloseTo(dbLabel2.CreatedAt, TimeSpan.FromMilliseconds(300));
-            label2.LastModifiedAt.Should().Be(dbLabel2.LastModifiedAt);
+            await Assert.That(label2.Id).IsEqualTo(dbLabel2.Id);
+            await Assert.That(label2.Title).IsEqualTo(dbLabel2.Title);
+            await Assert.That(label2.Description).IsEqualTo(dbLabel2.Description);
+            await Assert.That(label2.Color).IsEqualTo(dbLabel2.Color);
+            await Assert.That(label2.TextColor).IsEqualTo(dbLabel2.TextColor);
+            await Assert.That(label2.CreatedAt).IsEquivalentTo(dbLabel2.CreatedAt);
+            await Assert.That(label2.LastModifiedAt).IsEquivalentTo(dbLabel2.LastModifiedAt);
 
             List<Edge<LabelDto>> edges = response.Data.Labels.Edges.ToList();
-            edges.Count.Should().Be(2);
+            await Assert.That(edges.Count).IsEqualTo(2);
 
             LabelDto edgeLabel = edges.Single(entity => entity.Node.Id.Equals(dbLabel.Id)).Node;
-            edgeLabel.Id.Should().Be(dbLabel.Id);
-            edgeLabel.Title.Should().Be(dbLabel.Title);
-            edgeLabel.Description.Should().Be(dbLabel.Description);
-            edgeLabel.Color.Should().Be(dbLabel.Color);
-            edgeLabel.TextColor.Should().Be(dbLabel.TextColor);
-            edgeLabel.CreatedAt.Should().BeCloseTo(dbLabel.CreatedAt, TimeSpan.FromMilliseconds(300));
-            edgeLabel.LastModifiedAt.Should().Be(dbLabel.LastModifiedAt);
+            await Assert.That(edgeLabel.Id).IsEqualTo(dbLabel.Id);
+            await Assert.That(edgeLabel.Title).IsEqualTo(dbLabel.Title);
+            await Assert.That(edgeLabel.Description).IsEqualTo(dbLabel.Description);
+            await Assert.That(edgeLabel.Color).IsEqualTo(dbLabel.Color);
+            await Assert.That(edgeLabel.TextColor).IsEqualTo(dbLabel.TextColor);
+            await Assert.That(edgeLabel.CreatedAt).IsEquivalentTo(dbLabel.CreatedAt);
+            await Assert.That(edgeLabel.LastModifiedAt).IsEquivalentTo(dbLabel.LastModifiedAt);
 
             LabelDto edgeLabel2 = edges.Single(entity => entity.Node.Id.Equals(dbLabel2.Id)).Node;
-            edgeLabel2.Id.Should().Be(dbLabel2.Id);
-            edgeLabel2.Title.Should().Be(dbLabel2.Title);
-            edgeLabel2.Description.Should().Be(dbLabel2.Description);
-            edgeLabel2.Color.Should().Be(dbLabel2.Color);
-            edgeLabel2.TextColor.Should().Be(dbLabel2.TextColor);
-            edgeLabel2.CreatedAt.Should().BeCloseTo(dbLabel2.CreatedAt, TimeSpan.FromMilliseconds(300));
-            edgeLabel2.LastModifiedAt.Should().Be(dbLabel2.LastModifiedAt);
+            await Assert.That(edgeLabel2.Id).IsEqualTo(dbLabel2.Id);
+            await Assert.That(edgeLabel2.Title).IsEqualTo(dbLabel2.Title);
+            await Assert.That(edgeLabel2.Description).IsEqualTo(dbLabel2.Description);
+            await Assert.That(edgeLabel2.Color).IsEqualTo(dbLabel2.Color);
+            await Assert.That(edgeLabel2.TextColor).IsEqualTo(dbLabel2.TextColor);
+            await Assert.That(edgeLabel2.CreatedAt).IsEquivalentTo(dbLabel2.CreatedAt);
+            await Assert.That(edgeLabel2.LastModifiedAt).IsEquivalentTo(dbLabel2.LastModifiedAt);
         }
     }
 
@@ -154,17 +157,16 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetLabelRequest(id);
 
         // Act
-        GraphQLResponse<GetLabelResponse> response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
+        GraphQLResponse<GetLabelResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
-            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
-            //     StringComparer.InvariantCultureIgnoreCase);
-            response.Data.Should().NotBeNull();
-            response.Data.Label.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull();
+            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.", StringComparer.InvariantCultureIgnoreCase);
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Label).IsNull();
         }
     }
 
@@ -172,27 +174,27 @@ public class LabelQueriesTests : IntegrationTestBase
     public async Task GetLabelShouldReturnNullIfLabelsAreEmpty()
     {
         // Arrange
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Labels.Should().BeEmpty();
+            await Assert.That(context.Labels).IsEmpty();
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
         GraphQLRequest request = CreateGetLabelRequest(id);
 
         // Act
-        GraphQLResponse<GetLabelResponse> response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
+        GraphQLResponse<GetLabelResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull();
             // var firstError = response.Errors!.First();
             // firstError.Extensions.Should().NotBeNull();
             // firstError.Extensions!.GetValueOrDefault("message").Should().Be($"No Label found with id '{id}'.",
             //     StringComparer.InvariantCultureIgnoreCase);
-            response.Data.Should().NotBeNull();
-            response.Data.Label.Should().BeNull();
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Label).IsNull();
         }
     }
 
@@ -242,25 +244,24 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetLabelRequest(id);
 
         // Act
-        GraphQLResponse<GetLabelResponse> response = await GraphQLClient.SendQueryAsync<GetLabelResponse>(request);
+        GraphQLResponse<GetLabelResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
-            response.Data.Should().NotBeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull();
+            await Assert.That(response.Data).IsNotNull();
             LabelDto? label = response.Data.Label;
-
-            label.Should().NotBeNull();
-            label!.Id.Should().Be(dbLabel.Id);
-            label.Title.Should().Be(dbLabel.Title);
-            label.Description.Should().Be(dbLabel.Description);
-            label.Color.Should().Be(dbLabel.Color);
-            label.TextColor.Should().Be(dbLabel.TextColor);
-            label.Issues.Should().Contain(i => i.Id.Equals(issue.Id));
-            label.CreatedAt.Should().BeCloseTo(dbLabel.CreatedAt, TimeSpan.FromMilliseconds(300));
-            label.LastModifiedAt.Should().Be(dbLabel.LastModifiedAt);
+            await Assert.That(label).IsNotNull();
+            await Assert.That(label!.Id).IsEqualTo(dbLabel.Id);
+            await Assert.That(label.Title).IsEqualTo(dbLabel.Title);
+            await Assert.That(label.Description).IsEqualTo(dbLabel.Description);
+            await Assert.That(label.Color).IsEqualTo(dbLabel.Color);
+            await Assert.That(label.TextColor).IsEqualTo(dbLabel.TextColor);
+            await Assert.That(label.Issues.ToList()).Contains(i => i.Id.Equals(issue.Id));
+            await Assert.That(label.CreatedAt).IsEquivalentTo(dbLabel.CreatedAt);
+            await Assert.That(label.LastModifiedAt).IsEquivalentTo(dbLabel.LastModifiedAt);
         }
     }
 

@@ -1,9 +1,7 @@
 using Bogus;
-using FluentAssertions;
-using FluentAssertions.Execution;
 using GraphQL;
 using Microsoft.EntityFrameworkCore;
-using StarWarsProgressBarIssueTracker.App.Mutations;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
@@ -11,37 +9,40 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Mutations;
 
-[TestFixture(TestOf = typeof(IssueTrackerMutations))]
 [Category(TestCategory.Integration)]
+[NotInParallel(NotInParallelTests.MilestoneMutation)]
 public class MilestoneMutationsTests : IntegrationTestBase
 {
+    // TODO: Check DoesNotContain and Contains
     private const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ß_#%";
 
-    [TestCaseSource(nameof(AddMilestoneCases))]
+    [Test]
+    [MethodDataSource(nameof(AddMilestoneCases))]
     public async Task AddMilestoneShouldAddMilestone(Milestone expectedMilestone)
     {
         // Arrange
-        CheckDbContent(context =>
+        DateTime startTime = DateTime.UtcNow;
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().BeEmpty();
+            await Assert.That(context.Milestones).IsEmpty();
         });
-        var mutationRequest = CreateAddRequest(expectedMilestone);
+        GraphQLRequest mutationRequest = CreateAddRequest(expectedMilestone);
         expectedMilestone.State = MilestoneState.Open;
 
-        var startTime = DateTime.UtcNow;
-
         // Act
-        var response = await GraphQLClient.SendMutationAsync<AddMilestoneResponse>(mutationRequest);
+        GraphQLResponse<AddMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<AddMilestoneResponse>(mutationRequest);
 
         // Assert
-        AssertAddedMilestone(response, expectedMilestone, startTime);
+        await AssertAddedMilestoneAsync(response, expectedMilestone, startTime);
     }
 
-    [TestCaseSource(nameof(AddMilestoneCases))]
+    [Test]
+    [MethodDataSource(nameof(AddMilestoneCases))]
     public async Task AddMilestoneShouldAddMilestoneIfMilestonesAreNotEmpty(Milestone expectedMilestone)
     {
         // Arrange
-        var dbMilestone = new Milestone
+        DateTime startTime = DateTime.UtcNow;
+        Milestone dbMilestone = new Milestone
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -53,43 +54,44 @@ public class MilestoneMutationsTests : IntegrationTestBase
         {
             context.Milestones.Add(dbMilestone);
         });
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().ContainEquivalentOf(dbMilestone);
+            await Assert.That(context.Milestones.ToList()).ContainsEquivalentOf(dbMilestone);
         });
-        var mutationRequest = CreateAddRequest(expectedMilestone);
-
-        var startTime = DateTime.UtcNow;
+        GraphQLRequest mutationRequest = CreateAddRequest(expectedMilestone);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<AddMilestoneResponse>(mutationRequest);
+        GraphQLResponse<AddMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<AddMilestoneResponse>(mutationRequest);
 
         // Assert
-        AssertAddedMilestone(response, expectedMilestone, startTime, dbMilestone);
+        await AssertAddedMilestoneAsync(response, expectedMilestone, startTime, dbMilestone);
     }
 
-    [TestCaseSource(nameof(InvalidAddMilestoneCases))]
+    [Test]
+    [MethodDataSource(nameof(InvalidAddMilestoneCases))]
     public async Task AddMilestoneShouldNotAddMilestone((Milestone expectedMilestone, IEnumerable<string> errors) expectedResult)
     {
         // Arrange
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().BeEmpty();
+            await Assert.That(context.Milestones).IsEmpty();
         });
-        var mutationRequest = CreateAddRequest(expectedResult.expectedMilestone);
+        GraphQLRequest mutationRequest = CreateAddRequest(expectedResult.expectedMilestone);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<AddMilestoneResponse>(mutationRequest);
+        GraphQLResponse<AddMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<AddMilestoneResponse>(mutationRequest);
 
         // Assert
-        AssertMilestoneNotAdded(response, expectedResult.errors);
+        await AssertMilestoneNotAddedAsync(response, expectedResult.errors);
     }
 
-    [TestCaseSource(nameof(AddMilestoneCases))]
+    [Test]
+    [MethodDataSource(nameof(AddMilestoneCases))]
     public async Task UpdateMilestoneShouldUpdateMilestone(Milestone expectedMilestone)
     {
         // Arrange
-        var dbMilestone = new Milestone
+        DateTime startTime = DateTime.UtcNow;
+        Milestone dbMilestone = new Milestone
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -103,26 +105,26 @@ public class MilestoneMutationsTests : IntegrationTestBase
         });
         expectedMilestone.Id = dbMilestone.Id;
         expectedMilestone.CreatedAt = dbMilestone.CreatedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().ContainEquivalentOf(dbMilestone);
+            await Assert.That(context.Milestones.ToList()).ContainsEquivalentOf(dbMilestone);
         });
-        var mutationRequest = CreateUpdateRequest(expectedMilestone);
-
-        var startTime = DateTime.UtcNow;
+        GraphQLRequest mutationRequest = CreateUpdateRequest(expectedMilestone);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
+        GraphQLResponse<UpdateMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
 
         // Assert
-        AssertUpdatedMilestone(response, expectedMilestone, startTime);
+        await AssertUpdatedMilestoneAsync(response, expectedMilestone, startTime);
     }
 
-    [TestCaseSource(nameof(AddMilestoneCases))]
+    [Test]
+    [MethodDataSource(nameof(AddMilestoneCases))]
     public async Task UpdateMilestoneShouldUpdateMilestoneIfMilestonesAreNotEmpty(Milestone expectedMilestone)
     {
         // Arrange
-        var dbMilestone = new Milestone
+        DateTime startTime = DateTime.UtcNow;
+        Milestone dbMilestone = new Milestone
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
             Title = "Title",
@@ -130,7 +132,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             State = MilestoneState.Open,
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbMilestone2 = new Milestone
+        Milestone dbMilestone2 = new Milestone
         {
             Id = new Guid("0609F93C-CBCC-4650-BA4C-B8D5FF93A877"),
             Title = "Title 2",
@@ -139,7 +141,6 @@ public class MilestoneMutationsTests : IntegrationTestBase
             LastModifiedAt = DateTime.UtcNow.AddDays(2)
         };
 
-
         await SeedDatabaseAsync(context =>
         {
             context.Milestones.Add(dbMilestone);
@@ -147,63 +148,66 @@ public class MilestoneMutationsTests : IntegrationTestBase
         });
         expectedMilestone.Id = dbMilestone.Id;
         expectedMilestone.CreatedAt = dbMilestone.CreatedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().ContainEquivalentOf(dbMilestone);
-            context.Milestones.Should().ContainEquivalentOf(dbMilestone2);
+            using (Assert.Multiple())
+            {
+                List<Milestone> milestones = context.Milestones.ToList();
+                await Assert.That(milestones).ContainsEquivalentOf(dbMilestone);
+                await Assert.That(milestones).ContainsEquivalentOf(dbMilestone2);
+            }
         });
-        var mutationRequest = CreateUpdateRequest(expectedMilestone);
-
-        var startTime = DateTime.UtcNow;
+        GraphQLRequest mutationRequest = CreateUpdateRequest(expectedMilestone);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
+        GraphQLResponse<UpdateMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
 
         // Assert
-        AssertUpdatedMilestone(response, expectedMilestone, startTime, dbMilestone, dbMilestone2);
+        await AssertUpdatedMilestoneAsync(response, expectedMilestone, startTime, dbMilestone, dbMilestone2);
     }
 
-    [TestCaseSource(nameof(InvalidUpdateMilestoneCases))]
+    [Test]
+    [MethodDataSource(nameof(InvalidUpdateMilestoneCases))]
     public async Task UpdateMilestoneShouldNotUpdateMilestone((Milestone expectedMilestone, IEnumerable<string> errors) expectedResult)
     {
         // Arrange
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().BeEmpty();
+            await Assert.That(context.Milestones).IsEmpty();
         });
-        var mutationRequest = CreateUpdateRequest(expectedResult.expectedMilestone);
+        GraphQLRequest mutationRequest = CreateUpdateRequest(expectedResult.expectedMilestone);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
+        GraphQLResponse<UpdateMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
 
         // Assert
-        AssertMilestoneNotUpdated(response, expectedResult.errors);
+        await AssertMilestoneNotUpdatedAsync(response, expectedResult.errors);
     }
 
     [Test]
     public async Task UpdateMilestoneShouldNotUpdateMilestoneIfMilestoneDoesNotExist()
     {
         // Arrange
-        var milestone = CreateMilestone();
-        CheckDbContent(context =>
+        Milestone milestone = CreateMilestone();
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().BeEmpty();
+            await Assert.That(context.Milestones).IsEmpty();
         });
-        var mutationRequest = CreateUpdateRequest(milestone);
+        GraphQLRequest mutationRequest = CreateUpdateRequest(milestone);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
+        GraphQLResponse<UpdateMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
 
         // Assert
-        AssertMilestoneNotUpdated(response, new List<string> { $"No {nameof(Milestone)} found with id '{milestone.Id}'." });
+        await AssertMilestoneNotUpdatedAsync(response, new List<string> { $"No {nameof(Milestone)} found with id '{milestone.Id}'." });
     }
 
     [Test]
     public async Task DeleteMilestoneShouldDeleteMilestone()
     {
         // Arrange
-        var milestone = CreateMilestone();
-        var dbMilestone = new Milestone
+        Milestone milestone = CreateMilestone();
+        Milestone dbMilestone = new Milestone
         {
             Id = milestone.Id,
             Title = milestone.Title,
@@ -217,25 +221,25 @@ public class MilestoneMutationsTests : IntegrationTestBase
         });
         milestone.CreatedAt = dbMilestone.CreatedAt;
         milestone.LastModifiedAt = dbMilestone.LastModifiedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().ContainEquivalentOf(dbMilestone);
+            await Assert.That(context.Milestones.ToList()).ContainsEquivalentOf(dbMilestone);
         });
-        var mutationRequest = CreateDeleteRequest(milestone);
+        GraphQLRequest mutationRequest = CreateDeleteRequest(milestone);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
+        GraphQLResponse<DeleteMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
 
         // Assert
-        AssertDeletedMilestone(response, milestone);
+        await AssertDeletedMilestoneAsync(response, milestone);
     }
 
     [Test]
     public async Task DeleteMilestoneShouldDeleteMilestoneAndReferenceToIssues()
     {
         // Arrange
-        var milestone = CreateMilestone();
-        var dbMilestone = new Milestone
+        Milestone milestone = CreateMilestone();
+        Milestone dbMilestone = new Milestone
         {
             Id = milestone.Id,
             Title = milestone.Title,
@@ -243,20 +247,20 @@ public class MilestoneMutationsTests : IntegrationTestBase
             State = milestone.State,
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbIssue = new Issue
+        Issue dbIssue = new Issue
         {
             Id = new Guid("87A2F9BF-CAB7-41D3-84F9-155135FA41D7"),
             Title = "IssueTitle",
             Milestone = dbMilestone
         };
         dbMilestone.Issues.Add(dbIssue);
-        var dbMilestone2 = new Milestone
+        Milestone dbMilestone2 = new Milestone
         {
             Id = new Guid("B961A621-9848-429A-8B44-B1AF1F0182CE"),
             State = MilestoneState.Closed,
             Title = "Title 2"
         };
-        var dbIssue2 = new Issue
+        Issue dbIssue2 = new Issue
         {
             Id = new Guid("74AE8DD4-7669-4428-8E81-FB8A24A217A3"),
             Title = "IssueTitle",
@@ -272,29 +276,32 @@ public class MilestoneMutationsTests : IntegrationTestBase
         });
         milestone.CreatedAt = dbMilestone.CreatedAt;
         milestone.LastModifiedAt = dbMilestone.LastModifiedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().ContainEquivalentOf(dbMilestone, options => options.Excluding(entity => entity.Issues));
+            await Assert.That(context.Milestones.ToList()).ContainsEquivalentOf(dbMilestone);
         });
-        var mutationRequest = CreateDeleteRequest(milestone);
+        GraphQLRequest mutationRequest = CreateDeleteRequest(milestone);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
+        GraphQLResponse<DeleteMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
 
         // Assert
-        AssertDeletedMilestone(response, milestone);
-        CheckDbContent(context =>
+        await AssertDeletedMilestoneAsync(response, milestone);
+        await CheckDbContentAsync(async context =>
         {
-            var dbIssues = context.Issues.Include(dbEntity => dbEntity.Milestone).ToList();
-            dbIssues.Should().Contain(i => i.Id.Equals(dbIssue.Id));
-            dbIssues.Should().Contain(i => i.Id.Equals(dbIssue2.Id));
+            using (Assert.Multiple())
+            {
+                List<Issue> dbIssues = context.Issues.Include(dbEntity => dbEntity.Milestone).ToList();
+                await Assert.That(dbIssues).Contains(i => i.Id.Equals(dbIssue.Id));
+                await Assert.That(dbIssues).Contains(i => i.Id.Equals(dbIssue2.Id));
 
-            var changedDbIssue = context.Issues.Include(dbEntity => dbEntity.Milestone).Single(dbEntity => dbEntity.Id.Equals(dbIssue.Id));
-            changedDbIssue.Milestone.Should().BeNull();
+                Issue changedDbIssue = context.Issues.Include(dbEntity => dbEntity.Milestone).Single(dbEntity => dbEntity.Id.Equals(dbIssue.Id));
+                await Assert.That(changedDbIssue.Milestone).IsNull();
 
-            var unchangedDbIssue = context.Issues.Include(dbEntity => dbEntity.Milestone).Single(dbEntity => dbEntity.Id.Equals(dbIssue2.Id));
-            unchangedDbIssue.Milestone.Should().NotBeNull();
-            unchangedDbIssue.Milestone!.Id.Should().Be(dbMilestone2.Id);
+                Issue unchangedDbIssue = context.Issues.Include(dbEntity => dbEntity.Milestone).Single(dbEntity => dbEntity.Id.Equals(dbIssue2.Id));
+                await Assert.That(unchangedDbIssue.Milestone).IsNotNull();
+                await Assert.That(unchangedDbIssue.Milestone!.Id).IsEqualTo(dbMilestone2.Id);
+            }
         });
     }
 
@@ -302,8 +309,8 @@ public class MilestoneMutationsTests : IntegrationTestBase
     public async Task DeleteMilestoneShouldDeleteMilestoneIfMilestonesIsNotEmpty()
     {
         // Arrange
-        var milestone = CreateMilestone();
-        var dbMilestone = new Milestone
+        Milestone milestone = CreateMilestone();
+        Milestone dbMilestone = new Milestone
         {
             Id = milestone.Id,
             Title = milestone.Title,
@@ -311,7 +318,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             State = milestone.State,
             LastModifiedAt = DateTime.UtcNow.AddDays(1)
         };
-        var dbMilestone2 = new Milestone
+        Milestone dbMilestone2 = new Milestone
         {
             Id = new Guid("0609F93C-CBCC-4650-BA4C-B8D5FF93A877"),
             Title = "Title 2",
@@ -320,7 +327,6 @@ public class MilestoneMutationsTests : IntegrationTestBase
             LastModifiedAt = DateTime.UtcNow.AddDays(2)
         };
 
-
         await SeedDatabaseAsync(context =>
         {
             context.Milestones.Add(dbMilestone);
@@ -328,46 +334,50 @@ public class MilestoneMutationsTests : IntegrationTestBase
         });
         milestone.CreatedAt = dbMilestone.CreatedAt;
         milestone.LastModifiedAt = dbMilestone.LastModifiedAt;
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().ContainEquivalentOf(dbMilestone);
-            context.Milestones.Should().ContainEquivalentOf(dbMilestone2);
+            using (Assert.Multiple())
+            {
+                List<Milestone> milestones = context.Milestones.ToList();
+                await Assert.That(milestones).ContainsEquivalentOf(dbMilestone);
+                await Assert.That(milestones).ContainsEquivalentOf(dbMilestone2);
+            }
         });
-        var mutationRequest = CreateDeleteRequest(milestone);
+        GraphQLRequest mutationRequest = CreateDeleteRequest(milestone);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
+        GraphQLResponse<DeleteMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
 
         // Assert
-        AssertDeletedMilestone(response, milestone, dbMilestone2);
+        await AssertDeletedMilestoneAsync(response, milestone, dbMilestone2);
     }
 
     [Test]
     public async Task DeleteMilestoneShouldNotDeleteMilestoneIfMilestoneDoesNotExist()
     {
         // Arrange
-        var milestone = CreateMilestone();
-        CheckDbContent(context =>
+        Milestone milestone = CreateMilestone();
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().BeEmpty();
+            await Assert.That(context.Milestones).IsEmpty();
         });
-        var mutationRequest = CreateDeleteRequest(milestone);
+        GraphQLRequest mutationRequest = CreateDeleteRequest(milestone);
 
         // Act
-        var response = await GraphQLClient.SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
+        GraphQLResponse<DeleteMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
 
         // Assert
-        AssertMilestoneNotDeleted(response, new List<string> { $"No {nameof(Milestone)} found with id '{milestone.Id}'." });
+        await AssertMilestoneNotDeletedAsync(response, new List<string> { $"No {nameof(Milestone)} found with id '{milestone.Id}'." });
     }
 
     private static GraphQLRequest CreateAddRequest(Milestone expectedMilestone)
     {
-        var descriptionParameter = expectedMilestone.Description != null
+        string descriptionParameter = expectedMilestone.Description != null
             ? $"""
                , description: "{expectedMilestone.Description}"
                """
             : string.Empty;
-        var mutationRequest = new GraphQLRequest
+        GraphQLRequest mutationRequest = new GraphQLRequest
         {
             Query = $$"""
                       mutation addMilestone
@@ -403,75 +413,74 @@ public class MilestoneMutationsTests : IntegrationTestBase
         return mutationRequest;
     }
 
-    private void AssertAddedMilestone(GraphQLResponse<AddMilestoneResponse> response, Milestone expectedMilestone,
+    private async Task AssertAddedMilestoneAsync(GraphQLResponse<AddMilestoneResponse> response, Milestone expectedMilestone,
         DateTime startTime, Milestone? dbMilestone = null)
     {
         DateTime endTime = DateTime.UtcNow;
         Milestone? addedMilestone;
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             addedMilestone = response.Data.AddMilestone.Milestone;
-            addedMilestone.Id.Should().NotBeEmpty();
-            addedMilestone.Title.Should().Be(expectedMilestone.Title);
-            addedMilestone.Description.Should().Be(expectedMilestone.Description);
-            addedMilestone.State.Should().Be(expectedMilestone.State);
-            addedMilestone.Issues.Should().BeEquivalentTo(expectedMilestone.Issues);
-            addedMilestone.CreatedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
-                .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
-            addedMilestone.LastModifiedAt.Should().BeNull();
+            await Assert.That(addedMilestone.Id).IsNotDefault();
+            await Assert.That(addedMilestone.Title).IsEqualTo(expectedMilestone.Title);
+            await Assert.That(addedMilestone.Description).IsEqualTo(expectedMilestone.Description);
+            await Assert.That(addedMilestone.State).IsEqualTo(expectedMilestone.State);
+            await Assert.That(addedMilestone.Issues).IsEquivalentTo(expectedMilestone.Issues);
+            await Assert.That(addedMilestone.CreatedAt).IsBetween(startTime, endTime).WithInclusiveBounds();
+            await Assert.That(addedMilestone.LastModifiedAt).IsNull();
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            using (new AssertionScope())
+            using (Assert.Multiple())
             {
                 if (dbMilestone is not null)
                 {
-                    context.Milestones.Any(dbMilestone1 => dbMilestone1.Id.Equals(dbMilestone.Id)).Should().BeTrue();
+                    await Assert.That(context.Milestones.ToList())
+                        .Contains(dbMilestone1 => dbMilestone1.Id.Equals(dbMilestone.Id));
                 }
-                var addedDbMilestone = context.Milestones.Include(dbMilestone2 => dbMilestone2.Issues)
+                Milestone addedDbMilestone = context.Milestones.Include(dbMilestone2 => dbMilestone2.Issues)
                     .First(dbMilestone1 => dbMilestone1.Id.Equals(addedMilestone.Id));
-                addedDbMilestone.Should().NotBeNull();
-                addedDbMilestone.Id.Should().NotBeEmpty().And.Be(addedMilestone.Id);
-                addedDbMilestone.Title.Should().Be(expectedMilestone.Title);
-                addedDbMilestone.Description.Should().Be(expectedMilestone.Description);
-                addedDbMilestone.State.Should().Be(expectedMilestone.State);
-                addedDbMilestone.Issues.Should().BeEquivalentTo(expectedMilestone.Issues);
-                addedDbMilestone.CreatedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
-                    .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
-                addedDbMilestone.LastModifiedAt.Should().BeNull();
+                await Assert.That(addedDbMilestone).IsNotNull();
+                await Assert.That(addedDbMilestone.Id).IsNotDefault().And.IsEqualTo(addedMilestone.Id);
+                await Assert.That(addedDbMilestone.Title).IsEqualTo(expectedMilestone.Title);
+                await Assert.That(addedDbMilestone.Description).IsEqualTo(expectedMilestone.Description);
+                await Assert.That(addedDbMilestone.State).IsEqualTo(expectedMilestone.State);
+                await Assert.That(addedDbMilestone.Issues).IsEquivalentTo(expectedMilestone.Issues);
+                await Assert.That(addedDbMilestone.CreatedAt).IsBetween(startTime, endTime).WithInclusiveBounds();
+                await Assert.That(addedDbMilestone.LastModifiedAt).IsNull();
             }
         });
     }
 
-    private void AssertMilestoneNotAdded(GraphQLResponse<AddMilestoneResponse> response, IEnumerable<string> errors)
+    private async Task AssertMilestoneNotAddedAsync(GraphQLResponse<AddMilestoneResponse> response, IEnumerable<string> errors)
     {
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Data.AddMilestone.Errors.Should().NotBeNullOrEmpty();
-            response.Data.AddMilestone.Milestone.Should().BeNull();
+           await Assert.That(response).IsNotNull();
+           await Assert.That(response.Data.AddMilestone.Errors).IsNotNull().And.IsNotEmpty();
+           await Assert.That(response.Data.AddMilestone.Milestone).IsNull();
 
-            var resultErrors = response.Data.AddMilestone.Errors.Select(error => error.Message);
-            resultErrors.Should().BeEquivalentTo(errors);
+            IEnumerable<string> resultErrors = response.Data.AddMilestone.Errors.Select(error => error.Message);
+            await Assert.That(resultErrors).IsEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().BeEmpty();
+            await Assert.That(context.Milestones).IsEmpty();
         });
     }
 
     private static GraphQLRequest CreateUpdateRequest(Milestone expectedMilestone)
     {
-        var descriptionParameter = expectedMilestone.Description != null
+        string descriptionParameter = expectedMilestone.Description != null
             ? $"""
                , description: "{expectedMilestone.Description}"
                """
             : string.Empty;
-        var mutationRequest = new GraphQLRequest
+        GraphQLRequest mutationRequest = new GraphQLRequest
         {
             Query = $$"""
                       mutation updateMilestone
@@ -507,106 +516,105 @@ public class MilestoneMutationsTests : IntegrationTestBase
         return mutationRequest;
     }
 
-    private void AssertUpdatedMilestone(GraphQLResponse<UpdateMilestoneResponse> response, Milestone expectedMilestone,
+    private async Task AssertUpdatedMilestoneAsync(GraphQLResponse<UpdateMilestoneResponse> response, Milestone expectedMilestone,
         DateTime startTime, Milestone? dbMilestone = null, Milestone? notUpdatedMilestone = null, bool emptyIssues = true)
     {
         DateTime endTime = DateTime.UtcNow;
         Milestone? updatedMilestone;
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             updatedMilestone = response.Data.UpdateMilestone.Milestone;
-            updatedMilestone.Id.Should().Be(expectedMilestone.Id);
-            updatedMilestone.Title.Should().Be(expectedMilestone.Title);
-            updatedMilestone.Description.Should().Be(expectedMilestone.Description);
-            updatedMilestone.State.Should().Be(expectedMilestone.State);
-            updatedMilestone.CreatedAt.Should().BeCloseTo(expectedMilestone.CreatedAt, TimeSpan.FromSeconds(1));
-            updatedMilestone.LastModifiedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
-                .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
+            await Assert.That(updatedMilestone.Id).IsEqualTo(expectedMilestone.Id);
+            await Assert.That(updatedMilestone.Title).IsEqualTo(expectedMilestone.Title);
+            await Assert.That(updatedMilestone.Description).IsEqualTo(expectedMilestone.Description);
+            await Assert.That(updatedMilestone.State).IsEqualTo(expectedMilestone.State);
+            await Assert.That(updatedMilestone.CreatedAt).IsEquivalentTo(expectedMilestone.CreatedAt);
+            await Assert.That(updatedMilestone.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
             if (emptyIssues)
             {
-                updatedMilestone.Issues.Should().BeEmpty();
+                await Assert.That(updatedMilestone.Issues).IsEmpty();
             }
             else
             {
-                updatedMilestone.Issues.Should().NotBeEmpty();
+                await Assert.That(updatedMilestone.Issues).IsNotEmpty();
             }
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            using (new AssertionScope())
+            using (Assert.Multiple())
             {
                 if (dbMilestone is not null)
                 {
-                    context.Milestones.Any(dbMilestone1 => dbMilestone1.Id.Equals(dbMilestone.Id)).Should().BeTrue();
+                    await Assert.That(context.Milestones.ToList())
+                        .Contains(dbMilestone1 => dbMilestone1.Id.Equals(dbMilestone.Id));
                 }
-                var updatedDbMilestone = context.Milestones.Include(dbMilestone2 => dbMilestone2.Issues)
+                Milestone updatedDbMilestone = context.Milestones.Include(dbMilestone2 => dbMilestone2.Issues)
                     .First(dbMilestone1 => dbMilestone1.Id.Equals(updatedMilestone.Id));
-                updatedDbMilestone.Should().NotBeNull();
-                updatedDbMilestone.Id.Should().NotBeEmpty().And.Be(updatedMilestone.Id);
-                updatedDbMilestone.Title.Should().Be(expectedMilestone.Title);
-                updatedDbMilestone.Description.Should().Be(expectedMilestone.Description);
-                updatedDbMilestone.State.Should().Be(expectedMilestone.State);
-                updatedDbMilestone.CreatedAt.Should().BeCloseTo(expectedMilestone.CreatedAt, TimeSpan.FromSeconds(1));
-                updatedDbMilestone.LastModifiedAt.Should().BeCloseTo(startTime, TimeSpan.FromSeconds(1), "Start time").And
-                    .BeCloseTo(endTime, TimeSpan.FromSeconds(1), "End time");
+                await Assert.That(updatedDbMilestone).IsNotNull();
+                await Assert.That(updatedDbMilestone.Id).IsNotDefault().And.IsEqualTo(updatedMilestone.Id);
+                await Assert.That(updatedDbMilestone.Title).IsEqualTo(expectedMilestone.Title);
+                await Assert.That(updatedDbMilestone.Description).IsEqualTo(expectedMilestone.Description);
+                await Assert.That(updatedDbMilestone.State).IsEqualTo(expectedMilestone.State);
+                await Assert.That(updatedDbMilestone.CreatedAt).IsEquivalentTo(expectedMilestone.CreatedAt);
+                await Assert.That(updatedDbMilestone.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
                 if (emptyIssues)
                 {
-                    updatedDbMilestone.Issues.Should().BeEmpty();
+                    await Assert.That(updatedDbMilestone.Issues).IsEmpty();
                 }
                 else
                 {
-                    updatedDbMilestone.Issues.Should().NotBeEmpty();
+                    await Assert.That(updatedDbMilestone.Issues).IsNotEmpty();
                 }
 
                 if (notUpdatedMilestone is not null)
                 {
-                    var secondMilestone =
+                    Milestone? secondMilestone =
                         context.Milestones.Include(dbMilestone2 => dbMilestone2.Issues)
                             .FirstOrDefault(milestone => milestone.Id.Equals(notUpdatedMilestone.Id));
-                    secondMilestone.Should().NotBeNull();
-                    secondMilestone!.Id.Should().NotBeEmpty().And.Be(notUpdatedMilestone.Id);
-                    secondMilestone.Title.Should().Be(notUpdatedMilestone.Title);
-                    secondMilestone.Description.Should().Be(notUpdatedMilestone.Description);
-                    secondMilestone.State.Should().Be(notUpdatedMilestone.State);
-                    secondMilestone.CreatedAt.Should().BeCloseTo(notUpdatedMilestone.CreatedAt, TimeSpan.FromSeconds(1));
-                    secondMilestone.LastModifiedAt.Should().BeCloseTo(notUpdatedMilestone.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
+                    await Assert.That(secondMilestone).IsNotNull();
+                    await Assert.That(secondMilestone!.Id).IsNotDefault().And.IsEqualTo(notUpdatedMilestone.Id);
+                    await Assert.That(secondMilestone.Title).IsEqualTo(notUpdatedMilestone.Title);
+                    await Assert.That(secondMilestone.Description).IsEqualTo(notUpdatedMilestone.Description);
+                    await Assert.That(secondMilestone.State).IsEqualTo(notUpdatedMilestone.State);
+                    await Assert.That(secondMilestone.CreatedAt).IsEquivalentTo(notUpdatedMilestone.CreatedAt);
+                    await Assert.That(secondMilestone.LastModifiedAt).IsEquivalentTo(notUpdatedMilestone.LastModifiedAt!.Value);
                     if (emptyIssues)
                     {
-                        secondMilestone.Issues.Should().BeEmpty();
+                        await Assert.That(secondMilestone.Issues).IsEmpty();
                     }
                     else
                     {
-                        secondMilestone.Issues.Should().NotBeEmpty();
+                        await Assert.That(secondMilestone.Issues).IsNotEmpty();
                     }
                 }
             }
         });
     }
 
-    private void AssertMilestoneNotUpdated(GraphQLResponse<UpdateMilestoneResponse> response, IEnumerable<string> errors)
+    private async Task AssertMilestoneNotUpdatedAsync(GraphQLResponse<UpdateMilestoneResponse> response, IEnumerable<string> errors)
     {
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Data.UpdateMilestone.Errors.Should().NotBeNullOrEmpty();
-            response.Data.UpdateMilestone.Milestone.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Data.UpdateMilestone.Errors).IsNotNull().And.IsNotEmpty();
+            await Assert.That(response.Data.UpdateMilestone.Milestone).IsNull();
 
-            var resultErrors = response.Data.UpdateMilestone.Errors.Select(error => error.Message);
-            resultErrors.Should().BeEquivalentTo(errors);
+            IEnumerable<string> resultErrors = response.Data.UpdateMilestone.Errors.Select(error => error.Message);
+            await Assert.That(resultErrors).IsEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().BeEmpty();
+            await Assert.That(context.Milestones).IsEmpty();
         });
     }
 
     private static GraphQLRequest CreateDeleteRequest(Milestone expectedMilestone)
     {
-        var mutationRequest = new GraphQLRequest
+        GraphQLRequest mutationRequest = new GraphQLRequest
         {
             Query = $$"""
                       mutation deleteMilestone
@@ -642,56 +650,58 @@ public class MilestoneMutationsTests : IntegrationTestBase
         return mutationRequest;
     }
 
-    private void AssertDeletedMilestone(GraphQLResponse<DeleteMilestoneResponse> response, Milestone expectedMilestone, Milestone? dbMilestone = null)
+    private async Task AssertDeletedMilestoneAsync(GraphQLResponse<DeleteMilestoneResponse> response, Milestone expectedMilestone, Milestone? dbMilestone = null)
     {
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
-            var deletedMilestone = response.Data.DeleteMilestone.Milestone;
-            deletedMilestone.Id.Should().NotBeEmpty();
-            deletedMilestone.Title.Should().Be(expectedMilestone.Title);
-            deletedMilestone.Description.Should().Be(expectedMilestone.Description);
-            deletedMilestone.State.Should().Be(expectedMilestone.State);
-            deletedMilestone.CreatedAt.Should().BeCloseTo(expectedMilestone.CreatedAt, TimeSpan.FromSeconds(1));
-            deletedMilestone.LastModifiedAt.Should().BeCloseTo(expectedMilestone.LastModifiedAt!.Value, TimeSpan.FromSeconds(1));
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
+            Milestone deletedMilestone = response.Data.DeleteMilestone.Milestone;
+            await Assert.That(deletedMilestone.Id).IsNotDefault();
+            await Assert.That(deletedMilestone.Title).IsEqualTo(expectedMilestone.Title);
+            await Assert.That(deletedMilestone.Description).IsEqualTo(expectedMilestone.Description);
+            await Assert.That(deletedMilestone.State).IsEqualTo(expectedMilestone.State);
+            await Assert.That(deletedMilestone.CreatedAt).IsEquivalentTo(expectedMilestone.CreatedAt);
+            await Assert.That(deletedMilestone.LastModifiedAt).IsEquivalentTo(expectedMilestone.LastModifiedAt!.Value);
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            using (new AssertionScope())
+            using (Assert.Multiple())
             {
-                context.Milestones.Any(dbMilestone1 => dbMilestone1.Id.Equals(expectedMilestone.Id)).Should().BeFalse();
+                await Assert.That(context.Milestones.ToList())
+                    .DoesNotContain(dbMilestone1 => dbMilestone1.Id.Equals(expectedMilestone.Id));
 
                 if (dbMilestone is not null)
                 {
-                    context.Milestones.Any(dbMilestone1 => dbMilestone1.Id.Equals(dbMilestone.Id)).Should().BeTrue();
+                    await Assert.That(context.Milestones.ToList())
+                        .Contains(dbMilestone1 => dbMilestone1.Id.Equals(dbMilestone.Id));
                 }
             }
         });
     }
 
-    private void AssertMilestoneNotDeleted(GraphQLResponse<DeleteMilestoneResponse> response, IEnumerable<string> errors)
+    private async Task AssertMilestoneNotDeletedAsync(GraphQLResponse<DeleteMilestoneResponse> response, IEnumerable<string> errors)
     {
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Data.DeleteMilestone.Errors.Should().NotBeNullOrEmpty();
-            response.Data.DeleteMilestone.Milestone.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Data.DeleteMilestone.Errors).IsNotNull().And.IsNotEmpty();
+            await Assert.That(response.Data.DeleteMilestone.Milestone).IsNull();
 
-            var resultErrors = response.Data.DeleteMilestone.Errors.Select(error => error.Message);
-            resultErrors.Should().BeEquivalentTo(errors);
+            IEnumerable<string> resultErrors = response.Data.DeleteMilestone.Errors.Select(error => error.Message);
+            await Assert.That(resultErrors).IsEquivalentTo(errors);
         }
 
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Milestones.Should().BeEmpty();
+            await Assert.That(context.Milestones).IsEmpty();
         });
     }
 
     private static Milestone CreateMilestone()
     {
-        var faker = new Faker<Milestone>()
+        Faker<Milestone>? faker = new Faker<Milestone>()
             .RuleFor(milestone => milestone.Id, f => f.Random.Guid())
             .RuleFor(milestone => milestone.Title, f => f.Random.String2(1, 50, AllowedChars))
             .RuleFor(milestone => milestone.Description, f => f.Random.String2(0, 255, AllowedChars).OrNull(f, 0.3f))
@@ -699,31 +709,32 @@ public class MilestoneMutationsTests : IntegrationTestBase
         return faker.Generate();
     }
 
-    private static IEnumerable<Milestone> AddMilestoneCases()
+    public static IEnumerable<Func<Milestone>> AddMilestoneCases()
     {
-        var faker = new Faker<Milestone>()
+        Faker<Milestone>? faker = new Faker<Milestone>()
             .RuleFor(milestone => milestone.Title, f => f.Random.String2(1, 50, AllowedChars))
             .RuleFor(milestone => milestone.Description, f => f.Random.String2(0, 255, AllowedChars).OrNull(f, 0.3f))
             .RuleFor(milestone => milestone.State, _ => MilestoneState.Open);
-        return faker.Generate(20);
+        List<Milestone>? milestones = faker.Generate(20);
+        return milestones.Select<Milestone, Func<Milestone>>(milestone => () => milestone);
     }
 
-    private static IEnumerable<(Milestone, IEnumerable<string>)> InvalidAddMilestoneCases()
+    public static IEnumerable<Func<(Milestone, IEnumerable<string>)>> InvalidAddMilestoneCases()
     {
-        yield return (new Milestone { Title = null!, Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set.", $"The value '' for {nameof(Milestone.Title)} is too short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
-        yield return (new Milestone { Title = "", Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set.", $"The value '' for {nameof(Milestone.Title)} is too short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
-        yield return (new Milestone { Title = "  \t ", Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set." });
-        yield return (new Milestone { Title = new string('a', 51), Description = null, State = MilestoneState.Open }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Milestone.Title)} is long short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
-        yield return (new Milestone { Title = "Valid", Description = new string('a', 256), State = MilestoneState.Open }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Milestone.Description)} is long short. The length of {nameof(Milestone.Description)} has to be less than 256." });
+        yield return () => (new Milestone { Title = null!, Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set.", $"The value '' for {nameof(Milestone.Title)} is too short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
+        yield return () => (new Milestone { Title = "", Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set.", $"The value '' for {nameof(Milestone.Title)} is too short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
+        yield return () => (new Milestone { Title = "  \t ", Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set." });
+        yield return () => (new Milestone { Title = new string('a', 51), Description = null, State = MilestoneState.Open }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Milestone.Title)} is long short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
+        yield return () => (new Milestone { Title = "Valid", Description = new string('a', 256), State = MilestoneState.Open }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Milestone.Description)} is long short. The length of {nameof(Milestone.Description)} has to be less than 256." });
     }
 
-    private static IEnumerable<(Milestone, IEnumerable<string>)> InvalidUpdateMilestoneCases()
+    public static IEnumerable<Func<(Milestone, IEnumerable<string>)>> InvalidUpdateMilestoneCases()
     {
-        yield return (new Milestone { Title = null!, Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set.", $"The value '' for {nameof(Milestone.Title)} is too short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
-        yield return (new Milestone { Title = "", Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set.", $"The value '' for {nameof(Milestone.Title)} is too short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
-        yield return (new Milestone { Title = "  \t ", Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set." });
-        yield return (new Milestone { Title = new string('a', 51), Description = null, State = MilestoneState.Open }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Milestone.Title)} is long short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
-        yield return (new Milestone { Title = "Valid", Description = new string('a', 256), State = MilestoneState.Open }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Milestone.Description)} is long short. The length of {nameof(Milestone.Description)} has to be less than 256." });
-        yield return (new Milestone { Title = "Valid", Description = null, State = MilestoneState.Unknown }, new List<string> { $"The value for {nameof(Milestone.State)} is not set." });
+        yield return () => (new Milestone { Title = null!, Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set.", $"The value '' for {nameof(Milestone.Title)} is too short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
+        yield return () => (new Milestone { Title = "", Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set.", $"The value '' for {nameof(Milestone.Title)} is too short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
+        yield return () => (new Milestone { Title = "  \t ", Description = null, State = MilestoneState.Open }, new List<string> { $"The value for {nameof(Milestone.Title)} is not set." });
+        yield return () => (new Milestone { Title = new string('a', 51), Description = null, State = MilestoneState.Open }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Milestone.Title)} is long short. The length of {nameof(Milestone.Title)} has to be between 1 and 50." });
+        yield return () => (new Milestone { Title = "Valid", Description = new string('a', 256), State = MilestoneState.Open }, new List<string> { $"The value 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' for {nameof(Milestone.Description)} is long short. The length of {nameof(Milestone.Description)} has to be less than 256." });
+        yield return () => (new Milestone { Title = "Valid", Description = null, State = MilestoneState.Unknown }, new List<string> { $"The value for {nameof(Milestone.State)} is not set." });
     }
 }

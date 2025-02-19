@@ -1,7 +1,5 @@
-using FluentAssertions;
-using FluentAssertions.Execution;
 using GraphQL;
-using StarWarsProgressBarIssueTracker.App.Queries;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Releases;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
@@ -12,36 +10,37 @@ using StarWarsProgressBarIssueTracker.TestHelpers;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Integration.Queries;
 
-[TestFixture(TestOf = typeof(IssueTrackerQueries))]
 [Category(TestCategory.Integration)]
+[NotInParallel(NotInParallelTests.ReleaseRetrieval)]
 public class ReleaseQueriesTests : IntegrationTestBase
 {
+    // TODO: Check DoesNotContain and Contains
     [Test]
     public async Task GetReleasesShouldReturnEmptyListIfNoReleaseExist()
     {
         // Arrange
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Releases.Should().BeEmpty();
+            await Assert.That(context.Releases).IsEmpty();
         });
-        var request = CreateGetReleasesRequest();
+        GraphQLRequest request = CreateGetReleasesRequest();
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetReleasesResponse>(request);
+        GraphQLResponse<GetReleasesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleasesResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
-            response.Data.Should().NotBeNull();
-            response.Data.Releases.TotalCount.Should().Be(0);
-            response.Data.Releases.PageInfo.HasNextPage.Should().BeFalse();
-            response.Data.Releases.PageInfo.HasPreviousPage.Should().BeFalse();
-            response.Data.Releases.PageInfo.StartCursor.Should().BeNull();
-            response.Data.Releases.PageInfo.EndCursor.Should().BeNull();
-            response.Data.Releases.Edges.Should().BeEmpty();
-            response.Data.Releases.Nodes.Should().BeEmpty();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Releases.TotalCount).IsEqualTo(0);
+            await Assert.That(response.Data.Releases.PageInfo.HasNextPage).IsFalse();
+            await Assert.That(response.Data.Releases.PageInfo.HasPreviousPage).IsFalse();
+            await Assert.That(response.Data.Releases.PageInfo.StartCursor).IsNull();
+            await Assert.That(response.Data.Releases.PageInfo.EndCursor).IsNull();
+            await Assert.That(response.Data.Releases.Edges).IsEmpty();
+            await Assert.That(response.Data.Releases.Nodes).IsEmpty();
         }
     }
 
@@ -49,13 +48,13 @@ public class ReleaseQueriesTests : IntegrationTestBase
     public async Task GetReleasesShouldReturnAllReleases()
     {
         // Arrange
-        var dbRelease = new Release
+        Release dbRelease = new Release
         {
             Title = "Release 1",
             State = ReleaseState.Planned
         };
 
-        var dbIssue = new Issue
+        Issue dbIssue = new Issue
         {
             Title = "issue title",
             State = IssueState.Closed,
@@ -70,7 +69,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
                 Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbRelease2 = new Release
+        Release dbRelease2 = new Release
         {
             Title = "Release 2",
             Notes = "Notes 2",
@@ -88,94 +87,98 @@ public class ReleaseQueriesTests : IntegrationTestBase
             context.Releases.Add(dbRelease);
             context.Releases.Add(dbRelease2);
         });
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            var dbReleases = context.Releases.ToList();
-            dbReleases.Any(release => release.Id.Equals(dbRelease.Id)).Should().BeTrue();
-            dbReleases.Any(release => release.Id.Equals(dbRelease2.Id)).Should().BeTrue();
-            var dbIssues = context.Issues.ToList();
-            dbIssues.Any(issue => issue.Id.Equals(dbIssue.Id)).Should().BeTrue();
+            List<Release> dbReleases = context.Releases.ToList();
+            List<Issue> dbIssues = context.Issues.ToList();
+            using (Assert.Multiple())
+            {
+                await Assert.That(dbReleases).Contains(release => release.Id.Equals(dbRelease.Id));
+                await Assert.That(dbReleases).Contains(release => release.Id.Equals(dbRelease2.Id));
+                await Assert.That(dbIssues).Contains(issue => issue.Id.Equals(dbIssue.Id));
+            }
         });
-        var request = CreateGetReleasesRequest();
+        GraphQLRequest request = CreateGetReleasesRequest();
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetReleasesResponse>(request);
+        GraphQLResponse<GetReleasesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleasesResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNullOrEmpty();
-            response.Data.Should().NotBeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
+            await Assert.That(response.Data).IsNotNull();
 
-            response.Data.Releases.TotalCount.Should().Be(2);
-            response.Data.Releases.PageInfo.HasNextPage.Should().BeFalse();
-            response.Data.Releases.PageInfo.HasPreviousPage.Should().BeFalse();
-            response.Data.Releases.PageInfo.StartCursor.Should().NotBeNull();
-            response.Data.Releases.PageInfo.EndCursor.Should().NotBeNull();
+            await Assert.That(response.Data.Releases.TotalCount).IsEqualTo(2);
+            await Assert.That(response.Data.Releases.PageInfo.HasNextPage).IsFalse();
+            await Assert.That(response.Data.Releases.PageInfo.HasPreviousPage).IsFalse();
+            await Assert.That(response.Data.Releases.PageInfo.StartCursor).IsNotNull();
+            await Assert.That(response.Data.Releases.PageInfo.EndCursor).IsNotNull();
+
             List<Release> releases = response.Data.Releases.Nodes.ToList();
-            releases.Count.Should().Be(2);
+            await Assert.That(releases.Count).IsEqualTo(2);
 
             Release release = releases.Single(entity => entity.Id.Equals(dbRelease.Id));
-            release.Id.Should().Be(dbRelease.Id);
-            release.Title.Should().Be(dbRelease.Title);
-            release.Notes.Should().BeNull();
-            release.State.Should().Be(dbRelease.State);
-            release.Date.Should().BeNull();
-            release.CreatedAt.Should().BeCloseTo(dbRelease.CreatedAt, TimeSpan.FromMilliseconds(300));
-            release.LastModifiedAt.Should().Be(dbRelease.LastModifiedAt);
-            release.Issues.Should().BeEmpty();
+            await Assert.That(release.Id).IsEqualTo(dbRelease.Id);
+            await Assert.That(release.Title).IsEqualTo(dbRelease.Title);
+            await Assert.That(release.Notes).IsNull();
+            await Assert.That(release.State).IsEqualTo(dbRelease.State);
+            await Assert.That(release.Date).IsNull();
+            await Assert.That(release.CreatedAt).IsEquivalentTo(dbRelease.CreatedAt);
+            await Assert.That(release.LastModifiedAt).IsEquivalentTo(dbRelease.LastModifiedAt);
+            await Assert.That(release.Issues).IsEmpty();
 
             Release release2 = releases.Single(entity => entity.Id.Equals(dbRelease2.Id));
-            release2.Id.Should().Be(dbRelease2.Id);
-            release2.Title.Should().Be(dbRelease2.Title);
-            release2.Notes.Should().Be(dbRelease2.Notes);
-            release2.State.Should().Be(dbRelease2.State);
-            release2.Date.Should().BeCloseTo(dbRelease2.Date!.Value, TimeSpan.FromMilliseconds(300));
-            release2.CreatedAt.Should().BeCloseTo(dbRelease2.CreatedAt, TimeSpan.FromMilliseconds(300));
-            release2.LastModifiedAt.Should().BeCloseTo(dbRelease2.LastModifiedAt!.Value, TimeSpan.FromMilliseconds(300));
-            release2.Issues.Should().NotBeEmpty();
-            release2.Issues.Count.Should().Be(1);
+            await Assert.That(release2.Id).IsEqualTo(dbRelease2.Id);
+            await Assert.That(release2.Title).IsEqualTo(dbRelease2.Title);
+            await Assert.That(release2.Notes).IsEqualTo(dbRelease2.Notes);
+            await Assert.That(release2.State).IsEqualTo(dbRelease2.State);
+            await Assert.That(release2.Date).IsEquivalentTo(dbRelease2.Date);
+            await Assert.That(release2.CreatedAt).IsEquivalentTo(dbRelease2.CreatedAt);
+            await Assert.That(release2.LastModifiedAt).IsEquivalentTo(dbRelease2.LastModifiedAt);
+            await Assert.That(release2.Issues).IsNotEmpty();
+            await Assert.That(release2.Issues.Count).IsEqualTo(1);
             Issue issue = release2.Issues.First();
-            issue.Id.Should().Be(dbIssue.Id);
-            issue.Milestone.Should().NotBeNull();
-            issue.Milestone!.Id.Should().Be(dbIssue.Milestone.Id);
-            issue.Vehicle.Should().NotBeNull();
-            issue.Vehicle!.Id.Should().Be(dbIssue.Vehicle.Id);
-            issue.Vehicle!.Translations.Should().BeEmpty();
-            issue.Vehicle!.Photos.Should().BeEmpty();
+            await Assert.That(issue.Id).IsEqualTo(dbIssue.Id);
+            await Assert.That(issue.Milestone).IsNotNull();
+            await Assert.That(issue.Milestone!.Id).IsEqualTo(dbIssue.Milestone.Id);
+            await Assert.That(issue.Vehicle).IsNotNull();
+            await Assert.That(issue.Vehicle!.Id).IsEqualTo(dbIssue.Vehicle.Id);
+            await Assert.That(issue.Vehicle!.Translations).IsEmpty();
+            await Assert.That(issue.Vehicle!.Photos).IsEmpty();
 
             List<Edge<Release>> edges = response.Data.Releases.Edges.ToList();
-            edges.Count.Should().Be(2);
+            await Assert.That(edges.Count).IsEqualTo(2);
 
             Release edgeRelease = edges.Single(entity => entity.Node.Id.Equals(dbRelease.Id)).Node;
-            edgeRelease.Id.Should().Be(dbRelease.Id);
-            edgeRelease.Title.Should().Be(dbRelease.Title);
-            edgeRelease.Notes.Should().BeNull();
-            edgeRelease.State.Should().Be(dbRelease.State);
-            edgeRelease.Date.Should().BeNull();
-            edgeRelease.CreatedAt.Should().BeCloseTo(dbRelease.CreatedAt, TimeSpan.FromMilliseconds(300));
-            edgeRelease.LastModifiedAt.Should().Be(dbRelease.LastModifiedAt);
-            edgeRelease.Issues.Should().BeEmpty();
+            await Assert.That(edgeRelease.Id).IsEqualTo(dbRelease.Id);
+            await Assert.That(edgeRelease.Title).IsEqualTo(dbRelease.Title);
+            await Assert.That(edgeRelease.Notes).IsNull();
+            await Assert.That(edgeRelease.State).IsEqualTo(dbRelease.State);
+            await Assert.That(edgeRelease.Date).IsNull();
+            await Assert.That(edgeRelease.CreatedAt).IsEquivalentTo(dbRelease.CreatedAt);
+            await Assert.That(edgeRelease.LastModifiedAt).IsEquivalentTo(dbRelease.LastModifiedAt);
+            await Assert.That(edgeRelease.Issues).IsEmpty();
 
             Release edgeRelease2 = edges.Single(entity => entity.Node.Id.Equals(dbRelease2.Id)).Node;
-            edgeRelease2.Id.Should().Be(dbRelease2.Id);
-            edgeRelease2.Title.Should().Be(dbRelease2.Title);
-            edgeRelease2.Notes.Should().Be(dbRelease2.Notes);
-            edgeRelease2.State.Should().Be(dbRelease2.State);
-            edgeRelease2.Date.Should().BeCloseTo(dbRelease2.Date!.Value, TimeSpan.FromMilliseconds(300));
-            edgeRelease2.CreatedAt.Should().BeCloseTo(dbRelease2.CreatedAt, TimeSpan.FromMilliseconds(300));
-            edgeRelease2.LastModifiedAt.Should().BeCloseTo(dbRelease2.LastModifiedAt!.Value, TimeSpan.FromMilliseconds(300));
-            edgeRelease2.Issues.Should().NotBeEmpty();
-            edgeRelease2.Issues.Count.Should().Be(1);
+            await Assert.That(edgeRelease2.Id).IsEqualTo(dbRelease2.Id);
+            await Assert.That(edgeRelease2.Title).IsEqualTo(dbRelease2.Title);
+            await Assert.That(edgeRelease2.Notes).IsEqualTo(dbRelease2.Notes);
+            await Assert.That(edgeRelease2.State).IsEqualTo(dbRelease2.State);
+            await Assert.That(edgeRelease2.Date).IsEquivalentTo(dbRelease2.Date);
+            await Assert.That(edgeRelease2.CreatedAt).IsEquivalentTo(dbRelease2.CreatedAt);
+            await Assert.That(edgeRelease2.LastModifiedAt).IsEquivalentTo(dbRelease2.LastModifiedAt);
+            await Assert.That(edgeRelease2.Issues).IsNotEmpty();
+            await Assert.That(edgeRelease2.Issues.Count).IsEqualTo(1);
             Issue edgeIssue = edgeRelease2.Issues.First();
-            edgeIssue.Id.Should().Be(dbIssue.Id);
-            edgeIssue.Milestone.Should().NotBeNull();
-            edgeIssue.Milestone!.Id.Should().Be(dbIssue.Milestone.Id);
-            edgeIssue.Vehicle.Should().NotBeNull();
-            edgeIssue.Vehicle!.Id.Should().Be(dbIssue.Vehicle.Id);
-            edgeIssue.Vehicle!.Translations.Should().BeEmpty();
-            edgeIssue.Vehicle!.Photos.Should().BeEmpty();
+            await Assert.That(edgeIssue.Id).IsEqualTo(dbIssue.Id);
+            await Assert.That(edgeIssue.Milestone).IsNotNull();
+            await Assert.That(edgeIssue.Milestone!.Id).IsEqualTo(dbIssue.Milestone.Id);
+            await Assert.That(edgeIssue.Vehicle).IsNotNull();
+            await Assert.That(edgeIssue.Vehicle!.Id).IsEqualTo(dbIssue.Vehicle.Id);
+            await Assert.That(edgeIssue.Vehicle!.Translations).IsEmpty();
+            await Assert.That(edgeIssue.Vehicle!.Photos).IsEmpty();
         }
     }
 
@@ -196,20 +199,19 @@ public class ReleaseQueriesTests : IntegrationTestBase
             });
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var request = CreateGetReleaseRequest(id);
+        GraphQLRequest request = CreateGetReleaseRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
+        GraphQLResponse<GetReleaseResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
-            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
-            //     StringComparer.InvariantCultureIgnoreCase);
-            response.Data.Should().NotBeNull();
-            response.Data.Release.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull();
+            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.", StringComparer.InvariantCultureIgnoreCase);
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Release).IsNull();
         }
     }
 
@@ -217,25 +219,24 @@ public class ReleaseQueriesTests : IntegrationTestBase
     public async Task GetReleaseShouldReturnNullIfReleasesAreEmpty()
     {
         // Arrange
-        CheckDbContent(context =>
+        await CheckDbContentAsync(async context =>
         {
-            context.Releases.Should().BeEmpty();
+            await Assert.That(context.Releases).IsEmpty();
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var request = CreateGetReleaseRequest(id);
+        GraphQLRequest request = CreateGetReleaseRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
+        GraphQLResponse<GetReleaseResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
-            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.",
-            //     StringComparer.InvariantCultureIgnoreCase);
-            response.Data.Should().NotBeNull();
-            response.Data.Release.Should().BeNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull();
+            // response.Errors!.First().Extensions!["message"].Should().Be($"No Label found with id '{id}'.", StringComparer.InvariantCultureIgnoreCase);
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Release).IsNull();
         }
     }
 
@@ -244,7 +245,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
     {
         // Arrange
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
-        var dbIssue = new Issue
+        Issue dbIssue = new Issue
         {
             Title = "issue title",
             State = IssueState.Closed,
@@ -259,7 +260,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
                 Photos = [new Photo { FilePath = string.Empty }]
             }
         };
-        var dbRelease = new Release
+        Release dbRelease = new Release
         {
             Id = new Guid(id),
             Title = "Release 2",
@@ -279,43 +280,43 @@ public class ReleaseQueriesTests : IntegrationTestBase
             });
             context.Releases.Add(dbRelease);
         });
-        var request = CreateGetReleaseRequest(id);
+        GraphQLRequest request = CreateGetReleaseRequest(id);
 
         // Act
-        var response = await GraphQLClient.SendQueryAsync<GetReleaseResponse>(request);
+        GraphQLResponse<GetReleaseResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
-        using (new AssertionScope())
+        using (Assert.Multiple())
         {
-            response.Should().NotBeNull();
-            response.Errors.Should().BeNull();
-            response.Data.Should().NotBeNull();
-            var release = response.Data.Release;
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull();
+            await Assert.That(response.Data).IsNotNull();
+            Release? release = response.Data.Release;
 
-            release.Should().NotBeNull();
-            release!.Id.Should().Be(dbRelease.Id);
-            release.Title.Should().Be(dbRelease.Title);
-            release.Notes.Should().Be(dbRelease.Notes);
-            release.State.Should().Be(dbRelease.State);
-            release.Date.Should().BeCloseTo(dbRelease.Date!.Value, TimeSpan.FromMilliseconds(300));
-            release.CreatedAt.Should().BeCloseTo(dbRelease.CreatedAt, TimeSpan.FromMilliseconds(300));
-            release.LastModifiedAt.Should().BeCloseTo(dbRelease.LastModifiedAt!.Value, TimeSpan.FromMilliseconds(300));
-            release.Issues.Should().NotBeEmpty();
-            release.Issues.Count.Should().Be(1);
-            var issue = release.Issues.First();
-            issue.Id.Should().Be(dbIssue.Id);
-            issue.Milestone.Should().NotBeNull();
-            issue.Milestone!.Id.Should().Be(dbIssue.Milestone.Id);
-            issue.Vehicle.Should().NotBeNull();
-            issue.Vehicle!.Id.Should().Be(dbIssue.Vehicle.Id);
-            issue.Vehicle!.Translations.Should().BeEmpty();
-            issue.Vehicle!.Photos.Should().BeEmpty();
+            await Assert.That(release).IsNotNull();
+            await Assert.That(release!.Id).IsEqualTo(dbRelease.Id);
+            await Assert.That(release.Title).IsEqualTo(dbRelease.Title);
+            await Assert.That(release.Notes).IsEqualTo(dbRelease.Notes);
+            await Assert.That(release.State).IsEqualTo(dbRelease.State);
+            await Assert.That(release.Date).IsEquivalentTo(dbRelease.Date);
+            await Assert.That(release.CreatedAt).IsEquivalentTo(dbRelease.CreatedAt);
+            await Assert.That(release.LastModifiedAt).IsEquivalentTo(dbRelease.LastModifiedAt);
+            await Assert.That(release.Issues).IsNotEmpty();
+            await Assert.That(release.Issues.Count).IsEqualTo(1);
+            Issue issue = release.Issues.First();
+            await Assert.That(issue.Id).IsEqualTo(dbIssue.Id);
+            await Assert.That(issue.Milestone).IsNotNull();
+            await Assert.That(issue.Milestone!.Id).IsEqualTo(dbIssue.Milestone.Id);
+            await Assert.That(issue.Vehicle).IsNotNull();
+            await Assert.That(issue.Vehicle!.Id).IsEqualTo(dbIssue.Vehicle.Id);
+            await Assert.That(issue.Vehicle!.Translations).IsEmpty();
+            await Assert.That(issue.Vehicle!.Photos).IsEmpty();
         }
     }
 
     private static GraphQLRequest CreateGetReleasesRequest()
     {
-        var queryRequest = new GraphQLRequest
+        GraphQLRequest queryRequest = new GraphQLRequest
         {
             Query = """
                     query releases
@@ -401,7 +402,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
 
     private static GraphQLRequest CreateGetReleaseRequest(string id)
     {
-        var queryRequest = new GraphQLRequest
+        GraphQLRequest queryRequest = new GraphQLRequest
         {
             Query = $$"""
                     query release

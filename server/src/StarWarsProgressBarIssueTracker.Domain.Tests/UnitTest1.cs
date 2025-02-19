@@ -4,15 +4,16 @@ namespace StarWarsProgressBarIssueTracker.Domain.Tests;
 
 public class Tests
 {
-    [SetUp]
+    [Before(Test)]
     public void Setup()
     {
     }
 
     [Test]
     [Error("Error")]
-    public void Test1()
+    public async Task Test1()
     {
-        Assert.Pass();
+        var errorTest = "Error test";
+        await Assert.That(errorTest).IsNotEmpty();
     }
 }

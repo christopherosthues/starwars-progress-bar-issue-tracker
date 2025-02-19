@@ -25,7 +25,7 @@ public class LabelMapper
             TextColor = label.TextColor,
             GitHubId = label.GitHubId,
             GitlabId = label.GitlabId,
-            Issues = label.Issues.Select(issue => new IssueDto
+            Issues = label.Issues.Select(issue => new LabelIssueDto
             {
                 Id = issue.Id,
                 CreatedAt = issue.CreatedAt,
@@ -45,14 +45,14 @@ public class LabelMapper
         };
     }
 
-    private static MilestoneDto? MapToMilestoneDto(Milestone? milestone)
+    private static LabelMilestoneDto? MapToMilestoneDto(Milestone? milestone)
     {
         if (milestone == null)
         {
             return null;
         }
 
-        return new MilestoneDto
+        return new LabelMilestoneDto
         {
             Id = milestone.Id,
             CreatedAt = milestone.CreatedAt,
@@ -66,14 +66,14 @@ public class LabelMapper
         };
     }
 
-    private static ReleaseDto? MapToReleaseDto(Release? release)
+    private static LabelReleaseDto? MapToReleaseDto(Release? release)
     {
         if (release == null)
         {
             return null;
         }
 
-        return new ReleaseDto
+        return new LabelReleaseDto
         {
             Id = release.Id,
             CreatedAt = release.CreatedAt,
@@ -88,9 +88,9 @@ public class LabelMapper
         };
     }
 
-    private static IssueLabelDto MapToIssueLabelDto(Label label)
+    private static LabelIssueLabelDto MapToIssueLabelDto(Label label)
     {
-        return new IssueLabelDto
+        return new LabelIssueLabelDto
         {
             Id = label.Id,
             CreatedAt = label.CreatedAt,

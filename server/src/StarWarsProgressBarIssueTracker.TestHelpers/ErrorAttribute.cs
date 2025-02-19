@@ -1,8 +1,7 @@
-using System.ComponentModel;
+using CategoryAttribute = TUnit.Core.CategoryAttribute;
 
 namespace StarWarsProgressBarIssueTracker.TestHelpers;
 
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 public class ErrorAttribute : CategoryAttribute
 {
     public ErrorAttribute(string errorMessage) : base(TestCategory.Error)

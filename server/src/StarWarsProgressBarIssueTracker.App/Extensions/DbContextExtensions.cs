@@ -18,10 +18,10 @@ public static class DbContextExtensions
 
     public static async Task ConfigureDatabaseAsync(this IServiceProvider serviceProvider)
     {
-        using var scope = serviceProvider.CreateScope();
+        using IServiceScope scope = serviceProvider.CreateScope();
 
-        var context = scope.ServiceProvider.GetRequiredService<IssueTrackerContext>();
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        IssueTrackerContext context = scope.ServiceProvider.GetRequiredService<IssueTrackerContext>();
+        ILogger<Program> logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
         try
         {

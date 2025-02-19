@@ -11,11 +11,11 @@ public class LinkedIssueDto : DtoBase
 
     public Priority Priority { get; set; }
 
-    public MilestoneDto? Milestone { get; set; }
+    public IssueMilestoneDto? Milestone { get; set; }
 
-    public ReleaseDto? Release { get; set; }
+    public IssueReleaseDto? Release { get; set; }
 
-    public IList<LabelDto> Labels { get; set; } = [];
+    public IList<IssueLabelDto> Labels { get; set; } = [];
 
     public string? Description { get; set; }
 

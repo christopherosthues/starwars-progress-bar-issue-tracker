@@ -320,8 +320,8 @@ public class IssueRepository(IssueTrackerContext context) : IssueTrackerReposito
         CancellationToken cancellationToken = default)
     {
         // TODO: pasted from data port. Maybe further adjustments needed
-        var issues = await DbSet.ToListAsync(cancellationToken);
-        var toBeDeleted =
+        List<Issue> issues = await DbSet.ToListAsync(cancellationToken);
+        IEnumerable<Issue> toBeDeleted =
             issues.Where(dbIssue => domains.Any(issue => issue.GitlabId?.Equals(dbIssue.GitlabId) ?? false));
         await DeleteRangeAsync(toBeDeleted, cancellationToken);
     }

@@ -1,6 +1,6 @@
 namespace StarWarsProgressBarIssueTracker.App.Issues;
 
-public class LabelDto : DtoBase
+public class IssueLabelDto : DtoBase
 {
     public required string Title { get; set; }
 
