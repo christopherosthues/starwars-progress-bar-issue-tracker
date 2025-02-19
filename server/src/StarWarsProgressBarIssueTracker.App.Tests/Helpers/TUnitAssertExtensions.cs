@@ -1,6 +1,8 @@
 using System.Runtime.CompilerServices;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
+using StarWarsProgressBarIssueTracker.Domain.Milestones;
+using StarWarsProgressBarIssueTracker.Domain.Releases;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using StarWarsProgressBarIssueTracker.TestHelpers.TUnit;
 using TUnit.Assertions.AssertConditions.Interfaces;
@@ -33,15 +35,53 @@ public static class TUnitAssertExtensions
                                               issue.Description == null) &&
                                              value.Priority.Equals(issue.Priority) &&
                                              value.State.Equals(issue.State) &&
-                                             (value.Milestone?.Id.Equals(issue.Milestone?.Id) ?? issue.Milestone == null) &&
+                                             (value.Milestone?.Id.Equals(issue.Milestone?.Id) ??
+                                              issue.Milestone == null) &&
                                              (value.Release?.Id.Equals(issue.Release?.Id) ?? issue.Release == null) &&
                                              (value.Vehicle?.Id.Equals(issue.Vehicle?.Id) ?? issue.Vehicle == null) &&
-                                             value.Labels.Select(label => label.Id).Intersect(issue.Labels.Select(label => label.Id)).Count() == value.Labels.Count &&
-                                             value.LinkedIssues.Select(linkedIssue => linkedIssue.Id).Intersect(issue.LinkedIssues.Select(linkedIssue => linkedIssue.Id)).Count() == value.LinkedIssues.Count &&
+                                             value.Labels.Select(label => label.Id)
+                                                 .Intersect(issue.Labels.Select(label => label.Id)).Count() ==
+                                             value.Labels.Count &&
+                                             value.LinkedIssues.Select(linkedIssue => linkedIssue.Id)
+                                                 .Intersect(issue.LinkedIssues.Select(linkedIssue => linkedIssue.Id))
+                                                 .Count() == value.LinkedIssues.Count &&
                                              (value.GitlabId?.Equals(issue.GitlabId) ?? issue.GitlabId == null) &&
+                                             (value.GitlabIid?.Equals(issue.GitlabIid) ?? issue.GitlabIid == null) &&
                                              (value.GitHubId?.Equals(issue.GitHubId) ?? issue.GitHubId == null) &&
                                              DateTimeEquals(value.CreatedAt, issue.CreatedAt) &&
                                              DateTimeEquals(value.LastModifiedAt, issue.LastModifiedAt));
+    }
+
+    public static InvokableValueAssertionBuilder<IEnumerable<Milestone>> ContainsEquivalentOf(
+        this IValueSource<List<Milestone>> valueSource, Milestone milestone)
+    {
+        return valueSource.Contains(value => value.Id.Equals(milestone.Id) &&
+                                             value.Title.Equals(milestone.Title) &&
+                                             (value.Description?.Equals(milestone.Description) ??
+                                              milestone.Description == null) &&
+                                             value.State.Equals(milestone.State) &&
+                                             value.Issues.Select(issue => issue.Id).Intersect(milestone.Issues.Select(issue => issue.Id)).Count() == value.Issues.Count &&
+                                             (value.GitlabId?.Equals(milestone.GitlabId) ?? milestone.GitlabId == null) &&
+                                             (value.GitlabIid?.Equals(milestone.GitlabIid) ?? milestone.GitlabIid == null) &&
+                                             (value.GitHubId?.Equals(milestone.GitHubId) ?? milestone.GitHubId == null) &&
+                                             DateTimeEquals(value.CreatedAt, milestone.CreatedAt) &&
+                                             DateTimeEquals(value.LastModifiedAt, milestone.LastModifiedAt));
+    }
+
+    public static InvokableValueAssertionBuilder<IEnumerable<Release>> ContainsEquivalentOf(
+        this IValueSource<List<Release>> valueSource, Release release)
+    {
+        return valueSource.Contains(value => value.Id.Equals(release.Id) &&
+                                             value.Title.Equals(release.Title) &&
+                                             (value.Notes?.Equals(release.Notes) ?? release.Notes == null) &&
+                                             value.State.Equals(release.State) &&
+                                             DateTimeEquals(value.Date, release.Date) &&
+                                             value.Issues.Select(issue => issue.Id).Intersect(release.Issues.Select(issue => issue.Id)).Count() == value.Issues.Count &&
+                                             (value.GitlabId?.Equals(release.GitlabId) ?? release.GitlabId == null) &&
+                                             (value.GitlabIid?.Equals(release.GitlabIid) ?? release.GitlabIid == null) &&
+                                             (value.GitHubId?.Equals(release.GitHubId) ?? release.GitHubId == null) &&
+                                             DateTimeEquals(value.CreatedAt, release.CreatedAt) &&
+                                             DateTimeEquals(value.LastModifiedAt, release.LastModifiedAt));
     }
 
     public static InvokableValueAssertionBuilder<IEnumerable<Label>> ContainsEquivalentOf(

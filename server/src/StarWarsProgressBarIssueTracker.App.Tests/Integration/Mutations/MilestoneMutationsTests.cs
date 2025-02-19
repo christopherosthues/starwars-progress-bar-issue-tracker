@@ -21,14 +21,13 @@ public class MilestoneMutationsTests : IntegrationTestBase
     public async Task AddMilestoneShouldAddMilestone(Milestone expectedMilestone)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         await CheckDbContentAsync(async context =>
         {
             await Assert.That(context.Milestones).IsEmpty();
         });
         GraphQLRequest mutationRequest = CreateAddRequest(expectedMilestone);
         expectedMilestone.State = MilestoneState.Open;
-
-        DateTime startTime = DateTime.UtcNow;
 
         // Act
         GraphQLResponse<AddMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<AddMilestoneResponse>(mutationRequest);
@@ -42,6 +41,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     public async Task AddMilestoneShouldAddMilestoneIfMilestonesAreNotEmpty(Milestone expectedMilestone)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Milestone dbMilestone = new Milestone
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -56,11 +56,9 @@ public class MilestoneMutationsTests : IntegrationTestBase
         });
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Milestones).Contains(dbMilestone);
+            await Assert.That(context.Milestones.ToList()).ContainsEquivalentOf(dbMilestone);
         });
         GraphQLRequest mutationRequest = CreateAddRequest(expectedMilestone);
-
-        DateTime startTime = DateTime.UtcNow;
 
         // Act
         GraphQLResponse<AddMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<AddMilestoneResponse>(mutationRequest);
@@ -92,6 +90,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     public async Task UpdateMilestoneShouldUpdateMilestone(Milestone expectedMilestone)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Milestone dbMilestone = new Milestone
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -108,11 +107,9 @@ public class MilestoneMutationsTests : IntegrationTestBase
         expectedMilestone.CreatedAt = dbMilestone.CreatedAt;
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Milestones).Contains(dbMilestone);
+            await Assert.That(context.Milestones.ToList()).ContainsEquivalentOf(dbMilestone);
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedMilestone);
-
-        DateTime startTime = DateTime.UtcNow;
 
         // Act
         GraphQLResponse<UpdateMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
@@ -126,6 +123,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
     public async Task UpdateMilestoneShouldUpdateMilestoneIfMilestonesAreNotEmpty(Milestone expectedMilestone)
     {
         // Arrange
+        DateTime startTime = DateTime.UtcNow;
         Milestone dbMilestone = new Milestone
         {
             Id = new Guid("87653DC5-B029-4BA6-959A-1FBFC48E2C81"),
@@ -143,7 +141,6 @@ public class MilestoneMutationsTests : IntegrationTestBase
             LastModifiedAt = DateTime.UtcNow.AddDays(2)
         };
 
-
         await SeedDatabaseAsync(context =>
         {
             context.Milestones.Add(dbMilestone);
@@ -155,13 +152,12 @@ public class MilestoneMutationsTests : IntegrationTestBase
         {
             using (Assert.Multiple())
             {
-                await Assert.That(context.Milestones).Contains(dbMilestone);
-                await Assert.That(context.Milestones).Contains(dbMilestone2);
+                List<Milestone> milestones = context.Milestones.ToList();
+                await Assert.That(milestones).ContainsEquivalentOf(dbMilestone);
+                await Assert.That(milestones).ContainsEquivalentOf(dbMilestone2);
             }
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedMilestone);
-
-        DateTime startTime = DateTime.UtcNow;
 
         // Act
         GraphQLResponse<UpdateMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
@@ -227,7 +223,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         milestone.LastModifiedAt = dbMilestone.LastModifiedAt;
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Milestones).Contains(dbMilestone);
+            await Assert.That(context.Milestones.ToList()).ContainsEquivalentOf(dbMilestone);
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(milestone);
 
@@ -282,7 +278,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         milestone.LastModifiedAt = dbMilestone.LastModifiedAt;
         await CheckDbContentAsync(async context =>
         {
-            await Assert.That(context.Milestones).Contains(dbMilestone);
+            await Assert.That(context.Milestones.ToList()).ContainsEquivalentOf(dbMilestone);
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(milestone);
 
@@ -331,7 +327,6 @@ public class MilestoneMutationsTests : IntegrationTestBase
             LastModifiedAt = DateTime.UtcNow.AddDays(2)
         };
 
-
         await SeedDatabaseAsync(context =>
         {
             context.Milestones.Add(dbMilestone);
@@ -343,8 +338,9 @@ public class MilestoneMutationsTests : IntegrationTestBase
         {
             using (Assert.Multiple())
             {
-                await Assert.That(context.Milestones).Contains(dbMilestone);
-                await Assert.That(context.Milestones).Contains(dbMilestone2);
+                List<Milestone> milestones = context.Milestones.ToList();
+                await Assert.That(milestones).ContainsEquivalentOf(dbMilestone);
+                await Assert.That(milestones).ContainsEquivalentOf(dbMilestone2);
             }
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(milestone);
@@ -534,7 +530,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
             await Assert.That(updatedMilestone.Title).IsEqualTo(expectedMilestone.Title);
             await Assert.That(updatedMilestone.Description).IsEqualTo(expectedMilestone.Description);
             await Assert.That(updatedMilestone.State).IsEqualTo(expectedMilestone.State);
-            await Assert.That(updatedMilestone.CreatedAt).IsEqualTo(expectedMilestone.CreatedAt);
+            await Assert.That(updatedMilestone.CreatedAt).IsEquivalentTo(expectedMilestone.CreatedAt);
             await Assert.That(updatedMilestone.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
             if (emptyIssues)
             {
@@ -562,7 +558,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
                 await Assert.That(updatedDbMilestone.Title).IsEqualTo(expectedMilestone.Title);
                 await Assert.That(updatedDbMilestone.Description).IsEqualTo(expectedMilestone.Description);
                 await Assert.That(updatedDbMilestone.State).IsEqualTo(expectedMilestone.State);
-                await Assert.That(updatedDbMilestone.CreatedAt).IsEqualTo(expectedMilestone.CreatedAt);
+                await Assert.That(updatedDbMilestone.CreatedAt).IsEquivalentTo(expectedMilestone.CreatedAt);
                 await Assert.That(updatedDbMilestone.LastModifiedAt!.Value).IsBetween(startTime, endTime).WithInclusiveBounds();
                 if (emptyIssues)
                 {
@@ -583,8 +579,8 @@ public class MilestoneMutationsTests : IntegrationTestBase
                     await Assert.That(secondMilestone.Title).IsEqualTo(notUpdatedMilestone.Title);
                     await Assert.That(secondMilestone.Description).IsEqualTo(notUpdatedMilestone.Description);
                     await Assert.That(secondMilestone.State).IsEqualTo(notUpdatedMilestone.State);
-                    await Assert.That(secondMilestone.CreatedAt).IsEqualTo(notUpdatedMilestone.CreatedAt);
-                    await Assert.That(secondMilestone.LastModifiedAt).IsEqualTo(notUpdatedMilestone.LastModifiedAt!.Value);
+                    await Assert.That(secondMilestone.CreatedAt).IsEquivalentTo(notUpdatedMilestone.CreatedAt);
+                    await Assert.That(secondMilestone.LastModifiedAt).IsEquivalentTo(notUpdatedMilestone.LastModifiedAt!.Value);
                     if (emptyIssues)
                     {
                         await Assert.That(secondMilestone.Issues).IsEmpty();
@@ -665,8 +661,8 @@ public class MilestoneMutationsTests : IntegrationTestBase
             await Assert.That(deletedMilestone.Title).IsEqualTo(expectedMilestone.Title);
             await Assert.That(deletedMilestone.Description).IsEqualTo(expectedMilestone.Description);
             await Assert.That(deletedMilestone.State).IsEqualTo(expectedMilestone.State);
-            await Assert.That(deletedMilestone.CreatedAt).IsEqualTo(expectedMilestone.CreatedAt);
-            await Assert.That(deletedMilestone.LastModifiedAt).IsEqualTo(expectedMilestone.LastModifiedAt!.Value);
+            await Assert.That(deletedMilestone.CreatedAt).IsEquivalentTo(expectedMilestone.CreatedAt);
+            await Assert.That(deletedMilestone.LastModifiedAt).IsEquivalentTo(expectedMilestone.LastModifiedAt!.Value);
         }
 
         await CheckDbContentAsync(async context =>

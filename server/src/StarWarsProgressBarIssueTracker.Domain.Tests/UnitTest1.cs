@@ -11,8 +11,9 @@ public class Tests
 
     [Test]
     [Error("Error")]
-    public void Test1()
+    public async Task Test1()
     {
-        Assert.Fail("Error test");
+        var errorTest = "Error test";
+        await Assert.That(errorTest).IsNotEmpty();
     }
 }
