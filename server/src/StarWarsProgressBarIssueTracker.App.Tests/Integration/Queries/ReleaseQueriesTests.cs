@@ -1,4 +1,5 @@
 using GraphQL;
+using StarWarsProgressBarIssueTracker.App.Releases;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Releases;
@@ -116,10 +117,10 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(response.Data.Releases.PageInfo.StartCursor).IsNotNull();
             await Assert.That(response.Data.Releases.PageInfo.EndCursor).IsNotNull();
 
-            List<Release> releases = response.Data.Releases.Nodes.ToList();
+            List<ReleaseDto> releases = response.Data.Releases.Nodes.ToList();
             await Assert.That(releases.Count).IsEqualTo(2);
 
-            Release release = releases.Single(entity => entity.Id.Equals(dbRelease.Id));
+            ReleaseDto release = releases.Single(entity => entity.Id.Equals(dbRelease.Id));
             await Assert.That(release.Id).IsEqualTo(dbRelease.Id);
             await Assert.That(release.Title).IsEqualTo(dbRelease.Title);
             await Assert.That(release.Notes).IsNull();
@@ -129,7 +130,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(release.LastModifiedAt).IsEquivalentTo(dbRelease.LastModifiedAt);
             await Assert.That(release.Issues).IsEmpty();
 
-            Release release2 = releases.Single(entity => entity.Id.Equals(dbRelease2.Id));
+            ReleaseDto release2 = releases.Single(entity => entity.Id.Equals(dbRelease2.Id));
             await Assert.That(release2.Id).IsEqualTo(dbRelease2.Id);
             await Assert.That(release2.Title).IsEqualTo(dbRelease2.Title);
             await Assert.That(release2.Notes).IsEqualTo(dbRelease2.Notes);
@@ -139,7 +140,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(release2.LastModifiedAt).IsEquivalentTo(dbRelease2.LastModifiedAt);
             await Assert.That(release2.Issues).IsNotEmpty();
             await Assert.That(release2.Issues.Count).IsEqualTo(1);
-            Issue issue = release2.Issues.First();
+            ReleaseIssueDto issue = release2.Issues.First();
             await Assert.That(issue.Id).IsEqualTo(dbIssue.Id);
             await Assert.That(issue.Milestone).IsNotNull();
             await Assert.That(issue.Milestone!.Id).IsEqualTo(dbIssue.Milestone.Id);
@@ -148,10 +149,10 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(issue.Vehicle!.Translations).IsEmpty();
             await Assert.That(issue.Vehicle!.Photos).IsEmpty();
 
-            List<Edge<Release>> edges = response.Data.Releases.Edges.ToList();
+            List<Edge<ReleaseDto>> edges = response.Data.Releases.Edges.ToList();
             await Assert.That(edges.Count).IsEqualTo(2);
 
-            Release edgeRelease = edges.Single(entity => entity.Node.Id.Equals(dbRelease.Id)).Node;
+            ReleaseDto edgeRelease = edges.Single(entity => entity.Node.Id.Equals(dbRelease.Id)).Node;
             await Assert.That(edgeRelease.Id).IsEqualTo(dbRelease.Id);
             await Assert.That(edgeRelease.Title).IsEqualTo(dbRelease.Title);
             await Assert.That(edgeRelease.Notes).IsNull();
@@ -161,7 +162,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(edgeRelease.LastModifiedAt).IsEquivalentTo(dbRelease.LastModifiedAt);
             await Assert.That(edgeRelease.Issues).IsEmpty();
 
-            Release edgeRelease2 = edges.Single(entity => entity.Node.Id.Equals(dbRelease2.Id)).Node;
+            ReleaseDto edgeRelease2 = edges.Single(entity => entity.Node.Id.Equals(dbRelease2.Id)).Node;
             await Assert.That(edgeRelease2.Id).IsEqualTo(dbRelease2.Id);
             await Assert.That(edgeRelease2.Title).IsEqualTo(dbRelease2.Title);
             await Assert.That(edgeRelease2.Notes).IsEqualTo(dbRelease2.Notes);
@@ -171,7 +172,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(edgeRelease2.LastModifiedAt).IsEquivalentTo(dbRelease2.LastModifiedAt);
             await Assert.That(edgeRelease2.Issues).IsNotEmpty();
             await Assert.That(edgeRelease2.Issues.Count).IsEqualTo(1);
-            Issue edgeIssue = edgeRelease2.Issues.First();
+            ReleaseIssueDto edgeIssue = edgeRelease2.Issues.First();
             await Assert.That(edgeIssue.Id).IsEqualTo(dbIssue.Id);
             await Assert.That(edgeIssue.Milestone).IsNotNull();
             await Assert.That(edgeIssue.Milestone!.Id).IsEqualTo(dbIssue.Milestone.Id);
@@ -291,7 +292,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(response).IsNotNull();
             await Assert.That(response.Errors).IsNull();
             await Assert.That(response.Data).IsNotNull();
-            Release? release = response.Data.Release;
+            ReleaseDto? release = response.Data.Release;
 
             await Assert.That(release).IsNotNull();
             await Assert.That(release!.Id).IsEqualTo(dbRelease.Id);
@@ -303,7 +304,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(release.LastModifiedAt).IsEquivalentTo(dbRelease.LastModifiedAt);
             await Assert.That(release.Issues).IsNotEmpty();
             await Assert.That(release.Issues.Count).IsEqualTo(1);
-            Issue issue = release.Issues.First();
+            ReleaseIssueDto issue = release.Issues.First();
             await Assert.That(issue.Id).IsEqualTo(dbIssue.Id);
             await Assert.That(issue.Milestone).IsNotNull();
             await Assert.That(issue.Milestone!.Id).IsEqualTo(dbIssue.Milestone.Id);

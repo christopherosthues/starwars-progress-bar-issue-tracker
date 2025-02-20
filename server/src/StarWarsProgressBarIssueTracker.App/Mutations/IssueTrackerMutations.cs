@@ -1,6 +1,7 @@
 using StarWarsProgressBarIssueTracker.App.Issues;
 using StarWarsProgressBarIssueTracker.App.Labels;
 using StarWarsProgressBarIssueTracker.App.Milestones;
+using StarWarsProgressBarIssueTracker.App.Releases;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
@@ -17,4 +18,5 @@ public partial class IssueTrackerMutations(
     IReleaseService releaseService,
     LabelMapper labelMapper,
     IssueMapper issueMapper,
-    MilestoneMapper milestoneMapper);
+    MilestoneMapper milestoneMapper,
+    ReleaseMapper releaseMapper);

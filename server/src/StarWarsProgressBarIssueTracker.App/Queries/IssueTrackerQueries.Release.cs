@@ -5,6 +5,7 @@ using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.App.Extensions;
+using StarWarsProgressBarIssueTracker.App.Releases;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
 
@@ -14,22 +15,27 @@ public partial class IssueTrackerQueries
 {
     [UsePaging(IncludeTotalCount = true)]
     [UseSorting]
-    public async Task<Connection<Release>> GetReleases(
+    public async Task<Connection<ReleaseDto>> GetReleases(
         PagingArguments pagingArguments,
         IReleaseService releaseService,
+        ReleaseMapper releaseMapper,
         CancellationToken cancellationToken)
     {
         Page<Release> page = await releaseService.GetAllReleasesAsync(pagingArguments, cancellationToken);
-        return page.ToConnectionWithTotalCount();
+        Page<ReleaseDto> dtoPage = new Page<ReleaseDto>(
+            [..page.Items.Select(releaseMapper.MapToReleaseDto)], page.HasNextPage,
+            page.HasPreviousPage, release => page.CreateCursor(releaseMapper.MapToRelease(release)), page.TotalCount);
+        return dtoPage.ToConnectionWithTotalCount();
     }
 
     [Error<DomainIdNotFoundException>]
-    public async Task<Release?> GetRelease(
+    public async Task<ReleaseDto?> GetRelease(
         Guid id,
         IReleaseService releaseService,
+        ReleaseMapper releaseMapper,
         CancellationToken cancellationToken)
     {
-        return await releaseService.GetReleaseAsync(id, cancellationToken);
+        return releaseMapper.MapToNullableLabelDto(await releaseService.GetReleaseAsync(id, cancellationToken));
     }
 
     [DataLoader]
