@@ -10,7 +10,6 @@
     <UserSecretsId>26e2fc24-5de9-4860-b503-9983f5ae0e73</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" />
     <PackageReference Include="HotChocolate.AspNetCore" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" />
     <PackageReference Include="HotChocolate.Pagination.Core" />
