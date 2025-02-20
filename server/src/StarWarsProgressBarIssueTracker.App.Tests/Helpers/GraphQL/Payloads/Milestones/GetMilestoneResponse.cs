@@ -1,8 +1,8 @@
-using StarWarsProgressBarIssueTracker.Domain.Milestones;
+using StarWarsProgressBarIssueTracker.App.Milestones;
 
 namespace StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Milestones;
 
 public class GetMilestoneResponse
 {
-    public Milestone? Milestone { get; set; }
+    public MilestoneDto? Milestone { get; set; }
 }

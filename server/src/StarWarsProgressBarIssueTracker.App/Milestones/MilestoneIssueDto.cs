@@ -3,7 +3,7 @@ using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 
 namespace StarWarsProgressBarIssueTracker.App.Milestones;
 
-public class MilestoneIssue : DtoBase
+public class MilestoneIssueDto : DtoBase
 {
     public required string Title { get; set; }
 

@@ -1,4 +1,3 @@
-using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 
 namespace StarWarsProgressBarIssueTracker.App.Milestones;
@@ -11,7 +10,7 @@ public class MilestoneDto : DtoBase
 
     public MilestoneState State { get; set; }
 
-    public IList<Issue> Issues { get; set; } = [];
+    public IList<MilestoneIssueDto> Issues { get; set; } = [];
 
     public string? GitlabId { get; set; }
 

@@ -1,5 +1,6 @@
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
+using StarWarsProgressBarIssueTracker.App.Milestones;
 using StarWarsProgressBarIssueTracker.CodeGen;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
@@ -12,14 +13,14 @@ public partial class IssueTrackerMutations
     [Error<StringTooShortException>]
     [Error<StringTooLongException>]
     [MutationFieldName(nameof(Milestone))]
-    public partial async Task<Milestone> AddMilestone(string title, string? description, CancellationToken cancellationToken)
+    public partial async Task<MilestoneDto> AddMilestone(string title, string? description, CancellationToken cancellationToken)
     {
-        return await milestoneService.AddMilestoneAsync(new()
+        return milestoneMapper.MapToMilestoneDto(await milestoneService.AddMilestoneAsync(new()
         {
             Title = title,
             Description = description,
             State = MilestoneState.Open,
-        }, cancellationToken);
+        }, cancellationToken));
     }
 
     [Error<ValueNotSetException>]
@@ -27,21 +28,21 @@ public partial class IssueTrackerMutations
     [Error<StringTooLongException>]
     [Error<DomainIdNotFoundException>]
     [MutationFieldName(nameof(Milestone))]
-    public partial async Task<Milestone> UpdateMilestone([ID] Guid id, string title, MilestoneState state, string? description, CancellationToken cancellationToken)
+    public partial async Task<MilestoneDto> UpdateMilestone([ID] Guid id, string title, MilestoneState state, string? description, CancellationToken cancellationToken)
     {
-        return await milestoneService.UpdateMilestoneAsync(new Milestone
+        return milestoneMapper.MapToMilestoneDto(await milestoneService.UpdateMilestoneAsync(new Milestone
         {
             Id = id,
             Title = title,
             Description = description,
             State = state
-        }, cancellationToken);
+        }, cancellationToken));
     }
 
     [Error<DomainIdNotFoundException>]
     [MutationFieldName(nameof(Milestone))]
-    public partial async Task<Milestone> DeleteMilestone([ID] Guid id, CancellationToken cancellationToken)
+    public partial async Task<MilestoneDto> DeleteMilestone([ID] Guid id, CancellationToken cancellationToken)
     {
-        return await milestoneService.DeleteMilestoneAsync(id, cancellationToken);
+        return milestoneMapper.MapToMilestoneDto(await milestoneService.DeleteMilestoneAsync(id, cancellationToken));
     }
 }

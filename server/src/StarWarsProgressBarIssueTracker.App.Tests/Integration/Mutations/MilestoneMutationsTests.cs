@@ -1,6 +1,7 @@
 using Bogus;
 using GraphQL;
 using Microsoft.EntityFrameworkCore;
+using StarWarsProgressBarIssueTracker.App.Milestones;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
@@ -417,7 +418,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         DateTime startTime, Milestone? dbMilestone = null)
     {
         DateTime endTime = DateTime.UtcNow;
-        Milestone? addedMilestone;
+        MilestoneDto? addedMilestone;
         using (Assert.Multiple())
         {
             await Assert.That(response).IsNotNull();
@@ -520,7 +521,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         DateTime startTime, Milestone? dbMilestone = null, Milestone? notUpdatedMilestone = null, bool emptyIssues = true)
     {
         DateTime endTime = DateTime.UtcNow;
-        Milestone? updatedMilestone;
+        MilestoneDto? updatedMilestone;
         using (Assert.Multiple())
         {
             await Assert.That(response).IsNotNull();
@@ -656,7 +657,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         {
             await Assert.That(response).IsNotNull();
             await Assert.That(response.Errors).IsNull().Or.IsEmpty();
-            Milestone deletedMilestone = response.Data.DeleteMilestone.Milestone;
+            MilestoneDto deletedMilestone = response.Data.DeleteMilestone.Milestone;
             await Assert.That(deletedMilestone.Id).IsNotDefault();
             await Assert.That(deletedMilestone.Title).IsEqualTo(expectedMilestone.Title);
             await Assert.That(deletedMilestone.Description).IsEqualTo(expectedMilestone.Description);

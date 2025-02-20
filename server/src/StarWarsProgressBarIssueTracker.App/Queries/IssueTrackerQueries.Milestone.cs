@@ -5,6 +5,7 @@ using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.App.Extensions;
+using StarWarsProgressBarIssueTracker.App.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 
@@ -14,22 +15,27 @@ public partial class IssueTrackerQueries
 {
     [UsePaging(IncludeTotalCount = true)]
     [UseSorting]
-    public async Task<Connection<Milestone>> GetMilestones(
+    public async Task<Connection<MilestoneDto>> GetMilestones(
         PagingArguments pagingArguments,
         IMilestoneService milestoneService,
+        MilestoneMapper milestoneMapper,
         CancellationToken cancellationToken)
     {
         Page<Milestone> page = await milestoneService.GetAllMilestonesAsync(pagingArguments, cancellationToken);
-        return page.ToConnectionWithTotalCount();
+        Page<MilestoneDto> dtoPage = new Page<MilestoneDto>(
+            [..page.Items.Select(milestoneMapper.MapToMilestoneDto)], page.HasNextPage,
+            page.HasPreviousPage, milestone => page.CreateCursor(milestoneMapper.MapToMilestone(milestone)), page.TotalCount);
+        return dtoPage.ToConnectionWithTotalCount();
     }
 
     [Error<DomainIdNotFoundException>]
-    public async Task<Milestone?> GetMilestone(
+    public async Task<MilestoneDto?> GetMilestone(
         Guid id,
         IMilestoneService milestoneService,
+        MilestoneMapper milestoneMapper,
         CancellationToken cancellationToken)
     {
-        return await milestoneService.GetMilestoneAsync(id, cancellationToken);
+        return milestoneMapper.MapToNullableMilestoneDto(await milestoneService.GetMilestoneAsync(id, cancellationToken));
     }
 
     [DataLoader]
