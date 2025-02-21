@@ -1,6 +1,6 @@
 using GreenDonut;
+using GreenDonut.Data;
 using HotChocolate.Data;
-using HotChocolate.Pagination;
 using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;

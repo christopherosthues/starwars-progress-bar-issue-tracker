@@ -1,4 +1,4 @@
-using HotChocolate.Pagination;
+using GreenDonut.Data;
 using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
 using StarWarsProgressBarIssueTracker.Infrastructure.Database;

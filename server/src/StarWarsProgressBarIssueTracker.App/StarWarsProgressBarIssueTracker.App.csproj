@@ -12,7 +12,6 @@
   <ItemGroup>
     <PackageReference Include="HotChocolate.AspNetCore" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" />
-    <PackageReference Include="HotChocolate.Pagination.Core" />
     <PackageReference Include="HotChocolate.Types.Analyzers" />
     <PackageReference Include="HotChocolate.Types.Scalars" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />

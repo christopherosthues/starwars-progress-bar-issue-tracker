@@ -1,4 +1,4 @@
-using HotChocolate.Pagination;
+using GreenDonut.Data;
 using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Issues;

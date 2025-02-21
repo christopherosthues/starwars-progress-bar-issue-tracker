@@ -1,4 +1,4 @@
-using HotChocolate.Pagination;
+using GreenDonut.Data;
 using HotChocolate.Types.Pagination;
 
 namespace StarWarsProgressBarIssueTracker.App.Extensions;

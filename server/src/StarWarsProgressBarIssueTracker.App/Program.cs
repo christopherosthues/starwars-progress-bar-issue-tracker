@@ -36,7 +36,13 @@ builder.Services.AddGraphQLServer()
     .AddMutationType<IssueTrackerMutations>()
     .AddAppTypes()
     .AddPagingArguments()
-    .AddSorting();
+    .AddSorting()
+    .ModifyPagingOptions(options =>
+    {
+        options.DefaultPageSize = 50;
+        options.MaxPageSize = 100;
+        options.IncludeTotalCount = true;
+    });
     // .AddErrorInterfaceType<IUserError>(); TODO: User error
 
 // builder.Services.AddResiliencePipeline("job-pipeline", pipelineBuilder =>
