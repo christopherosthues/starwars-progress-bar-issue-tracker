@@ -10,7 +10,7 @@ public class NullableDateTimeEqualToIgnoreMillisecondsCondition(DateTime? expect
         return $"to be equal to {ExpectedValue}";
     }
 
-    protected override Task<AssertionResult> GetResult(DateTime? actualValue, DateTime? expectedValue)
+    protected override ValueTask<AssertionResult> GetResult(DateTime? actualValue, DateTime? expectedValue)
     {
         if (actualValue is not null && expectedValue is not null)
         {

@@ -15,9 +15,7 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Integration;
 public class IntegrationTestBase
 {
     [ClassDataSource<IssueTrackerWebApplicationFactory>(Shared = SharedType.PerClass)]
-    public required IssueTrackerWebApplicationFactory ApiFactory { get; set; }
-
-    protected TimeSpan Tolerance => TimeSpan.FromMilliseconds(300);
+    public required IssueTrackerWebApplicationFactory ApiFactory { get; init; }
 
     protected GraphQLHttpClient CreateGraphQLClient()
     {

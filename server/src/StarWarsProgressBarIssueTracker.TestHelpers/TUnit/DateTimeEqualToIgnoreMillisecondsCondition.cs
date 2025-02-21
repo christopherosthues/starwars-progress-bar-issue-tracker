@@ -10,7 +10,7 @@ public class DateTimeEqualToIgnoreMillisecondsCondition(DateTime expected)
         return $"to be equal to {ExpectedValue}";
     }
 
-    protected override Task<AssertionResult> GetResult(DateTime actualValue, DateTime expectedValue)
+    protected override ValueTask<AssertionResult> GetResult(DateTime actualValue, DateTime expectedValue)
     {
         DateTime actualDateTime = new DateTime(actualValue.Year, actualValue.Month, actualValue.Day, actualValue.Hour,
             actualValue.Minute, actualValue.Second, DateTimeKind.Utc);
