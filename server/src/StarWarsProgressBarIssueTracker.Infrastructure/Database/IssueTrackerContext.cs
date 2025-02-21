@@ -12,17 +12,17 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database;
 
 public class IssueTrackerContext(DbContextOptions<IssueTrackerContext> options) : DbContext(options)
 {
-    public DbSet<Appearance> Appearances { get; init; } = default!;
-    public DbSet<Issue> Issues { get; init; } = default!;
-    public DbSet<IssueLink> IssueLinks { get; init; } = default!;
-    public DbSet<Label> Labels { get; init; } = default!;
-    public DbSet<Milestone> Milestones { get; init; } = default!;
-    public DbSet<Release> Releases { get; init; } = default!;
-    public DbSet<Vehicle> Vehicles { get; init; } = default!;
-    public DbSet<Photo> Photos { get; init; } = default!;
-    public DbSet<Translation> Translations { get; init; } = default!;
-    public DbSet<DbJob> Jobs { get; init; } = default!;
-    public DbSet<DbTask> Tasks { get; init; } = default!;
+    public DbSet<Appearance> Appearances { get; init; } = null!;
+    public DbSet<Issue> Issues { get; init; } = null!;
+    public DbSet<IssueLink> IssueLinks { get; init; } = null!;
+    public DbSet<Label> Labels { get; init; } = null!;
+    public DbSet<Milestone> Milestones { get; init; } = null!;
+    public DbSet<Release> Releases { get; init; } = null!;
+    public DbSet<Vehicle> Vehicles { get; init; } = null!;
+    public DbSet<Photo> Photos { get; init; } = null!;
+    public DbSet<Translation> Translations { get; init; } = null!;
+    public DbSet<DbJob> Jobs { get; init; } = null!;
+    public DbSet<DbTask> Tasks { get; init; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

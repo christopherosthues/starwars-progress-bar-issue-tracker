@@ -13,11 +13,11 @@ public class LinkIssue
     [JsonPropertyName("project_id")]
     public int ProjectId { get; set; }
 
-    public string Title { get; set; } = default!;
+    public string Title { get; set; } = null!;
 
-    public string Description { get; set; } = default!;
+    public string Description { get; set; } = null!;
 
-    public string State { get; set; } = default!;
+    public string State { get; set; } = null!;
 
     [JsonPropertyName("due_date")]
     public string? DueDate { get; set; }

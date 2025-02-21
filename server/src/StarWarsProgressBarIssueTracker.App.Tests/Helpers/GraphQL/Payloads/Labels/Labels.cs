@@ -5,7 +5,7 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Lab
 public class Labels
 {
     public int TotalCount { get; set; }
-    public PageInfo PageInfo { get; set; } = default!;
+    public PageInfo PageInfo { get; set; } = null!;
     public IEnumerable<Edge<LabelDto>> Edges { get; set; } = [];
     public IEnumerable<LabelDto> Nodes { get; set; } = [];
 }

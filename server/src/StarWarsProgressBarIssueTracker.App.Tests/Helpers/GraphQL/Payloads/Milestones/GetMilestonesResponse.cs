@@ -2,5 +2,5 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Mil
 
 public class GetMilestonesResponse
 {
-    public Milestones Milestones { get; set; } = default!;
+    public Milestones Milestones { get; set; } = null!;
 }
