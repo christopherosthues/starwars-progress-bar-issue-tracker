@@ -5,7 +5,7 @@ using StarWarsProgressBarIssueTracker.Domain.Labels;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
 using StarWarsProgressBarIssueTracker.Domain.Vehicles;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Infrastructure.Entities;
 using StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure;

@@ -1,4 +1,4 @@
-﻿namespace StarWarsProgressBarIssueTracker.Infrastructure.Models;
+﻿namespace StarWarsProgressBarIssueTracker.Infrastructure.Entities;
 
 public enum JobType
 {

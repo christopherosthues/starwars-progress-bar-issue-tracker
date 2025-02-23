@@ -3,9 +3,9 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using StarWarsProgressBarIssueTracker.CodeGen.Models;
+using StarWarsProgressBarIssueTracker.CodeGen.GraphQL.Models;
 
-namespace StarWarsProgressBarIssueTracker.CodeGen;
+namespace StarWarsProgressBarIssueTracker.CodeGen.GraphQL;
 
 [Generator]
 public sealed class MutationFieldNameGenerator : IIncrementalGenerator
@@ -20,7 +20,8 @@ public sealed class MutationFieldNameGenerator : IIncrementalGenerator
             )
             .Where(static m => m is not null);
 
-        context.RegisterSourceOutput(context.CompilationProvider.Combine(provider.Collect()), (sourceContext, data) => GenerateCode(sourceContext, data.Right!));
+        context.RegisterSourceOutput(context.CompilationProvider.Combine(provider.Collect()),
+            (sourceContext, data) => GenerateCode(sourceContext, data.Right!));
     }
 
     private static MutationFieldNameDataModel? GetMethodDeclarationForGen(GeneratorAttributeSyntaxContext context)
@@ -45,6 +46,11 @@ public sealed class MutationFieldNameGenerator : IIncrementalGenerator
             return null;
         }
 
+        string fieldName =
+            context.Attributes
+                .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == nameof(MutationFieldNameAttribute))
+                ?.ConstructorArguments[0].Value?.ToString() ?? string.Empty;
+
         return new MutationFieldNameDataModel
         {
             MethodName = methodSymbol.Name,
@@ -61,7 +67,7 @@ public sealed class MutationFieldNameGenerator : IIncrementalGenerator
             )),
             Namespace = methodSymbol.ContainingNamespace.ToDisplayString(),
             MinimalTypeName = methodSymbol.ContainingType.Name,
-            FieldName = context.Attributes[0].ConstructorArguments[0].Value?.ToString() ?? string.Empty,
+            FieldName = fieldName,
             MethodReturnType = methodSymbol.ReturnType.ToDisplayString(),
             MethodParameters = methodSymbol.Parameters.Select(p => p.ToDisplayString()).ToImmutableArray(),
         };

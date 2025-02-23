@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.Infrastructure.Database;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Infrastructure.Entities;
 
 namespace StarWarsProgressBarIssueTracker.App.Extensions;
 

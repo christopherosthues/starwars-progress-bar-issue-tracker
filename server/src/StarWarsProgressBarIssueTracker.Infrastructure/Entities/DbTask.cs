@@ -2,7 +2,7 @@
 using StarWarsProgressBarIssueTracker.Domain.Models;
 using StarWarsProgressBarIssueTracker.Infrastructure.Database.Configurations;
 
-namespace StarWarsProgressBarIssueTracker.Infrastructure.Models;
+namespace StarWarsProgressBarIssueTracker.Infrastructure.Entities;
 
 [EntityTypeConfiguration(typeof(DbTaskConfiguration))]
 public class DbTask : DomainBase

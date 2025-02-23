@@ -1,4 +1,4 @@
-namespace StarWarsProgressBarIssueTracker.CodeGen;
+namespace StarWarsProgressBarIssueTracker.CodeGen.GraphQL;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 public class MutationFieldNameAttribute(string name) : Attribute

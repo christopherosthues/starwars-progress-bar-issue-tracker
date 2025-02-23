@@ -1,7 +1,8 @@
 ﻿using GreenDonut.Data;
 using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.Infrastructure.Database;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Infrastructure.Entities;
+using TaskStatus = StarWarsProgressBarIssueTracker.Infrastructure.Entities.TaskStatus;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
@@ -21,9 +22,9 @@ public class TaskRepository(IssueTrackerContext context) : IssueTrackerRepositor
         CancellationToken cancellationToken = default)
     {
         return await GetIncludingFields().Where(task => task.Job.JobType == jobType &&
-                                                        task.Status != Models.TaskStatus.Unknown &&
-                                                        task.Status != Models.TaskStatus.Completed &&
-                                                        task.Status != Models.TaskStatus.Error)
+                                                        task.Status != TaskStatus.Unknown &&
+                                                        task.Status != TaskStatus.Completed &&
+                                                        task.Status != TaskStatus.Error)
             .ToListAsync(cancellationToken);
     }
 

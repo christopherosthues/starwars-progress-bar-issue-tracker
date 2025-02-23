@@ -1,7 +1,7 @@
 using GreenDonut.Data;
 using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.Infrastructure.Database;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Infrastructure.Entities;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 

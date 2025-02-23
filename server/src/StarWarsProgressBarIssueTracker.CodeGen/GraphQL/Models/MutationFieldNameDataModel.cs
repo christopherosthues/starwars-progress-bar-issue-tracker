@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace StarWarsProgressBarIssueTracker.CodeGen.Models;
+namespace StarWarsProgressBarIssueTracker.CodeGen.GraphQL.Models;
 
 public class MutationFieldNameDataModel
 {

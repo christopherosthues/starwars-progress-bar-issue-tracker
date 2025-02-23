@@ -1,8 +1,9 @@
 ﻿using Polly;
 using Polly.Registry;
 using StarWarsProgressBarIssueTracker.Infrastructure.Database;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Infrastructure.Entities;
 using StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
+using TaskStatus = StarWarsProgressBarIssueTracker.Infrastructure.Entities.TaskStatus;
 
 namespace StarWarsProgressBarIssueTracker.App.Jobs;
 
@@ -27,9 +28,9 @@ public class JobExecutionService
 
         foreach (DbTask task in tasks)
         {
-            if (task.Status == Infrastructure.Models.TaskStatus.Planned)
+            if (task.Status == TaskStatus.Planned)
             {
-                task.Status = Infrastructure.Models.TaskStatus.Running;
+                task.Status = TaskStatus.Running;
                 await _taskRepository.UpdateAsync(task, cancellationToken);
 
                 IJob job = _jobFactory.CreateJob(jobType);
@@ -42,25 +43,25 @@ public class JobExecutionService
                     {
                         try
                         {
-                            task.Status = Infrastructure.Models.TaskStatus.Running;
+                            task.Status = TaskStatus.Running;
                             await _taskRepository.UpdateAsync(task, cancellationToken);
 
                             await job.ExecuteAsync(cancellationToken);
 
-                            task.Status = Infrastructure.Models.TaskStatus.Completed;
+                            task.Status = TaskStatus.Completed;
                             task.ExecutedAt = DateTime.UtcNow;
                             await _taskRepository.UpdateAsync(task, cancellationToken);
                         }
                         catch
                         {
-                            task.Status = Infrastructure.Models.TaskStatus.FailureWaitingForRetry;
+                            task.Status = TaskStatus.FailureWaitingForRetry;
                             await _taskRepository.UpdateAsync(task, cancellationToken);
                         }
                     }, cancellationToken);
                 }
                 catch
                 {
-                    task.Status = Infrastructure.Models.TaskStatus.Error;
+                    task.Status = TaskStatus.Error;
                     await _taskRepository.UpdateAsync(task, cancellationToken);
                 }
             }

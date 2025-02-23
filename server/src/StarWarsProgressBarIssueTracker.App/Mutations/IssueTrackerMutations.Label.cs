@@ -1,7 +1,7 @@
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using StarWarsProgressBarIssueTracker.App.Labels;
-using StarWarsProgressBarIssueTracker.CodeGen;
+using StarWarsProgressBarIssueTracker.CodeGen.GraphQL;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Labels;
 

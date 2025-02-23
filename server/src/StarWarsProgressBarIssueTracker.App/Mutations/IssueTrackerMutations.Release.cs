@@ -1,6 +1,6 @@
 using HotChocolate.Types.Relay;
 using StarWarsProgressBarIssueTracker.App.Releases;
-using StarWarsProgressBarIssueTracker.CodeGen;
+using StarWarsProgressBarIssueTracker.CodeGen.GraphQL;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
 
 namespace StarWarsProgressBarIssueTracker.App.Mutations;

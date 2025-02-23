@@ -1,5 +1,5 @@
 ﻿using Quartz;
-using StarWarsProgressBarIssueTracker.Infrastructure.Models;
+using StarWarsProgressBarIssueTracker.Infrastructure.Entities;
 
 namespace StarWarsProgressBarIssueTracker.App.Jobs;
 
