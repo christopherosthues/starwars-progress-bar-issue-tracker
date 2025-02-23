@@ -98,19 +98,18 @@ public class MilestoneService(
     public async Task SynchronizeFromGitlabAsync(IList<Milestone> milestones,
         CancellationToken cancellationToken = default)
     {
-        // var existingMilestones = await milestoneRepository.GetAllAsync(cancellationToken);
-        //
-        // var milestonesToAdd = milestones.Where(milestone =>
-        //     !existingMilestones.Any(existingMilestone => milestone.GitlabId!.Equals(existingMilestone.GitlabId)));
-        //
-        // var milestonesToDelete = existingMilestones.Where(existingMilestone => existingMilestone.GitlabId != null &&
-        //                                                            !milestones.Any(milestone => milestone.GitlabId!.Equals(existingMilestone.GitlabId)));
-        //
-        // await milestoneRepository.AddRangeAsync(milestonesToAdd, cancellationToken);
-        //
-        // await milestoneRepository.DeleteRangeByGitlabIdAsync(milestonesToDelete, cancellationToken);
+        List<Milestone> existingMilestones = await milestoneRepository.GetAllAsync(cancellationToken);
 
-        await Task.CompletedTask;
+        IEnumerable<Milestone> milestonesToAdd = milestones.Where(milestone =>
+            !existingMilestones.Any(existingMilestone => milestone.GitlabId!.Equals(existingMilestone.GitlabId)));
+
+        IEnumerable<Milestone> milestonesToDelete = existingMilestones.Where(existingMilestone =>
+            existingMilestone.GitlabId != null &&
+            !milestones.Any(milestone => milestone.GitlabId!.Equals(existingMilestone.GitlabId)));
+
+        await milestoneRepository.AddRangeAsync(milestonesToAdd, cancellationToken);
+
+        await milestoneRepository.DeleteRangeByGitlabIdAsync(milestonesToDelete, cancellationToken);
 
         // TODO: Update milestone, resolve conflicts
     }

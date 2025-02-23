@@ -27,17 +27,6 @@ public static class ServiceRegistrationExtensions
         return serviceCollection;
     }
 
-    public static IServiceCollection AddDataPorts(this IServiceCollection serviceCollection)
-    {
-        // serviceCollection.AddScoped<IDataPort<Appearance>, AppearanceDataPort>();
-        // serviceCollection.AddScoped<IDataPort<Issue>, IssueDataPort>();
-        // serviceCollection.AddScoped<IDataPort<Label>, LabelDataPort>();
-        // serviceCollection.AddScoped<IDataPort<Milestone>, MilestoneDataPort>();
-        // serviceCollection.AddScoped<IDataPort<Release>, ReleaseDataPort>();
-
-        return serviceCollection;
-    }
-
     public static IServiceCollection AddIssueTrackerServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<IAppearanceService, AppearanceService>();

@@ -7,10 +7,34 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
 public class LabelRepository(IssueTrackerContext context) : IssueTrackerRepositoryBase<Label>(context), ILabelRepository
 {
+    public override async Task<List<Label>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Milestone)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Release)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Vehicle)
+            .ThenInclude(dbVehicle => dbVehicle!.Appearances)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Vehicle)
+            .ThenInclude(dbVehicle => dbVehicle!.Photos)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Vehicle)
+            .ThenInclude(dbVehicle => dbVehicle!.Translations)
+            .Include(dbLabel => dbLabel.Issues)
+            .ThenInclude(dbIssue => dbIssue.Labels)
+            .OrderBy(label => label.Title)
+            .ThenBy(label => label.Id)
+            .ToListAsync(cancellationToken);
+    }
+
     public override async Task<Page<Label>> GetAllAsync(PagingArguments pagingArguments,
         CancellationToken cancellationToken = default)
     {
         return await DbSet
+            .AsNoTracking()
             .Include(dbLabel => dbLabel.Issues)
             .ThenInclude(dbIssue => dbIssue.Milestone)
             .Include(dbLabel => dbLabel.Issues)
@@ -34,6 +58,7 @@ public class LabelRepository(IssueTrackerContext context) : IssueTrackerReposito
     public IQueryable<Label> GetLabelByIds(IReadOnlyList<Guid> ids)
     {
         return DbSet
+            .AsNoTracking()
             .Include(dbLabel => dbLabel.Issues)
             .ThenInclude(dbIssue => dbIssue.Milestone)
             .Include(dbLabel => dbLabel.Issues)

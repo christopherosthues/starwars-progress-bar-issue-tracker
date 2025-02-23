@@ -112,19 +112,18 @@ public partial class LabelService(ILabelRepository labelRepository, ILabelByIdDa
 
     public async Task SynchronizeFromGitlabAsync(IList<Label> labels, CancellationToken cancellationToken = default)
     {
-        // var existingLabels = await labelRepository.GetAllAsync(cancellationToken);
-        //
-        // var labelsToAdd = labels.Where(label =>
-        //     !existingLabels.Any(existingLabel => label.GitlabId!.Equals(existingLabel.GitlabId)));
-        //
-        // var labelsToDelete = existingLabels.Where(existingLabel => existingLabel.GitlabId != null &&
-        //     !labels.Any(label => label.GitlabId!.Equals(existingLabel.GitlabId)));
-        //
-        // await labelRepository.AddRangeAsync(labelsToAdd, cancellationToken);
-        //
-        // await labelRepository.DeleteRangeByGitlabIdAsync(labelsToDelete, cancellationToken);
+        List<Label> existingLabels = await labelRepository.GetAllAsync(cancellationToken);
 
-        await Task.CompletedTask;
+        IEnumerable<Label> labelsToAdd = labels.Where(label =>
+            !existingLabels.Any(existingLabel => label.GitlabId!.Equals(existingLabel.GitlabId)));
+
+        IEnumerable<Label> labelsToDelete = existingLabels.Where(existingLabel => existingLabel.GitlabId != null &&
+            !labels.Any(label => label.GitlabId!.Equals(existingLabel.GitlabId)));
+
+        await labelRepository.AddRangeAsync(labelsToAdd, cancellationToken);
+
+        await labelRepository.DeleteRangeByGitlabIdAsync(labelsToDelete, cancellationToken);
+
         // TODO: Update label, resolve conflicts
     }
 

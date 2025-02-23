@@ -8,10 +8,20 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
 public class TaskRepository(IssueTrackerContext context) : IssueTrackerRepositoryBase<DbTask>(context), ITaskRepository
 {
+    public override async Task<List<DbTask>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(task => task.Job)
+            .OrderBy(task => task.ExecuteAt)
+            .ThenBy(task => task.Id)
+            .ToListAsync(cancellationToken);
+    }
+
     public override async Task<Page<DbTask>> GetAllAsync(PagingArguments pagingArguments,
         CancellationToken cancellationToken = default)
     {
-        return await DbSet.AsNoTracking()
+        return await DbSet
+            .AsNoTracking()
             .Include(task => task.Job)
             .OrderBy(task => task.ExecuteAt)
             .ThenBy(task => task.Id)

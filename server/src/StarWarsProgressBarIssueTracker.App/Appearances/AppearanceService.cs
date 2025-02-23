@@ -117,19 +117,17 @@ public partial class AppearanceService(
     public async Task SynchronizeFromGitlabAsync(IList<Appearance> appearances,
         CancellationToken cancellationToken = default)
     {
-        // var existingAppearances = await appearanceRepository.GetAllAsync(cancellationToken);
-        //
-        // var appearancesToAdd = appearances.Where(appearance =>
-        //     !existingAppearances.Any(existingAppearance => appearance.GitlabId!.Equals(existingAppearance.GitlabId)));
-        //
-        // var appearancesToDelete = existingAppearances.Where(existingAppearance => existingAppearance.GitlabId != null &&
-        //     !appearances.Any(appearance => appearance.GitlabId!.Equals(existingAppearance.GitlabId)));
-        //
-        // await appearanceRepository.AddRangeAsync(appearancesToAdd, cancellationToken);
-        //
-        // await appearanceRepository.DeleteRangeByGitlabIdAsync(appearancesToDelete, cancellationToken);
+        List<Appearance> existingAppearances = await appearanceRepository.GetAllAsync(cancellationToken);
 
-        await Task.CompletedTask;
+        IEnumerable<Appearance> appearancesToAdd = appearances.Where(appearance =>
+            !existingAppearances.Any(existingAppearance => appearance.GitlabId!.Equals(existingAppearance.GitlabId)));
+
+        IEnumerable<Appearance> appearancesToDelete = existingAppearances.Where(existingAppearance => existingAppearance.GitlabId != null &&
+                                                                                                      !appearances.Any(appearance => appearance.GitlabId!.Equals(existingAppearance.GitlabId)));
+
+        await appearanceRepository.AddRangeAsync(appearancesToAdd, cancellationToken);
+
+        await appearanceRepository.DeleteRangeByGitlabIdAsync(appearancesToDelete, cancellationToken);
 
         // TODO: Update appearances, resolve conflicts
     }

@@ -89,7 +89,6 @@ builder.Services.AddGraphQLServer()
 
 builder.Services.AddJobs();
 builder.Services.AddRepositories();
-builder.Services.AddDataPorts();
 builder.Services.AddIssueTrackerConfigurations(builder.Configuration);
 builder.Services.AddIssueTrackerServices();
 builder.Services.AddMappers();

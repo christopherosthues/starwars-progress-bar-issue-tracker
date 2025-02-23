@@ -2,6 +2,7 @@ using GreenDonut.Data;
 using StarWarsProgressBarIssueTracker.App.Queries;
 using StarWarsProgressBarIssueTracker.Domain.Exceptions;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
+using StarWarsProgressBarIssueTracker.Domain.Vehicles;
 using KeyNotFoundException = GreenDonut.KeyNotFoundException;
 
 namespace StarWarsProgressBarIssueTracker.App.Issues;
@@ -135,42 +136,39 @@ public class IssueService(IIssueRepository issueRepository, IIssueByIdDataLoader
 
     public async Task SynchronizeFromGitlabAsync(IList<Issue> issues, CancellationToken cancellationToken = default)
     {
-        // var existingIssues = await issueRepository.GetAllAsync(cancellationToken);
-        //
-        // var issuesToAdd = issues.Where(issue =>
-        //     !existingIssues.Any(existingIssue => issue.GitlabId!.Equals(existingIssue.GitlabId)))
-        //     .ToList();
-        //
-        // var issuesToDelete = existingIssues.Where(existingIssue => existingIssue.GitlabId != null &&
-        //                                                            !issues.Any(issue =>
-        //                                                                issue.GitlabId!.Equals(existingIssue.GitlabId)));
-        //
-        // IList<Issue> newIssues = [];
-        // foreach (var issueToAdd in issuesToAdd)
-        // {
-        //     newIssues.Add(new Issue
-        //     {
-        //         GitlabId = issueToAdd.GitlabId,
-        //         GitlabIid = issueToAdd.GitlabIid,
-        //         Title = issueToAdd.Title,
-        //         Description = issueToAdd.Description,
-        //         Priority = issueToAdd.Priority,
-        //         Vehicle = issueToAdd.Vehicle != null ?
-        //             new Vehicle
-        //             {
-        //                 EngineColor = issueToAdd.Vehicle.EngineColor,
-        //                 Translations = issueToAdd.Vehicle.Translations
-        //             } : null
-        //     });
-        // }
-        //
-        // await issueRepository.AddRangeAsync(newIssues, cancellationToken);
-        //
-        // await issueRepository.UpdateRangeByGitlabIdAsync(issuesToAdd, cancellationToken);
-        //
-        // await issueRepository.DeleteRangeByGitlabIdAsync(issuesToDelete, cancellationToken);
+        List<Issue> existingIssues = await issueRepository.GetAllAsync(cancellationToken);
 
-        await Task.CompletedTask;
+        List<Issue> issuesToAdd = issues.Where(issue =>
+            !existingIssues.Any(existingIssue => issue.GitlabId!.Equals(existingIssue.GitlabId)))
+            .ToList();
+
+        IEnumerable<Issue> issuesToDelete = existingIssues.Where(existingIssue => existingIssue.GitlabId != null &&
+            !issues.Any(issue => issue.GitlabId!.Equals(existingIssue.GitlabId)));
+
+        IList<Issue> newIssues = [];
+        foreach (Issue issueToAdd in issuesToAdd)
+        {
+            newIssues.Add(new Issue
+            {
+                GitlabId = issueToAdd.GitlabId,
+                GitlabIid = issueToAdd.GitlabIid,
+                Title = issueToAdd.Title,
+                Description = issueToAdd.Description,
+                Priority = issueToAdd.Priority,
+                Vehicle = issueToAdd.Vehicle != null ?
+                    new Vehicle
+                    {
+                        EngineColor = issueToAdd.Vehicle.EngineColor,
+                        Translations = issueToAdd.Vehicle.Translations
+                    } : null
+            });
+        }
+
+        await issueRepository.AddRangeAsync(newIssues, cancellationToken);
+
+        await issueRepository.UpdateRangeByGitlabIdAsync(issuesToAdd, cancellationToken);
+
+        await issueRepository.DeleteRangeByGitlabIdAsync(issuesToDelete, cancellationToken);
 
         // TODO: Update issues, resolve conflicts
     }

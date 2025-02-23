@@ -94,19 +94,18 @@ public class ReleaseService(IReleaseRepository releaseRepository, IReleaseByIdDa
 
     public async Task SynchronizeFromGitlabAsync(IList<Release> releases, CancellationToken cancellationToken = default)
     {
-        // var existingReleases = await releaseRepository.GetAllAsync(cancellationToken);
-        //
-        // var releasesToAdd = releases.Where(release =>
-        //     !existingReleases.Any(existingRelease => release.GitlabId!.Equals(existingRelease.GitlabId)));
-        //
-        // var releasesToDelete = existingReleases.Where(existingRelease => existingRelease.GitlabId != null &&
-        //                                                                        !releases.Any(release => release.GitlabId!.Equals(existingRelease.GitlabId)));
-        //
-        // await releaseRepository.AddRangeAsync(releasesToAdd, cancellationToken);
-        //
-        // await releaseRepository.DeleteRangeByGitlabIdAsync(releasesToDelete, cancellationToken);
+        List<Release> existingReleases = await releaseRepository.GetAllAsync(cancellationToken);
 
-        await Task.CompletedTask;
+        IEnumerable<Release> releasesToAdd = releases.Where(release =>
+            !existingReleases.Any(existingRelease => release.GitlabId!.Equals(existingRelease.GitlabId)));
+
+        IEnumerable<Release> releasesToDelete = existingReleases.Where(existingRelease =>
+            existingRelease.GitlabId != null &&
+            !releases.Any(release => release.GitlabId!.Equals(existingRelease.GitlabId)));
+
+        await releaseRepository.AddRangeAsync(releasesToAdd, cancellationToken);
+
+        await releaseRepository.DeleteRangeByGitlabIdAsync(releasesToDelete, cancellationToken);
 
         // TODO: Update milestone, resolve conflicts
     }

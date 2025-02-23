@@ -8,6 +8,8 @@ public interface IRepository<TDomain>
 
     Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default);
 
+    Task<List<TDomain>> GetAllAsync(CancellationToken cancellationToken = default);
+
     Task<Page<TDomain>> GetAllAsync(PagingArguments pagingArguments, CancellationToken cancellationToken = default);
 
     Task<TDomain> AddAsync(TDomain entity, CancellationToken cancellationToken = default);

@@ -8,6 +8,24 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 
 public class IssueRepository(IssueTrackerContext context) : IssueTrackerRepositoryBase<Issue>(context), IIssueRepository
 {
+    public override async Task<List<Issue>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(dbIssue => dbIssue.Milestone)
+            .Include(dbIssue => dbIssue.Release)
+            .Include(dbIssue => dbIssue.Labels)
+            .Include(dbIssue => dbIssue.LinkedIssues)
+            .Include(dbIssue => dbIssue.Vehicle)
+            .ThenInclude(dbVehicle => dbVehicle!.Appearances)
+            .Include(dbIssue => dbIssue.Vehicle)
+            .ThenInclude(dbVehicle => dbVehicle!.Photos)
+            .Include(dbIssue => dbIssue.Vehicle)
+            .ThenInclude(dbVehicle => dbVehicle!.Translations)
+            .OrderBy(issue => issue.Title)
+            .ThenBy(issue => issue.Id)
+            .ToListAsync(cancellationToken);
+    }
+
     public override async Task<Page<Issue>> GetAllAsync(PagingArguments pagingArguments,
         CancellationToken cancellationToken = default)
     {

@@ -39,6 +39,8 @@ public abstract class IssueTrackerRepositoryBase<TDomain>(IssueTrackerContext co
         return await DbSet.AnyAsync(entity => entity.Id.Equals(id), cancellationToken);
     }
 
+    public abstract Task<List<TDomain>> GetAllAsync(CancellationToken cancellationToken = default);
+
     public abstract Task<Page<TDomain>> GetAllAsync(PagingArguments pagingArguments,
         CancellationToken cancellationToken = default);
 

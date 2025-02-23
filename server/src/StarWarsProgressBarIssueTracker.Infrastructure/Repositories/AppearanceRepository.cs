@@ -8,6 +8,14 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 public class AppearanceRepository(IssueTrackerContext context)
     : IssueTrackerRepositoryBase<Appearance>(context), IAppearanceRepository
 {
+    public override async Task<List<Appearance>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .OrderBy(appearance => appearance.Title)
+            .ThenBy(appearance => appearance.Id)
+            .ToListAsync(cancellationToken);
+    }
+
     public override async Task<Page<Appearance>> GetAllAsync(PagingArguments pagingArguments,
         CancellationToken cancellationToken = default)
     {

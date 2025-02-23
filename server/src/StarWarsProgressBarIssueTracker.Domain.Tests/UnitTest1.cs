@@ -13,7 +13,7 @@ public class Tests
     [Error("Error")]
     public async Task Test1()
     {
-        var errorTest = "Error test";
+        string errorTest = "Error test";
         await Assert.That(errorTest).IsNotEmpty();
     }
 }

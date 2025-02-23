@@ -8,10 +8,24 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Repositories;
 public class MilestoneRepository(IssueTrackerContext context)
     : IssueTrackerRepositoryBase<Milestone>(context), IMilestoneRepository
 {
+    public override async Task<List<Milestone>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(dbMilestone => dbMilestone.Issues)
+            .ThenInclude(dbIssue => dbIssue.Vehicle)
+            .ThenInclude(dbVehicle => dbVehicle!.Appearances)
+            .Include(dbMilestone => dbMilestone.Issues)
+            .ThenInclude(dbIssue => dbIssue.Release)
+            .OrderBy(milestone => milestone.Title)
+            .ThenBy(milestone => milestone.Id)
+            .ToListAsync(cancellationToken);
+    }
+
     public override async Task<Page<Milestone>> GetAllAsync(PagingArguments pagingArguments,
         CancellationToken cancellationToken = default)
     {
-        return await DbSet.AsNoTracking()
+        return await DbSet
+            .AsNoTracking()
             .Include(dbMilestone => dbMilestone.Issues)
             .ThenInclude(dbIssue => dbIssue.Vehicle)
             .ThenInclude(dbVehicle => dbVehicle!.Appearances)
