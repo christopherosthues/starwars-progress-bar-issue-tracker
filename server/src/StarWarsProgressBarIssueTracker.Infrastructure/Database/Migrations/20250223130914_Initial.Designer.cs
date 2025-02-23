@@ -12,7 +12,7 @@ using StarWarsProgressBarIssueTracker.Infrastructure.Database;
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(IssueTrackerContext))]
-    [Migration("20241223202020_Initial")]
+    [Migration("20250223130914_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -407,7 +407,97 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                     b.ToTable("Vehicles", "issue_tracker");
                 });
 
-            modelBuilder.Entity("StarWarsProgressBarIssueTracker.Infrastructure.Models.DbJob", b =>
+            modelBuilder.Entity("StarWarsProgressBarIssueTracker.Infrastructure.Entities.DbEngineColor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EngineColors", "issue_tracker");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Blue"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Brown"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Green"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Orange"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Purple"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Red"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Yellow"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "White"
+                        });
+                });
+
+            modelBuilder.Entity("StarWarsProgressBarIssueTracker.Infrastructure.Entities.DbIssueState", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IssueStates", "issue_tracker");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Open"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Closed"
+                        });
+                });
+
+            modelBuilder.Entity("StarWarsProgressBarIssueTracker.Infrastructure.Entities.DbJob", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -440,7 +530,172 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                     b.ToTable("Jobs", "issue_tracker");
                 });
 
-            modelBuilder.Entity("StarWarsProgressBarIssueTracker.Infrastructure.Models.DbTask", b =>
+            modelBuilder.Entity("StarWarsProgressBarIssueTracker.Infrastructure.Entities.DbJobType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JobTypes", "issue_tracker");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "GitlabSync"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "GitHubSync"
+                        });
+                });
+
+            modelBuilder.Entity("StarWarsProgressBarIssueTracker.Infrastructure.Entities.DbLinkType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LinkTypes", "issue_tracker");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Blocks"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "IsBlockedBy"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "RelatesTo"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "IsRelatedTo"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Duplicates"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "IsDuplicatedBy"
+                        });
+                });
+
+            modelBuilder.Entity("StarWarsProgressBarIssueTracker.Infrastructure.Entities.DbPriority", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Priorities", "issue_tracker");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Minor"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Lowest"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Low"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Medium"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "High"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Highest"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Blocker"
+                        });
+                });
+
+            modelBuilder.Entity("StarWarsProgressBarIssueTracker.Infrastructure.Entities.DbReleaseState", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ReleaseStates", "issue_tracker");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Planned"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Released"
+                        });
+                });
+
+            modelBuilder.Entity("StarWarsProgressBarIssueTracker.Infrastructure.Entities.DbTask", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -469,6 +724,51 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                     b.HasIndex("JobId");
 
                     b.ToTable("Tasks", "issue_tracker");
+                });
+
+            modelBuilder.Entity("StarWarsProgressBarIssueTracker.Infrastructure.Entities.DbTaskStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TaskStatuses", "issue_tracker");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Planned"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Running"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "FailureWaitingForRetry"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Error"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Completed"
+                        });
                 });
 
             modelBuilder.Entity("IssueLabel", b =>
@@ -541,9 +841,9 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                         .HasForeignKey("VehicleId");
                 });
 
-            modelBuilder.Entity("StarWarsProgressBarIssueTracker.Infrastructure.Models.DbTask", b =>
+            modelBuilder.Entity("StarWarsProgressBarIssueTracker.Infrastructure.Entities.DbTask", b =>
                 {
-                    b.HasOne("StarWarsProgressBarIssueTracker.Infrastructure.Models.DbJob", "Job")
+                    b.HasOne("StarWarsProgressBarIssueTracker.Infrastructure.Entities.DbJob", "Job")
                         .WithMany()
                         .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.Cascade)

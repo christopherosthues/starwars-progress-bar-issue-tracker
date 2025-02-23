@@ -18,14 +18,6 @@
   <ItemGroup>
     <Folder Include="Database\Migrations\" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Database\Migrations\20241223202020_Initial.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="Database\Migrations\20250223003330_AddEnumTables.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-  </ItemGroup>
   <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0">
     <Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High" />
     <Exec Command="dotnet husky install" StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory="../../../" />

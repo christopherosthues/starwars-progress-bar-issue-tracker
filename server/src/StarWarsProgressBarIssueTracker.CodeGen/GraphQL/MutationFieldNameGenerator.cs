@@ -48,7 +48,7 @@ public sealed class MutationFieldNameGenerator : IIncrementalGenerator
 
         string fieldName =
             context.Attributes
-                .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == nameof(MutationFieldNameAttribute))
+                .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == $"{typeof(MutationFieldNameAttribute).Namespace}.{nameof(MutationFieldNameAttribute)}")
                 ?.ConstructorArguments[0].Value?.ToString() ?? string.Empty;
 
         return new MutationFieldNameDataModel
