@@ -15,24 +15,11 @@ public class DatabaseEnumGenerator : IIncrementalGenerator
         IncrementalValuesProvider<(INamedTypeSymbol?, DatabaseEnumOptionsDataModel, List<DatabaseEnumDataModel>)> provider = context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 $"{typeof(DatabaseEnumAttribute).Namespace}.{nameof(DatabaseEnumAttribute)}",
-                static (node, _) => node is ClassDeclarationSyntax,//IsTargetClass(node),
+                static (node, _) => node is ClassDeclarationSyntax,
                 static (context, _) => GetDatabaseEnumDataModel(context));
 
         context.RegisterSourceOutput(context.CompilationProvider.Combine(provider.Collect()),
             (sourceContext, data) => GenerateCode(sourceContext, data.Right));
-    }
-
-    private static bool IsTargetClass(SyntaxNode syntaxNode)
-    {
-        if (syntaxNode is ClassDeclarationSyntax classDeclaration)
-        {
-            return classDeclaration.AttributeLists
-                .SelectMany(al => al.Attributes)
-                .Any(attribute => attribute.Name.ToString() == $"{typeof(DatabaseEnumOptionsAttribute).Namespace}.{nameof(DatabaseEnumOptionsAttribute)}" ||
-                                  attribute.Name.ToString() == $"{typeof(DatabaseEnumAttribute).Namespace}.{nameof(DatabaseEnumAttribute)}");
-        }
-
-        return false;
     }
 
     private static (INamedTypeSymbol?, DatabaseEnumOptionsDataModel, List<DatabaseEnumDataModel>) GetDatabaseEnumDataModel(GeneratorAttributeSyntaxContext context)
