@@ -25,7 +25,7 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database;
 [DatabaseEnum(typeof(EngineColor))]
 [DatabaseEnum(typeof(JobType))]
 [DatabaseEnum(typeof(TaskStatus))]
-public class IssueTrackerContext(DbContextOptions<IssueTrackerContext> options) : DbContext(options)
+public partial class IssueTrackerContext(DbContextOptions<IssueTrackerContext> options) : DbContext(options)
 {
     public DbSet<Appearance> Appearances { get; init; } = null!;
     public DbSet<Issue> Issues { get; init; } = null!;

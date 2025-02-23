@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StarWarsProgressBarIssueTracker.Domain.Issues;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 using StarWarsProgressBarIssueTracker.Domain.Releases;
+using StarWarsProgressBarIssueTracker.Infrastructure.Entities;
 
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Configurations;
 
@@ -30,5 +31,14 @@ public class IssueConfiguration : IEntityTypeConfiguration<Issue>
         builder.HasMany(issue => issue.Labels).WithMany(label => label.Issues); // TODO delete behavior to set null
         builder.HasMany(issue => issue.LinkedIssues).WithOne(linkedIssue => linkedIssue.LinkedIssue)
             .OnDelete(DeleteBehavior.SetNull);
+
+        builder.Property(e => e.State)
+            .HasConversion(
+                value => new DbIssueState { Id = (int)value, Name = Enum.GetName(value) ?? ((int)value).ToString() },
+                entity =>(IssueState)entity.Id);
+        builder.Property(e => e.Priority)
+            .HasConversion(
+                value => new DbPriority { Id = (int)value, Name = Enum.GetName(value) ?? ((int)value).ToString() },
+                entity =>(Priority)entity.Id);
     }
 }
