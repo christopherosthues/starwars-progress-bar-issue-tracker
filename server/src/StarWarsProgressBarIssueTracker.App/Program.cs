@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using StarWarsProgressBarIssueTracker.App.Extensions;
 using StarWarsProgressBarIssueTracker.App.Mutations;
 using StarWarsProgressBarIssueTracker.App.Queries;
@@ -8,6 +9,23 @@ using StarWarsProgressBarIssueTracker.Infrastructure.Gitlab;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders().AddConsole();
+
+IConfigurationSection keycloakConfig = builder.Configuration.GetSection("Keycloak");
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.Audience = keycloakConfig.GetValue<string>("Audience");
+        options.MetadataAddress = keycloakConfig.GetValue<string>("MetadataAddress")!;
+        options.TokenValidationParameters = new()
+        {
+            ValidIssuer = keycloakConfig.GetValue<string>("Keycloak:Issuer"),
+            ValidateIssuerSigningKey = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuer = true
+        };
+    });
 
 IConfigurationSection gitlabConfig = builder.Configuration.GetSection("Gitlab");
 string gitlabToken = gitlabConfig.GetValue<string>("Token")!;
@@ -29,7 +47,9 @@ builder.Services.AddGitHubClient();
 string connectionString = builder.Configuration.GetConnectionString("IssueTrackerContext")!;
 builder.Services.RegisterDbContext(connectionString);
 
-builder.Services.AddGraphQLServer()
+builder.Services
+    .AddGraphQLServer()
+    .AddAuthorization()
     .AddMutationConventions(applyToAllMutations: true)
     // .AddQueryConventions()
     .AddQueryType<IssueTrackerQueries>()
@@ -115,7 +135,11 @@ else
 
 // app.UseCors();
 
+app.UseRouting();
+
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.MapGraphQL();
 

@@ -16,9 +16,11 @@
     <PackageVersion Include="GreenDonut.Data.EntityFramework" Version="15.0.3" />
     <PackageVersion Include="GreenDonut.Data.Primitives" Version="15.0.3" />
     <PackageVersion Include="HotChocolate.AspNetCore" Version="15.0.3" />
+    <PackageVersion Include="HotChocolate.AspNetCore.Authorization" Version="15.0.3" />
     <PackageVersion Include="HotChocolate.Data.EntityFramework" Version="15.0.3" />
     <PackageVersion Include="HotChocolate.Types.Analyzers" Version="15.0.3" />
     <PackageVersion Include="HotChocolate.Types.Scalars" Version="15.0.3" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.2" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.2" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
