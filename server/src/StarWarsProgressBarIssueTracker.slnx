@@ -17,6 +17,9 @@
     <File Path="Directory.Build.targets" />
     <File Path="Directory.Packages.props" />
   </Folder>
+  <Folder Name="/.meta/database/">
+    <File Path="..\..\database\create-databases.sh" />
+  </Folder>
   <Folder Name="/.meta/Docs/">
     <File Path="..\CHANGELOG.md" />
     <File Path="..\README.md" />
