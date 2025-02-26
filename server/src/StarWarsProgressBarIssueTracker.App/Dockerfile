@@ -1,5 +1,5 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-RUN apt update && apt install -y postgresql-client
+RUN apt update && apt install -y postgresql-client && apt clean
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -26,6 +26,10 @@ ENV Gitlab__ProjectPath=${GITLAB_PROJECT_PATH}
 ENV Gitlab__Token=${GITLAB_TOKEN}
 ENV GitHub__ProjectPath=${GITHUB_PROJECT_PATH}
 ENV GitHub__Token=${GITHUB_TOKEN}
+ENV Keycloak__Audience=${KEYCLOAK_AUDIENCE}
+ENV Keycloak__MetadataAddress=${KEYCLOAK_METADATA_ADDRESS}
+ENV Keycloak__ValidIssuer=${KEYCLOAK_VALID_ISSUER}
+ENV Keycloak__AuthorizationUrl=${KEYCLOAK_AUTHORIZATION_URL}
 ENV HUSKY=${HUSKY}
 RUN dotnet restore "StarWarsProgressBarIssueTracker.App/StarWarsProgressBarIssueTracker.App.csproj"
 COPY . .
