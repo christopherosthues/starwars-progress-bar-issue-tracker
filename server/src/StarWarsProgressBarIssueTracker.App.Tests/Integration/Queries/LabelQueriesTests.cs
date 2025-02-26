@@ -17,6 +17,30 @@ public class LabelQueriesTests : IntegrationTestBase
 {
     // TODO: Check DoesNotContain and Contains
     [Test]
+    public async Task GetLabelsShouldReturnUnauthorizedIfUserIsNotAuthenticated()
+    {
+        // Arrange
+        await CheckDbContentAsync(async context =>
+        {
+            await Assert.That(context.Appearances).IsEmpty();
+        });
+        GraphQLRequest request = CreateGetLabelsRequest();
+
+        // Act
+        GraphQLResponse<GetLabelsResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelsResponse>(request);
+
+        // Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNotEmpty();
+            await Assert.That(response.Errors![0].Message).IsEqualTo("The current user is not authorized to access this resource.");
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Labels).IsNull();
+        }
+    }
+
+    [Test]
     public async Task GetLabelsShouldReturnEmptyListIfNoLabelExist()
     {
         // Arrange
@@ -135,6 +159,30 @@ public class LabelQueriesTests : IntegrationTestBase
             await Assert.That(edgeLabel2.TextColor).IsEqualTo(dbLabel2.TextColor);
             await Assert.That(edgeLabel2.CreatedAt).IsEquivalentTo(dbLabel2.CreatedAt);
             await Assert.That(edgeLabel2.LastModifiedAt).IsEquivalentTo(dbLabel2.LastModifiedAt);
+        }
+    }
+
+    [Test]
+    public async Task GetLabelShouldReturnUnauthorizedIfUserIsNotAuthenticated()
+    {
+        // Arrange
+        await CheckDbContentAsync(async context =>
+        {
+            await Assert.That(context.Appearances).IsEmpty();
+        });
+        GraphQLRequest request = CreateGetLabelRequest(Guid.CreateVersion7().ToString());
+
+        // Act
+        GraphQLResponse<GetLabelResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelResponse>(request);
+
+        // Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNotEmpty();
+            await Assert.That(response.Errors![0].Message).IsEqualTo("The current user is not authorized to access this resource.");
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Label).IsNull();
         }
     }
 

@@ -1,5 +1,6 @@
 using GreenDonut;
 using GreenDonut.Data;
+using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
@@ -15,6 +16,7 @@ public partial class IssueTrackerQueries
 {
     [UsePaging(IncludeTotalCount = true)]
     [UseSorting]
+    [Authorize]
     public async Task<Connection<MilestoneDto>> GetMilestones(
         PagingArguments pagingArguments,
         IMilestoneService milestoneService,
@@ -29,6 +31,7 @@ public partial class IssueTrackerQueries
     }
 
     [Error<DomainIdNotFoundException>]
+    [Authorize]
     public async Task<MilestoneDto?> GetMilestone(
         Guid id,
         IMilestoneService milestoneService,

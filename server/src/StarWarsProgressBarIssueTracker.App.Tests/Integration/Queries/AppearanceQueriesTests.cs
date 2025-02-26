@@ -13,6 +13,30 @@ public class AppearanceQueriesTests : IntegrationTestBase
 {
     // TODO: Check DoesNotContain and Contains
     [Test]
+    public async Task GetAppearancesShouldReturnUnauthorizedIfUserIsNotAuthenticated()
+    {
+        // Arrange
+        await CheckDbContentAsync(async context =>
+        {
+            await Assert.That(context.Appearances).IsEmpty();
+        });
+        GraphQLRequest request = CreateGetAppearancesRequest();
+
+        // Act
+        GraphQLResponse<GetAppearancesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearancesResponse>(request);
+
+        // Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNotEmpty();
+            await Assert.That(response.Errors![0].Message).IsEqualTo("The current user is not authorized to access this resource.");
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Appearances).IsNull();
+        }
+    }
+
+    [Test]
     public async Task GetAppearancesShouldReturnEmptyListIfNoAppearanceExist()
     {
         // Arrange
@@ -131,6 +155,30 @@ public class AppearanceQueriesTests : IntegrationTestBase
             await Assert.That(edgeAppearance2.TextColor).IsEqualTo(dbAppearance2.TextColor);
             await Assert.That(edgeAppearance2.CreatedAt).IsEquivalentTo(dbAppearance2.CreatedAt);
             await Assert.That(edgeAppearance2.LastModifiedAt).IsEquivalentTo(dbAppearance2.LastModifiedAt);
+        }
+    }
+
+    [Test]
+    public async Task GetAppearanceShouldReturnUnauthorizedIfUserIsNotAuthenticated()
+    {
+        // Arrange
+        await CheckDbContentAsync(async context =>
+        {
+            await Assert.That(context.Appearances).IsEmpty();
+        });
+        GraphQLRequest request = CreateGetAppearanceRequest(Guid.CreateVersion7().ToString());
+
+        // Act
+        GraphQLResponse<GetAppearanceResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearanceResponse>(request);
+
+        // Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNotEmpty();
+            await Assert.That(response.Errors![0].Message).IsEqualTo("The current user is not authorized to access this resource.");
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Appearance).IsNull();
         }
     }
 

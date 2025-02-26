@@ -1,3 +1,4 @@
+using HotChocolate.Authorization;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using StarWarsProgressBarIssueTracker.App.Issues;
@@ -19,6 +20,7 @@ public partial class IssueTrackerMutations
     [Error<DuplicatedTranslationsException>]
     [Error<DuplicatedPhotosException>]
     [MutationFieldName(nameof(Issue))]
+    [Authorize]
     public partial async Task<IssueDto> AddIssue(string title, string? description, Priority priority,
         Guid? milestoneId, Guid? releaseId, Vehicle? vehicle, CancellationToken cancellationToken)
     {
@@ -53,6 +55,7 @@ public partial class IssueTrackerMutations
     [Error<DuplicatedTranslationsException>]
     [Error<DuplicatedPhotosException>]
     [MutationFieldName(nameof(Issue))]
+    [Authorize]
     public partial async Task<IssueDto> UpdateIssue([ID] Guid id, string title, string? description, Priority priority,
         Guid? milestoneId, Guid? releaseId, Vehicle? vehicle, CancellationToken cancellationToken)
     {
@@ -82,6 +85,7 @@ public partial class IssueTrackerMutations
 
     [Error<DomainIdNotFoundException>]
     [MutationFieldName(nameof(Issue))]
+    [Authorize]
     public partial async Task<IssueDto> DeleteIssue([ID] Guid id, CancellationToken cancellationToken)
     {
         return issueMapper.MapToIssueDto(await issueService.DeleteIssueAsync(id, cancellationToken));

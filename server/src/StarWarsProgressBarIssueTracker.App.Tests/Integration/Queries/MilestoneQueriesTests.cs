@@ -17,6 +17,30 @@ public class MilestoneQueriesTests : IntegrationTestBase
 {
     // TODO: Check DoesNotContain and Contains
     [Test]
+    public async Task GetMilestonesShouldReturnUnauthorizedIfUserIsNotAuthenticated()
+    {
+        // Arrange
+        await CheckDbContentAsync(async context =>
+        {
+            await Assert.That(context.Appearances).IsEmpty();
+        });
+        GraphQLRequest request = CreateGetMilestonesRequest();
+
+        // Act
+        GraphQLResponse<GetMilestonesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestonesResponse>(request);
+
+        // Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNotEmpty();
+            await Assert.That(response.Errors![0].Message).IsEqualTo("The current user is not authorized to access this resource.");
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Milestones).IsNull();
+        }
+    }
+
+    [Test]
     public async Task GetMilestonesShouldReturnEmptyListIfNoReleaseExist()
     {
         // Arrange
@@ -174,6 +198,30 @@ public class MilestoneQueriesTests : IntegrationTestBase
             await Assert.That(edgeIssue.Vehicle!.Id).IsEqualTo(dbIssue.Vehicle.Id);
             await Assert.That(edgeIssue.Vehicle!.Translations).IsEmpty();
             await Assert.That(edgeIssue.Vehicle!.Photos).IsEmpty();
+        }
+    }
+
+    [Test]
+    public async Task GetMilestoneShouldReturnUnauthorizedIfUserIsNotAuthenticated()
+    {
+        // Arrange
+        await CheckDbContentAsync(async context =>
+        {
+            await Assert.That(context.Appearances).IsEmpty();
+        });
+        GraphQLRequest request = CreateGetMilestoneRequest(Guid.CreateVersion7().ToString());
+
+        // Act
+        GraphQLResponse<GetMilestoneResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestoneResponse>(request);
+
+        // Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNotEmpty();
+            await Assert.That(response.Errors![0].Message).IsEqualTo("The current user is not authorized to access this resource.");
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Milestone).IsNull();
         }
     }
 

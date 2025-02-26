@@ -1,3 +1,4 @@
+using HotChocolate.Authorization;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using StarWarsProgressBarIssueTracker.App.Labels;
@@ -14,6 +15,7 @@ public partial class IssueTrackerMutations
     [Error<StringTooLongException>]
     [Error<ColorFormatException>]
     [MutationFieldName(nameof(Label))]
+    [Authorize]
     public partial async Task<LabelDto> AddLabel(string title, string color, string textColor, string? description,
         CancellationToken cancellationToken)
     {
@@ -28,6 +30,7 @@ public partial class IssueTrackerMutations
     [Error<ColorFormatException>]
     [Error<DomainIdNotFoundException>]
     [MutationFieldName(nameof(Label))]
+    [Authorize]
     public partial async Task<LabelDto> UpdateLabel([ID] Guid id, string title, string color, string textColor,
         string? description, CancellationToken cancellationToken)
     {
@@ -44,6 +47,7 @@ public partial class IssueTrackerMutations
 
     [Error<DomainIdNotFoundException>]
     [MutationFieldName(nameof(Label))]
+    [Authorize]
     public partial async Task<LabelDto> DeleteLabel([ID] Guid id, CancellationToken cancellationToken)
     {
         return labelMapper.MapToLabelDto(await labelService.DeleteLabelAsync(id, cancellationToken));

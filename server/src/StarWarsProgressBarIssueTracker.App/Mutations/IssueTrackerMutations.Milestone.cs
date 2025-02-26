@@ -1,3 +1,4 @@
+using HotChocolate.Authorization;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using StarWarsProgressBarIssueTracker.App.Milestones;
@@ -13,6 +14,7 @@ public partial class IssueTrackerMutations
     [Error<StringTooShortException>]
     [Error<StringTooLongException>]
     [MutationFieldName(nameof(Milestone))]
+    [Authorize]
     public partial async Task<MilestoneDto> AddMilestone(string title, string? description, CancellationToken cancellationToken)
     {
         return milestoneMapper.MapToMilestoneDto(await milestoneService.AddMilestoneAsync(new()
@@ -28,6 +30,7 @@ public partial class IssueTrackerMutations
     [Error<StringTooLongException>]
     [Error<DomainIdNotFoundException>]
     [MutationFieldName(nameof(Milestone))]
+    [Authorize]
     public partial async Task<MilestoneDto> UpdateMilestone([ID] Guid id, string title, MilestoneState state, string? description, CancellationToken cancellationToken)
     {
         return milestoneMapper.MapToMilestoneDto(await milestoneService.UpdateMilestoneAsync(new Milestone
@@ -41,6 +44,7 @@ public partial class IssueTrackerMutations
 
     [Error<DomainIdNotFoundException>]
     [MutationFieldName(nameof(Milestone))]
+    [Authorize]
     public partial async Task<MilestoneDto> DeleteMilestone([ID] Guid id, CancellationToken cancellationToken)
     {
         return milestoneMapper.MapToMilestoneDto(await milestoneService.DeleteMilestoneAsync(id, cancellationToken));

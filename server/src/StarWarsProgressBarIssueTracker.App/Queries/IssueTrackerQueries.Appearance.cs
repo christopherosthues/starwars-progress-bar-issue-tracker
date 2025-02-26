@@ -1,5 +1,6 @@
 using GreenDonut;
 using GreenDonut.Data;
+using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
@@ -14,6 +15,7 @@ public partial class IssueTrackerQueries
 {
     [UsePaging(IncludeTotalCount = true)]
     [UseSorting]
+    [Authorize]
     public async Task<Connection<Appearance>> GetAppearances(
         PagingArguments pagingArguments,
         IAppearanceService appearanceService,
@@ -24,6 +26,7 @@ public partial class IssueTrackerQueries
     }
 
     [Error<DomainIdNotFoundException>]
+    [Authorize]
     public async Task<Appearance?> GetAppearance(
         Guid id,
         IAppearanceService appearanceService,

@@ -17,6 +17,30 @@ public class ReleaseQueriesTests : IntegrationTestBase
 {
     // TODO: Check DoesNotContain and Contains
     [Test]
+    public async Task GetReleasesShouldReturnUnauthorizedIfUserIsNotAuthenticated()
+    {
+        // Arrange
+        await CheckDbContentAsync(async context =>
+        {
+            await Assert.That(context.Appearances).IsEmpty();
+        });
+        GraphQLRequest request = CreateGetReleasesRequest();
+
+        // Act
+        GraphQLResponse<GetReleasesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleasesResponse>(request);
+
+        // Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNotEmpty();
+            await Assert.That(response.Errors![0].Message).IsEqualTo("The current user is not authorized to access this resource.");
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Releases).IsNull();
+        }
+    }
+
+    [Test]
     public async Task GetReleasesShouldReturnEmptyListIfNoReleaseExist()
     {
         // Arrange
@@ -180,6 +204,30 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(edgeIssue.Vehicle!.Id).IsEqualTo(dbIssue.Vehicle.Id);
             await Assert.That(edgeIssue.Vehicle!.Translations).IsEmpty();
             await Assert.That(edgeIssue.Vehicle!.Photos).IsEmpty();
+        }
+    }
+
+    [Test]
+    public async Task GetReleaseShouldReturnUnauthorizedIfUserIsNotAuthenticated()
+    {
+        // Arrange
+        await CheckDbContentAsync(async context =>
+        {
+            await Assert.That(context.Appearances).IsEmpty();
+        });
+        GraphQLRequest request = CreateGetReleaseRequest(Guid.CreateVersion7().ToString());
+
+        // Act
+        GraphQLResponse<GetReleaseResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleaseResponse>(request);
+
+        // Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNotEmpty();
+            await Assert.That(response.Errors![0].Message).IsEqualTo("The current user is not authorized to access this resource.");
+            await Assert.That(response.Data).IsNotNull();
+            await Assert.That(response.Data.Release).IsNull();
         }
     }
 

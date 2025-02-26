@@ -34,7 +34,6 @@ public class LabelRepository(IssueTrackerContext context) : IssueTrackerReposito
         CancellationToken cancellationToken = default)
     {
         return await DbSet
-            .AsNoTracking()
             .Include(dbLabel => dbLabel.Issues)
             .ThenInclude(dbIssue => dbIssue.Milestone)
             .Include(dbLabel => dbLabel.Issues)
@@ -58,7 +57,6 @@ public class LabelRepository(IssueTrackerContext context) : IssueTrackerReposito
     public IQueryable<Label> GetLabelByIds(IReadOnlyList<Guid> ids)
     {
         return DbSet
-            .AsNoTracking()
             .Include(dbLabel => dbLabel.Issues)
             .ThenInclude(dbIssue => dbIssue.Milestone)
             .Include(dbLabel => dbLabel.Issues)
