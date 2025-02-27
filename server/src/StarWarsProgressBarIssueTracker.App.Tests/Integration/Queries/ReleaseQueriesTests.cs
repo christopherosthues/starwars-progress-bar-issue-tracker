@@ -1,4 +1,5 @@
 using GraphQL;
+using GraphQL.Client.Http;
 using StarWarsProgressBarIssueTracker.App.Releases;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
@@ -49,9 +50,11 @@ public class ReleaseQueriesTests : IntegrationTestBase
             await Assert.That(context.Releases).IsEmpty();
         });
         GraphQLRequest request = CreateGetReleasesRequest();
+        GraphQLHttpClient graphQlHttpClient = CreateGraphQLClient();
+        await SetAuthorizationHeaderAsync(graphQlHttpClient.HttpClient);
 
         // Act
-        GraphQLResponse<GetReleasesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleasesResponse>(request);
+        GraphQLResponse<GetReleasesResponse> response = await graphQlHttpClient.SendQueryAsync<GetReleasesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -124,9 +127,11 @@ public class ReleaseQueriesTests : IntegrationTestBase
             }
         });
         GraphQLRequest request = CreateGetReleasesRequest();
+        GraphQLHttpClient graphQlHttpClient = CreateGraphQLClient();
+        await SetAuthorizationHeaderAsync(graphQlHttpClient.HttpClient);
 
         // Act
-        GraphQLResponse<GetReleasesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleasesResponse>(request);
+        GraphQLResponse<GetReleasesResponse> response = await graphQlHttpClient.SendQueryAsync<GetReleasesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -249,9 +254,11 @@ public class ReleaseQueriesTests : IntegrationTestBase
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
         GraphQLRequest request = CreateGetReleaseRequest(id);
+        GraphQLHttpClient graphQlHttpClient = CreateGraphQLClient();
+        await SetAuthorizationHeaderAsync(graphQlHttpClient.HttpClient);
 
         // Act
-        GraphQLResponse<GetReleaseResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleaseResponse>(request);
+        GraphQLResponse<GetReleaseResponse> response = await graphQlHttpClient.SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -274,9 +281,11 @@ public class ReleaseQueriesTests : IntegrationTestBase
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
         GraphQLRequest request = CreateGetReleaseRequest(id);
+        GraphQLHttpClient graphQlHttpClient = CreateGraphQLClient();
+        await SetAuthorizationHeaderAsync(graphQlHttpClient.HttpClient);
 
         // Act
-        GraphQLResponse<GetReleaseResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleaseResponse>(request);
+        GraphQLResponse<GetReleaseResponse> response = await graphQlHttpClient.SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -330,9 +339,11 @@ public class ReleaseQueriesTests : IntegrationTestBase
             context.Releases.Add(dbRelease);
         });
         GraphQLRequest request = CreateGetReleaseRequest(id);
+        GraphQLHttpClient graphQlHttpClient = CreateGraphQLClient();
+        await SetAuthorizationHeaderAsync(graphQlHttpClient.HttpClient);
 
         // Act
-        GraphQLResponse<GetReleaseResponse> response = await CreateGraphQLClient().SendQueryAsync<GetReleaseResponse>(request);
+        GraphQLResponse<GetReleaseResponse> response = await graphQlHttpClient.SendQueryAsync<GetReleaseResponse>(request);
 
         // Assert
         using (Assert.Multiple())

@@ -1,9 +1,13 @@
+using System.Net.Http.Json;
+using System.Security.Authentication;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Integration.Setup;
 using StarWarsProgressBarIssueTracker.Infrastructure.Database;
 
@@ -29,6 +33,34 @@ public class IntegrationTestBase
                 }),
                 httpClient);
         return graphQLClient;
+    }
+
+    protected static async Task SetAuthorizationHeaderAsync(HttpClient httpClient,
+        string username = KeycloakConfig.TestUserName, string password = KeycloakConfig.TestPassword)
+    {
+        string url = $"https://localhost:{KeycloakConfig.Port}/realms/{KeycloakConfig.Realm}/protocol/openid-connect/token";
+
+        Dictionary<string, string> data = new Dictionary<string, string>
+        {
+            { "grant_type", "password" }, { "client_id", KeycloakConfig.ClientId }, { "username", username }, { "password", password },
+        };
+
+        HttpClientHandler handler = new()
+        {
+            ServerCertificateCustomValidationCallback = (_, _, _, _) => true,
+            SslProtocols = SslProtocols.Tls13
+        };
+        HttpClient tokenClient = new HttpClient(handler);
+
+        HttpResponseMessage response = await tokenClient.PostAsync(url, new FormUrlEncodedContent(data));
+        JsonObject? content = await response.Content.ReadFromJsonAsync<JsonObject>();
+        string? token = content?["access_token"]?.ToString();
+        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+    }
+
+    protected static void UnsetAuthorizationHeader(HttpClient httpClient)
+    {
+        httpClient.DefaultRequestHeaders.Authorization = null;
     }
 
     protected async Task SeedDatabaseAsync(Action<IssueTrackerContext> seed)
