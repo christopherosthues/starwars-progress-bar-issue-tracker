@@ -1,5 +1,6 @@
 using Bogus;
 using GraphQL;
+using GraphQL.Client.Http;
 using Microsoft.EntityFrameworkCore;
 using StarWarsProgressBarIssueTracker.App.Milestones;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
@@ -29,9 +30,10 @@ public class MilestoneMutationsTests : IntegrationTestBase
         });
         GraphQLRequest mutationRequest = CreateAddRequest(expectedMilestone);
         expectedMilestone.State = MilestoneState.Open;
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<AddMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<AddMilestoneResponse>(mutationRequest);
+        GraphQLResponse<AddMilestoneResponse> response = await graphQlHttpClient.SendMutationAsync<AddMilestoneResponse>(mutationRequest);
 
         // Assert
         await AssertAddedMilestoneAsync(response, expectedMilestone, startTime);
@@ -60,9 +62,10 @@ public class MilestoneMutationsTests : IntegrationTestBase
             await Assert.That(context.Milestones.ToList()).ContainsEquivalentOf(dbMilestone);
         });
         GraphQLRequest mutationRequest = CreateAddRequest(expectedMilestone);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<AddMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<AddMilestoneResponse>(mutationRequest);
+        GraphQLResponse<AddMilestoneResponse> response = await graphQlHttpClient.SendMutationAsync<AddMilestoneResponse>(mutationRequest);
 
         // Assert
         await AssertAddedMilestoneAsync(response, expectedMilestone, startTime, dbMilestone);
@@ -78,9 +81,10 @@ public class MilestoneMutationsTests : IntegrationTestBase
             await Assert.That(context.Milestones).IsEmpty();
         });
         GraphQLRequest mutationRequest = CreateAddRequest(expectedResult.expectedMilestone);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<AddMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<AddMilestoneResponse>(mutationRequest);
+        GraphQLResponse<AddMilestoneResponse> response = await graphQlHttpClient.SendMutationAsync<AddMilestoneResponse>(mutationRequest);
 
         // Assert
         await AssertMilestoneNotAddedAsync(response, expectedResult.errors);
@@ -111,9 +115,10 @@ public class MilestoneMutationsTests : IntegrationTestBase
             await Assert.That(context.Milestones.ToList()).ContainsEquivalentOf(dbMilestone);
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedMilestone);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<UpdateMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
+        GraphQLResponse<UpdateMilestoneResponse> response = await graphQlHttpClient.SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
 
         // Assert
         await AssertUpdatedMilestoneAsync(response, expectedMilestone, startTime);
@@ -159,9 +164,10 @@ public class MilestoneMutationsTests : IntegrationTestBase
             }
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedMilestone);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<UpdateMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
+        GraphQLResponse<UpdateMilestoneResponse> response = await graphQlHttpClient.SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
 
         // Assert
         await AssertUpdatedMilestoneAsync(response, expectedMilestone, startTime, dbMilestone, dbMilestone2);
@@ -177,9 +183,10 @@ public class MilestoneMutationsTests : IntegrationTestBase
             await Assert.That(context.Milestones).IsEmpty();
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(expectedResult.expectedMilestone);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<UpdateMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
+        GraphQLResponse<UpdateMilestoneResponse> response = await graphQlHttpClient.SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
 
         // Assert
         await AssertMilestoneNotUpdatedAsync(response, expectedResult.errors);
@@ -195,9 +202,10 @@ public class MilestoneMutationsTests : IntegrationTestBase
             await Assert.That(context.Milestones).IsEmpty();
         });
         GraphQLRequest mutationRequest = CreateUpdateRequest(milestone);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<UpdateMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
+        GraphQLResponse<UpdateMilestoneResponse> response = await graphQlHttpClient.SendMutationAsync<UpdateMilestoneResponse>(mutationRequest);
 
         // Assert
         await AssertMilestoneNotUpdatedAsync(response, new List<string> { $"No {nameof(Milestone)} found with id '{milestone.Id}'." });
@@ -227,9 +235,10 @@ public class MilestoneMutationsTests : IntegrationTestBase
             await Assert.That(context.Milestones.ToList()).ContainsEquivalentOf(dbMilestone);
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(milestone);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<DeleteMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
+        GraphQLResponse<DeleteMilestoneResponse> response = await graphQlHttpClient.SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
 
         // Assert
         await AssertDeletedMilestoneAsync(response, milestone);
@@ -282,9 +291,10 @@ public class MilestoneMutationsTests : IntegrationTestBase
             await Assert.That(context.Milestones.ToList()).ContainsEquivalentOf(dbMilestone);
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(milestone);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<DeleteMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
+        GraphQLResponse<DeleteMilestoneResponse> response = await graphQlHttpClient.SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
 
         // Assert
         await AssertDeletedMilestoneAsync(response, milestone);
@@ -345,9 +355,10 @@ public class MilestoneMutationsTests : IntegrationTestBase
             }
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(milestone);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<DeleteMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
+        GraphQLResponse<DeleteMilestoneResponse> response = await graphQlHttpClient.SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
 
         // Assert
         await AssertDeletedMilestoneAsync(response, milestone, dbMilestone2);
@@ -363,9 +374,10 @@ public class MilestoneMutationsTests : IntegrationTestBase
             await Assert.That(context.Milestones).IsEmpty();
         });
         GraphQLRequest mutationRequest = CreateDeleteRequest(milestone);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<DeleteMilestoneResponse> response = await CreateGraphQLClient().SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
+        GraphQLResponse<DeleteMilestoneResponse> response = await graphQlHttpClient.SendMutationAsync<DeleteMilestoneResponse>(mutationRequest);
 
         // Assert
         await AssertMilestoneNotDeletedAsync(response, new List<string> { $"No {nameof(Milestone)} found with id '{milestone.Id}'." });

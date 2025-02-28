@@ -1,4 +1,5 @@
 using GraphQL;
+using GraphQL.Client.Http;
 using StarWarsProgressBarIssueTracker.App.Labels;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
@@ -27,7 +28,7 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetLabelsRequest();
 
         // Act
-        GraphQLResponse<GetLabelsResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelsResponse>(request);
+        GraphQLResponse<GetLabelsResponse> response = await CreateUnauthenticatedGraphQLClient().SendQueryAsync<GetLabelsResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -49,9 +50,10 @@ public class LabelQueriesTests : IntegrationTestBase
             await Assert.That(context.Labels).IsEmpty();
         });
         GraphQLRequest request = CreateGetLabelsRequest();
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetLabelsResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelsResponse>(request);
+        GraphQLResponse<GetLabelsResponse> response = await graphQlHttpClient.SendQueryAsync<GetLabelsResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -102,9 +104,10 @@ public class LabelQueriesTests : IntegrationTestBase
             }
         });
         GraphQLRequest request = CreateGetLabelsRequest();
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetLabelsResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelsResponse>(request);
+        GraphQLResponse<GetLabelsResponse> response = await graphQlHttpClient.SendQueryAsync<GetLabelsResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -173,7 +176,7 @@ public class LabelQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetLabelRequest(Guid.CreateVersion7().ToString());
 
         // Act
-        GraphQLResponse<GetLabelResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelResponse>(request);
+        GraphQLResponse<GetLabelResponse> response = await CreateUnauthenticatedGraphQLClient().SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -203,9 +206,10 @@ public class LabelQueriesTests : IntegrationTestBase
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
         GraphQLRequest request = CreateGetLabelRequest(id);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetLabelResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelResponse>(request);
+        GraphQLResponse<GetLabelResponse> response = await graphQlHttpClient.SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -228,9 +232,10 @@ public class LabelQueriesTests : IntegrationTestBase
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
         GraphQLRequest request = CreateGetLabelRequest(id);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetLabelResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelResponse>(request);
+        GraphQLResponse<GetLabelResponse> response = await graphQlHttpClient.SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -290,9 +295,10 @@ public class LabelQueriesTests : IntegrationTestBase
             context.Labels.Add(dbLabel);
         });
         GraphQLRequest request = CreateGetLabelRequest(id);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetLabelResponse> response = await CreateGraphQLClient().SendQueryAsync<GetLabelResponse>(request);
+        GraphQLResponse<GetLabelResponse> response = await graphQlHttpClient.SendQueryAsync<GetLabelResponse>(request);
 
         // Assert
         using (Assert.Multiple())

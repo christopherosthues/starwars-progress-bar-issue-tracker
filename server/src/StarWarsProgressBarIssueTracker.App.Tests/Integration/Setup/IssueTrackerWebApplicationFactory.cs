@@ -20,11 +20,15 @@ public class IssueTrackerWebApplicationFactory : WebApplicationFactory<Program>,
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder().Build();
     private readonly KeycloakContainer _keycloakContainer = new KeycloakBuilder()
         .WithImage("quay.io/keycloak/keycloak:latest")
-        .WithName(KeycloakConfig.KeycloakHostName)
-        .WithPortBinding(KeycloakConfig.Port, 8080)
         .WithResourceMapping("./Import/", "/opt/keycloak/data/import")
         // .WithResourceMapping("./Import/import.json", "/opt/keycloak/data/standalone/import")
         .WithCommand("--import-realm")
+        .WithEnvironment(new Dictionary<string, string>
+        {
+            {"KC_BOOTSTRAP_ADMIN_USERNAME", "admin"},
+            {"KC_BOOTSTRAP_ADMIN_PASSWORD", "admin"},
+            {"KC_HTTP_ENABLED", "true"},
+        })
         .Build();
 
 
@@ -33,13 +37,14 @@ public class IssueTrackerWebApplicationFactory : WebApplicationFactory<Program>,
     {
         builder.ConfigureAppConfiguration((_, configuration) =>
         {
+            string? keycloakBaseAddress = _keycloakContainer.GetBaseAddress();
             configuration.AddInMemoryCollection(
                 new Dictionary<string, string>
                 {
-                    { "Keycloak:Audience", "Test" },
-                    { "Keycloak:MetadataAddress", $"http://{KeycloakConfig.KeycloakHostName}:8080/realms/{KeycloakConfig.Realm}/.well-known/openid-configuration" },
-                    { "Keycloak:ValidIssuer", $"http://localhost:{KeycloakConfig.Port}/realms/{KeycloakConfig.Realm}" },
-                    { "Keycloak:AuthorizationUrl", $"http://localhost:{KeycloakConfig.Port}/realms/{KeycloakConfig.Realm}/protocol/openid-connect/auth" },
+                    { "Keycloak:Audience", "TestTracker" },
+                    { "Keycloak:MetadataAddress", $"{keycloakBaseAddress}/realms/{KeycloakConfig.Realm}/.well-known/openid-configuration" },
+                    { "Keycloak:ValidIssuer", $"{keycloakBaseAddress}/realms/{KeycloakConfig.Realm}" },
+                    { "Keycloak:AuthorizationUrl", $"{keycloakBaseAddress}/realms/{KeycloakConfig.Realm}/protocol/openid-connect/auth" },
                 }!
             );
         });
@@ -57,9 +62,6 @@ public class IssueTrackerWebApplicationFactory : WebApplicationFactory<Program>,
             {
                 opts.GraphQLUrl = "http://localhost:8082";
             });
-
-            // TODO: configure Keycloak settings
-            // TODO: Configure authentication
 
             ServiceDescriptor? dbContextDescriptor =
                 services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<IssueTrackerContext>));
@@ -93,6 +95,11 @@ public class IssueTrackerWebApplicationFactory : WebApplicationFactory<Program>,
                 client.Uri = new UriBuilder(Uri.UriSchemeWs, gitlabGraphQlUrl.Host, gitlabGraphQlUrl.Port, gitlabGraphQlUrl.PathAndQuery).Uri;
             });
         });
+    }
+
+    public string? KeycloakBaseAddress()
+    {
+        return _keycloakContainer.GetBaseAddress();
     }
 
     public async Task InitializeAsync()

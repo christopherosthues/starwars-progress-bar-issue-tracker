@@ -1,4 +1,5 @@
 using GraphQL;
+using GraphQL.Client.Http;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads.Appearances;
@@ -23,7 +24,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetAppearancesRequest();
 
         // Act
-        GraphQLResponse<GetAppearancesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearancesResponse>(request);
+        GraphQLResponse<GetAppearancesResponse> response = await CreateUnauthenticatedGraphQLClient().SendQueryAsync<GetAppearancesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -45,9 +46,10 @@ public class AppearanceQueriesTests : IntegrationTestBase
             await Assert.That(context.Appearances).IsEmpty();
         });
         GraphQLRequest request = CreateGetAppearancesRequest();
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetAppearancesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearancesResponse>(request);
+        GraphQLResponse<GetAppearancesResponse> response = await graphQlHttpClient.SendQueryAsync<GetAppearancesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -98,9 +100,10 @@ public class AppearanceQueriesTests : IntegrationTestBase
             }
         });
         GraphQLRequest request = CreateGetAppearancesRequest();
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetAppearancesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearancesResponse>(request);
+        GraphQLResponse<GetAppearancesResponse> response = await graphQlHttpClient.SendQueryAsync<GetAppearancesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -169,7 +172,7 @@ public class AppearanceQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetAppearanceRequest(Guid.CreateVersion7().ToString());
 
         // Act
-        GraphQLResponse<GetAppearanceResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearanceResponse>(request);
+        GraphQLResponse<GetAppearanceResponse> response = await CreateUnauthenticatedGraphQLClient().SendQueryAsync<GetAppearanceResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -199,9 +202,10 @@ public class AppearanceQueriesTests : IntegrationTestBase
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
         GraphQLRequest request = CreateGetAppearanceRequest(id);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetAppearanceResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearanceResponse>(request);
+        GraphQLResponse<GetAppearanceResponse> response = await graphQlHttpClient.SendQueryAsync<GetAppearanceResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -225,9 +229,10 @@ public class AppearanceQueriesTests : IntegrationTestBase
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
         GraphQLRequest request = CreateGetAppearanceRequest(id);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetAppearanceResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearanceResponse>(request);
+        GraphQLResponse<GetAppearanceResponse> response = await graphQlHttpClient.SendQueryAsync<GetAppearanceResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -267,9 +272,10 @@ public class AppearanceQueriesTests : IntegrationTestBase
             context.Appearances.Add(dbAppearance);
         });
         GraphQLRequest request = CreateGetAppearanceRequest(id);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetAppearanceResponse> response = await CreateGraphQLClient().SendQueryAsync<GetAppearanceResponse>(request);
+        GraphQLResponse<GetAppearanceResponse> response = await graphQlHttpClient.SendQueryAsync<GetAppearanceResponse>(request);
 
         // Assert
         using (Assert.Multiple())

@@ -21,7 +21,7 @@ public class IntegrationTestBase
     [ClassDataSource<IssueTrackerWebApplicationFactory>(Shared = SharedType.PerClass)]
     public required IssueTrackerWebApplicationFactory ApiFactory { get; init; }
 
-    protected GraphQLHttpClient CreateGraphQLClient()
+    protected GraphQLHttpClient CreateUnauthenticatedGraphQLClient()
     {
         HttpClient httpClient = ApiFactory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
         GraphQLHttpClient graphQLClient =
@@ -35,22 +35,33 @@ public class IntegrationTestBase
         return graphQLClient;
     }
 
-    protected static async Task SetAuthorizationHeaderAsync(HttpClient httpClient,
+    protected async Task<GraphQLHttpClient> CreateAuthenticatedGraphQLClientAsync(
         string username = KeycloakConfig.TestUserName, string password = KeycloakConfig.TestPassword)
     {
-        string url = $"https://localhost:{KeycloakConfig.Port}/realms/{KeycloakConfig.Realm}/protocol/openid-connect/token";
+        HttpClient httpClient = ApiFactory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        await SetAuthorizationHeaderAsync(httpClient);
+        GraphQLHttpClient graphQLClient =
+            new(new GraphQLHttpClientOptions { EndPoint = new Uri("http://localhost:8080/graphql"), },
+                new SystemTextJsonSerializer(new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new JsonStringEnumConverter() }
+                }),
+                httpClient);
+        return graphQLClient;
+    }
+
+    protected async Task SetAuthorizationHeaderAsync(HttpClient httpClient,
+        string username = KeycloakConfig.TestUserName, string password = KeycloakConfig.TestPassword)
+    {
+        string url = $"{ApiFactory.KeycloakBaseAddress()}/realms/{KeycloakConfig.Realm}/protocol/openid-connect/token";
 
         Dictionary<string, string> data = new Dictionary<string, string>
         {
             { "grant_type", "password" }, { "client_id", KeycloakConfig.ClientId }, { "username", username }, { "password", password },
         };
 
-        HttpClientHandler handler = new()
-        {
-            ServerCertificateCustomValidationCallback = (_, _, _, _) => true,
-            SslProtocols = SslProtocols.Tls13
-        };
-        HttpClient tokenClient = new HttpClient(handler);
+        HttpClient tokenClient = new HttpClient();
 
         HttpResponseMessage response = await tokenClient.PostAsync(url, new FormUrlEncodedContent(data));
         JsonObject? content = await response.Content.ReadFromJsonAsync<JsonObject>();

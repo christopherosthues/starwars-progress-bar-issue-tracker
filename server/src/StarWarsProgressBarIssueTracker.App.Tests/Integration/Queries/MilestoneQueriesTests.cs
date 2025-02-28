@@ -1,4 +1,5 @@
 using GraphQL;
+using GraphQL.Client.Http;
 using StarWarsProgressBarIssueTracker.App.Milestones;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 using StarWarsProgressBarIssueTracker.App.Tests.Helpers.GraphQL.Payloads;
@@ -27,7 +28,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetMilestonesRequest();
 
         // Act
-        GraphQLResponse<GetMilestonesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestonesResponse>(request);
+        GraphQLResponse<GetMilestonesResponse> response = await CreateUnauthenticatedGraphQLClient().SendQueryAsync<GetMilestonesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -49,9 +50,10 @@ public class MilestoneQueriesTests : IntegrationTestBase
             await Assert.That(context.Milestones).IsEmpty();
         });
         GraphQLRequest request = CreateGetMilestonesRequest();
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetMilestonesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestonesResponse>(request);
+        GraphQLResponse<GetMilestonesResponse> response = await graphQlHttpClient.SendQueryAsync<GetMilestonesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -123,9 +125,10 @@ public class MilestoneQueriesTests : IntegrationTestBase
             }
         });
         GraphQLRequest request = CreateGetMilestonesRequest();
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetMilestonesResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestonesResponse>(request);
+        GraphQLResponse<GetMilestonesResponse> response = await graphQlHttpClient.SendQueryAsync<GetMilestonesResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -212,7 +215,7 @@ public class MilestoneQueriesTests : IntegrationTestBase
         GraphQLRequest request = CreateGetMilestoneRequest(Guid.CreateVersion7().ToString());
 
         // Act
-        GraphQLResponse<GetMilestoneResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestoneResponse>(request);
+        GraphQLResponse<GetMilestoneResponse> response = await CreateUnauthenticatedGraphQLClient().SendQueryAsync<GetMilestoneResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -242,9 +245,10 @@ public class MilestoneQueriesTests : IntegrationTestBase
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
         GraphQLRequest request = CreateGetMilestoneRequest(id);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetMilestoneResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestoneResponse>(request);
+        GraphQLResponse<GetMilestoneResponse> response = await graphQlHttpClient.SendQueryAsync<GetMilestoneResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -267,9 +271,10 @@ public class MilestoneQueriesTests : IntegrationTestBase
         });
         const string id = "F1378377-9846-4168-A595-E763CD61CD9F";
         GraphQLRequest request = CreateGetMilestoneRequest(id);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetMilestoneResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestoneResponse>(request);
+        GraphQLResponse<GetMilestoneResponse> response = await graphQlHttpClient.SendQueryAsync<GetMilestoneResponse>(request);
 
         // Assert
         using (Assert.Multiple())
@@ -323,9 +328,10 @@ public class MilestoneQueriesTests : IntegrationTestBase
             context.Milestones.Add(dbMilestone);
         });
         GraphQLRequest request = CreateGetMilestoneRequest(id);
+        GraphQLHttpClient graphQlHttpClient = await CreateAuthenticatedGraphQLClientAsync();
 
         // Act
-        GraphQLResponse<GetMilestoneResponse> response = await CreateGraphQLClient().SendQueryAsync<GetMilestoneResponse>(request);
+        GraphQLResponse<GetMilestoneResponse> response = await graphQlHttpClient.SendQueryAsync<GetMilestoneResponse>(request);
 
         // Assert
         using (Assert.Multiple())
