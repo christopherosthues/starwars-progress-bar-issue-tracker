@@ -12,7 +12,7 @@ using StarWarsProgressBarIssueTracker.Infrastructure.Database;
 namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(IssueTrackerContext))]
-    [Migration("20250223130914_Initial")]
+    [Migration("20250301093948_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -686,12 +686,17 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Planned"
+                            Name = "Open"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Released"
+                            Name = "Planned"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Finished"
                         });
                 });
 

@@ -16,14 +16,15 @@ public partial class IssueTrackerMutations
     [Error<DomainIdNotFoundException>]
     [MutationFieldName(nameof(Release))]
     [Authorize]
-    public partial async Task<ReleaseDto> AddRelease(string title, string? releaseNotes, DateTime? releaseDate, CancellationToken cancellationToken)
+    public partial async Task<ReleaseDto> AddRelease(string title, string? releaseNotes, DateTime? releaseDate,
+        CancellationToken cancellationToken)
     {
         return releaseMapper.MapToReleaseDto(await releaseService.AddReleaseAsync(new()
         {
             Title = title,
             Notes = releaseNotes,
             Date = releaseDate,
-            State = ReleaseState.Planned,
+            State = ReleaseState.Open,
         }, cancellationToken));
     }
 
@@ -33,7 +34,8 @@ public partial class IssueTrackerMutations
     [Error<DomainIdNotFoundException>]
     [MutationFieldName(nameof(Release))]
     [Authorize]
-    public partial async Task<ReleaseDto> UpdateRelease([ID] Guid id, string title, ReleaseState state, string? releaseNotes, DateTime? releaseDate, CancellationToken cancellationToken)
+    public partial async Task<ReleaseDto> UpdateRelease([ID] Guid id, string title, ReleaseState state,
+        string? releaseNotes, DateTime? releaseDate, CancellationToken cancellationToken)
     {
         return releaseMapper.MapToReleaseDto(await releaseService.UpdateReleaseAsync(new Release
         {

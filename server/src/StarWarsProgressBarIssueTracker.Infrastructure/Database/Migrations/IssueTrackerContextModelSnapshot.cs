@@ -683,12 +683,17 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Planned"
+                            Name = "Open"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Released"
+                            Name = "Planned"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Finished"
                         });
                 });
 

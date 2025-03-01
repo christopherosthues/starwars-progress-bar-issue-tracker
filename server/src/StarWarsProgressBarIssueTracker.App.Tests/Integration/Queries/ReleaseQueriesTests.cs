@@ -100,7 +100,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
         {
             Title = "Release 2",
             Notes = "Notes 2",
-            State = ReleaseState.Released,
+            State = ReleaseState.Finished,
             Date = DateTime.UtcNow,
             LastModifiedAt = DateTime.UtcNow.AddDays(-1),
             Issues =
@@ -245,7 +245,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
                 Id = new Guid("5888CDB6-57E2-4774-B6E8-7AABE82E2A5F"),
                 Title = "Release 1",
                 Notes = "Notes 1",
-                State = ReleaseState.Released,
+                State = ReleaseState.Finished,
                 Date = DateTime.UtcNow,
                 LastModifiedAt = DateTime.UtcNow.AddDays(-1)
             });
@@ -319,7 +319,7 @@ public class ReleaseQueriesTests : IntegrationTestBase
             Id = new Guid(id),
             Title = "Release 2",
             Notes = "Notes 2",
-            State = ReleaseState.Released,
+            State = ReleaseState.Finished,
             Date = DateTime.UtcNow,
             LastModifiedAt = DateTime.UtcNow.AddDays(-1),
             Issues = [dbIssue]

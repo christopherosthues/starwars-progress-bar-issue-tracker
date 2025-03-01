@@ -329,7 +329,7 @@ public static class GitlabMockData
                 Date = new DateTime(2024, 2, 25, 19, 0, 1, DateTimeKind.Utc),
                 GitlabId = "gid://gitlab/Issue/1",
                 GitlabIid = "11",
-                State = ReleaseState.Released,
+                State = ReleaseState.Finished,
                 LastModifiedAt = new DateTime(2023, 3, 5, 13, 54, 6, DateTimeKind.Utc)
             },
             new Release

@@ -390,9 +390,9 @@ public class GitlabSynchronizationService(GraphQLService graphQlService,
     private static ReleaseState MapReleaseState(IssueState issueState) =>
         issueState switch
         {
-            IssueState.Opened => ReleaseState.Planned,
-            IssueState.Closed => ReleaseState.Released,
-            _ => ReleaseState.Released
+            IssueState.Opened => ReleaseState.Open,
+            IssueState.Closed => ReleaseState.Finished,
+            _ => ReleaseState.Planned
         };
 
     private static Domain.Issues.IssueState MapIssueState(IssueState issueState) =>

@@ -471,8 +471,9 @@ namespace StarWarsProgressBarIssueTracker.Infrastructure.Database.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Planned" },
-                    { 2, "Released" }
+                    { 1, "Open" },
+                    { 2, "Planned" },
+                    { 3, "Finished" }
                 });
 
             migrationBuilder.InsertData(
