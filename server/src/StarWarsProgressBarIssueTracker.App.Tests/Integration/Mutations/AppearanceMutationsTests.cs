@@ -476,6 +476,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         using (Assert.Multiple())
         {
             await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             await Assert.That(response.Data.AddAppearance.Errors).IsNotNull().And.IsNotEmpty();
             await Assert.That(response.Data.AddAppearance.Appearance).IsNull();
 
@@ -588,6 +589,7 @@ public class AppearanceMutationsTests : IntegrationTestBase
         using (Assert.Multiple())
         {
             await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             await Assert.That(response.Data.UpdateAppearance.Errors).IsNotNull().And.IsNotEmpty();
             await Assert.That(response.Data.UpdateAppearance.Appearance).IsNull();
 

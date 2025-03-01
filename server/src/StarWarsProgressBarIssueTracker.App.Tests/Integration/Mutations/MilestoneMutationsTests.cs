@@ -472,9 +472,10 @@ public class MilestoneMutationsTests : IntegrationTestBase
     {
         using (Assert.Multiple())
         {
-           await Assert.That(response).IsNotNull();
-           await Assert.That(response.Data.AddMilestone.Errors).IsNotNull().And.IsNotEmpty();
-           await Assert.That(response.Data.AddMilestone.Milestone).IsNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
+            await Assert.That(response.Data.AddMilestone.Errors).IsNotNull().And.IsNotEmpty();
+            await Assert.That(response.Data.AddMilestone.Milestone).IsNull();
 
             IEnumerable<string> resultErrors = response.Data.AddMilestone.Errors.Select(error => error.Message);
             await Assert.That(resultErrors).IsEquivalentTo(errors);
@@ -612,6 +613,7 @@ public class MilestoneMutationsTests : IntegrationTestBase
         using (Assert.Multiple())
         {
             await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             await Assert.That(response.Data.UpdateMilestone.Errors).IsNotNull().And.IsNotEmpty();
             await Assert.That(response.Data.UpdateMilestone.Milestone).IsNull();
 

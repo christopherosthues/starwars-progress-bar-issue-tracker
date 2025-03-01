@@ -14,6 +14,8 @@ public partial class IssueTrackerMutations
     [Error<StringTooShortException>]
     [Error<StringTooLongException>]
     [Error<DomainIdNotFoundException>]
+    [Error<ReleaseDateNotSetException>]
+    [Error<PlannedReleaseDateInThePastException>]
     [MutationFieldName(nameof(Release))]
     [Authorize]
     public partial async Task<ReleaseDto> AddRelease(string title, string? releaseNotes, DateTime? releaseDate,
@@ -32,6 +34,8 @@ public partial class IssueTrackerMutations
     [Error<StringTooShortException>]
     [Error<StringTooLongException>]
     [Error<DomainIdNotFoundException>]
+    [Error<ReleaseDateNotSetException>]
+    [Error<PlannedReleaseDateInThePastException>]
     [MutationFieldName(nameof(Release))]
     [Authorize]
     public partial async Task<ReleaseDto> UpdateRelease([ID] Guid id, string title, ReleaseState state,

@@ -385,9 +385,14 @@ public class ReleaseMutationsTests : IntegrationTestBase
 
     private static GraphQLRequest CreateAddRequest(Release expectedRelease)
     {
-        string descriptionParameter = expectedRelease.Notes != null
+        string releaseNotesParameter = expectedRelease.Notes != null
             ? $"""
                , releaseNotes: "{expectedRelease.Notes}"
+               """
+            : string.Empty;
+        string releaseDateParameter = expectedRelease.Date != null
+            ? $"""
+               , releaseDate: "{expectedRelease.Date}"
                """
             : string.Empty;
         GraphQLRequest mutationRequest = new GraphQLRequest
@@ -395,7 +400,7 @@ public class ReleaseMutationsTests : IntegrationTestBase
             Query = $$"""
                       mutation addRelease
                       {
-                          addRelease(input: {title: "{{expectedRelease.Title}}"{{descriptionParameter}}})
+                          addRelease(input: {title: "{{expectedRelease.Title}}"{{releaseNotesParameter}}{{releaseDateParameter}}})
                           {
                               release
                               {
@@ -473,9 +478,10 @@ public class ReleaseMutationsTests : IntegrationTestBase
     {
         using (Assert.Multiple())
         {
-           await Assert.That(response).IsNotNull();
-           await Assert.That(response.Data.AddRelease.Errors).IsNotNull().And.IsNotEmpty();
-           await Assert.That(response.Data.AddRelease.Release).IsNull();
+            await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
+            await Assert.That(response.Data.AddRelease.Errors).IsNotNull().And.IsNotEmpty();
+            await Assert.That(response.Data.AddRelease.Release).IsNull();
 
             IEnumerable<string> resultErrors = response.Data.AddRelease.Errors.Select(error => error.Message);
             await Assert.That(resultErrors).IsEquivalentTo(errors);
@@ -489,9 +495,14 @@ public class ReleaseMutationsTests : IntegrationTestBase
 
     private static GraphQLRequest CreateUpdateRequest(Release expectedRelease)
     {
-        string descriptionParameter = expectedRelease.Notes != null
+        string releaseNotesParameter = expectedRelease.Notes != null
             ? $"""
                , releaseNotes: "{expectedRelease.Notes}"
+               """
+            : string.Empty;
+        string releaseDateParameter = expectedRelease.Date != null
+            ? $"""
+               , releaseDate: "{expectedRelease.Date}"
                """
             : string.Empty;
         GraphQLRequest mutationRequest = new GraphQLRequest
@@ -499,7 +510,7 @@ public class ReleaseMutationsTests : IntegrationTestBase
             Query = $$"""
                       mutation updateRelease
                       {
-                          updateRelease(input: {id: "{{expectedRelease.Id}}", title: "{{expectedRelease.Title}}", state: {{expectedRelease.State.ToString().ToUpper()}}{{descriptionParameter}}})
+                          updateRelease(input: {id: "{{expectedRelease.Id}}", title: "{{expectedRelease.Title}}", state: {{expectedRelease.State.ToString().ToUpper()}}{{releaseNotesParameter}}{{releaseDateParameter}}})
                           {
                               release
                               {
@@ -614,6 +625,7 @@ public class ReleaseMutationsTests : IntegrationTestBase
         using (Assert.Multiple())
         {
             await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             await Assert.That(response.Data.UpdateRelease.Errors).IsNotNull().And.IsNotEmpty();
             await Assert.That(response.Data.UpdateRelease.Release).IsNull();
 
@@ -753,5 +765,7 @@ public class ReleaseMutationsTests : IntegrationTestBase
         yield return () => (new Release { Title = new string('a', 256), Notes = null, State = ReleaseState.Open }, new List<string> { $"The value '{new string('a', 256)}' for {nameof(Release.Title)} is long short. The length of {nameof(Release.Title)} has to be between 1 and 255." });
         yield return () => (new Release { Title = "Valid", Notes = new string('a', 1001), State = ReleaseState.Open }, new List<string> { $"The value '{new string('a', 1001)}' for {nameof(Release.Notes)} is long short. The length of {nameof(Release.Notes)} has to be less than 1001." });
         yield return () => (new Release { Title = "Valid", Notes = null, State = ReleaseState.Unknown }, new List<string> { $"The value for {nameof(Release.State)} is not set." });
+        yield return () => (new Release { Title = "Valid", Notes = null, State = ReleaseState.Planned }, new List<string> { "The release is planned but the release date is not set." });
+        yield return () => (new Release { Title = "Valid", Notes = null, State = ReleaseState.Planned, Date = DateTime.UtcNow.Date.AddDays(-1)}, new List<string> { $"The planned release date '{DateTime.UtcNow.Date.AddDays(-1):d}' is in the past." });
     }
 }

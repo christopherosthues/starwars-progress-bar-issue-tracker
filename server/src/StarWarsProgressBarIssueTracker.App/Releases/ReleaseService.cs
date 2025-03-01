@@ -64,6 +64,18 @@ public class ReleaseService(IReleaseRepository releaseRepository, IReleaseByIdDa
             errors.Add(new ValueNotSetException(nameof(Release.State)));
         }
 
+        if (release.State == ReleaseState.Planned)
+        {
+            if (release.Date is null)
+            {
+                errors.Add(new ReleaseDateNotSetException());
+            }
+            else if (release.Date < DateTime.UtcNow)
+            {
+                errors.Add(new PlannedReleaseDateInThePastException(release.Date.Value));
+            }
+        }
+
         if (errors.Count != 0)
         {
             throw new AggregateException(errors);

@@ -526,6 +526,7 @@ public class LabelMutationsTests : IntegrationTestBase
         using (Assert.Multiple())
         {
             await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             await Assert.That(response.Data.AddLabel.Errors).IsNotNull().And.IsNotEmpty();
             await Assert.That(response.Data.AddLabel.Label).IsNull();
 
@@ -657,6 +658,7 @@ public class LabelMutationsTests : IntegrationTestBase
         using (Assert.Multiple())
         {
             await Assert.That(response).IsNotNull();
+            await Assert.That(response.Errors).IsNull().Or.IsEmpty();
             await Assert.That(response.Data.UpdateLabel.Errors).IsNotNull().And.IsNotEmpty();
             await Assert.That(response.Data.UpdateLabel.Label).IsNull();
 
