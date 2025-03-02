@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+//import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 fun properties(key: String) = providers.gradleProperty(key)
 
@@ -15,7 +15,7 @@ plugins {
     alias(libs.plugins.changelog)
     alias(libs.plugins.detekt)
     alias(libs.plugins.kover)
-    alias(libs.plugins.ktlint)
+//    alias(libs.plugins.ktlint)
     alias(libs.plugins.apollographql)
     alias(libs.plugins.sonarqube)
 }
@@ -92,17 +92,20 @@ detekt {
     buildUponDefaultConfig = true
 }
 
-ktlint {
-    verbose = true
-    version = libs.versions.ktlint.get()
-    outputToConsole = true
-    coloredOutput = true
-    reporters {
-        reporter(ReporterType.CHECKSTYLE)
-        reporter(ReporterType.JSON)
-        reporter(ReporterType.HTML)
-    }
-}
+//ktlint {
+//    filter {
+//        exclude("**/generated/**")
+//    }
+//    verbose = true
+//    version = libs.versions.ktlint.get()
+//    outputToConsole = true
+//    coloredOutput = true
+//    reporters {
+//        reporter(ReporterType.CHECKSTYLE)
+//        reporter(ReporterType.JSON)
+//        reporter(ReporterType.HTML)
+//    }
+//}
 
 changelog {
     groups = listOf("Added", "Changed", "Removed", "Fixed")

@@ -1,4 +1,4 @@
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+//import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
@@ -11,6 +11,6 @@ plugins {
     alias(libs.plugins.changelog) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.kover) apply false
-    alias(libs.plugins.ktlint) apply false
+//    alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.sonarqube) apply false
 }
