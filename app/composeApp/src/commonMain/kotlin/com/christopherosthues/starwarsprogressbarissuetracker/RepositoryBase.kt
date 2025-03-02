@@ -1,3 +1,5 @@
+package com.christopherosthues.starwarsprogressbarissuetracker
+
 import com.apollographql.apollo.ApolloClient
 
 abstract class RepositoryBase {

@@ -1,6 +1,6 @@
-package milestones
+package com.christopherosthues.starwarsprogressbarissuetracker.milestones
 
-import RepositoryBase
+import com.christopherosthues.starwarsprogressbarissuetracker.RepositoryBase
 import com.christopherosthues.starwarsprogressbarissuetracker.graphql.MilestoneQuery
 import com.christopherosthues.starwarsprogressbarissuetracker.graphql.MilestonesQuery
 import com.christopherosthues.starwarsprogressbarissuetracker.graphql.type.UUID

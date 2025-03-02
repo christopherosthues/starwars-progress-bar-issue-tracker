@@ -1,3 +1,5 @@
+package com.christopherosthues.starwarsprogressbarissuetracker
+
 import android.os.Build
 
 class AndroidPlatform : Platform {

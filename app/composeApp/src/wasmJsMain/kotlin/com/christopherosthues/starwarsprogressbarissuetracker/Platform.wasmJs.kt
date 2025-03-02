@@ -1,3 +1,5 @@
+package com.christopherosthues.starwarsprogressbarissuetracker
+
 class WasmPlatform: Platform {
     override val name: String = "Web with Kotlin/Wasm"
 }

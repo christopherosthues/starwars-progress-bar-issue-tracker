@@ -10,8 +10,8 @@ fun properties(key: String) = providers.gradleProperty(key)
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.changelog)
     alias(libs.plugins.detekt)
     alias(libs.plugins.kover)
@@ -25,12 +25,14 @@ kotlin {
     wasmJs {
         moduleName = "composeApp"
         browser {
+            val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
                 outputFileName = "composeApp.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
+                        add(rootDirPath)
                         add(projectDirPath)
                     }
                 }
@@ -73,10 +75,13 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+            implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.apollographql.client)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutines.swing)
         }
     }
 }
@@ -151,9 +156,9 @@ android {
     namespace = "com.christopherosthues.starwarsprogressbarissuetracker"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
+//    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+//    sourceSets["main"].res.srcDirs("src/androidMain/res")
+//    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
         applicationId = "com.christopherosthues.starwarsprogressbarissuetracker"
@@ -176,17 +181,17 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    buildFeatures {
-        compose = true
-    }
-    dependencies {
-        debugImplementation(compose.uiTooling)
-    }
+//    buildFeatures {
+//        compose = true
+//    }
+//    dependencies {
+//        debugImplementation(compose.uiTooling)
+//    }
 }
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "com.christopherosthues.starwarsprogressbarissuetracker.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

@@ -1,3 +1,5 @@
+package com.christopherosthues.starwarsprogressbarissuetracker
+
 import platform.UIKit.UIDevice
 
 class IOSPlatform: Platform {

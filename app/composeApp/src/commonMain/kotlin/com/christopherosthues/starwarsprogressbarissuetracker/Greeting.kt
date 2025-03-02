@@ -1,3 +1,5 @@
+package com.christopherosthues.starwarsprogressbarissuetracker
+
 class Greeting {
     private val platform = getPlatform()
 

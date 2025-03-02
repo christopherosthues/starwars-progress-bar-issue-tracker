@@ -1,6 +1,6 @@
-package labels
+package com.christopherosthues.starwarsprogressbarissuetracker.labels
 
-import RepositoryBase
+import com.christopherosthues.starwarsprogressbarissuetracker.RepositoryBase
 import com.christopherosthues.starwarsprogressbarissuetracker.graphql.LabelQuery
 import com.christopherosthues.starwarsprogressbarissuetracker.graphql.LabelsQuery
 import com.christopherosthues.starwarsprogressbarissuetracker.graphql.type.UUID

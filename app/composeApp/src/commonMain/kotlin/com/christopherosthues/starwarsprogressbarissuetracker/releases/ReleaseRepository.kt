@@ -1,6 +1,6 @@
-package releases
+package com.christopherosthues.starwarsprogressbarissuetracker.releases
 
-import RepositoryBase
+import com.christopherosthues.starwarsprogressbarissuetracker.RepositoryBase
 import com.christopherosthues.starwarsprogressbarissuetracker.graphql.ReleaseQuery
 import com.christopherosthues.starwarsprogressbarissuetracker.graphql.ReleasesQuery
 import com.christopherosthues.starwarsprogressbarissuetracker.graphql.type.UUID
