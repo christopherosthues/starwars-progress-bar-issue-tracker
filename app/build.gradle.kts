@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.changelog) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.kover) apply false
+//    alias(libs.plugins.ktor) apply false
 //    alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.sonarqube) apply false
 }

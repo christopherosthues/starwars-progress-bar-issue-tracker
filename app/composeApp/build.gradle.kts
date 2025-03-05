@@ -16,6 +16,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.kover)
 //    alias(libs.plugins.ktlint)
+//    alias(libs.plugins.ktor)
     alias(libs.plugins.apollographql)
     alias(libs.plugins.sonarqube)
 }
@@ -78,6 +79,13 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.apollographql.client)
+            implementation(libs.ktor.client.auth)
+            implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.serialization.kotlinx.json)
+//            implementation("ch.qos.logback:logback-classic:$logback_version")
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
