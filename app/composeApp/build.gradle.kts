@@ -14,9 +14,9 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.changelog)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.kover)
 //    alias(libs.plugins.ktlint)
-//    alias(libs.plugins.ktor)
     alias(libs.plugins.apollographql)
     alias(libs.plugins.sonarqube)
 }
@@ -68,6 +68,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.kotlinx.coroutines.android)
+            implementation(libs.ktor.client.okhttp)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -79,17 +81,22 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.apollographql.client)
-            implementation(libs.ktor.client.auth)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.serialization)
+//            implementation(libs.ktor.client.auth)
             implementation(libs.ktor.client.cio)
-            implementation(libs.ktor.client.content.negotiation)
+//            implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.logging)
+//            implementation(libs.ktor.client.logging)
             implementation(libs.ktor.serialization.kotlinx.json)
 //            implementation("ch.qos.logback:logback-classic:$logback_version")
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
     }
 }
