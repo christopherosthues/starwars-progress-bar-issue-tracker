@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -24,11 +25,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 @Composable
-internal fun LoginView() {
+internal fun LoginView(authenticationService: AuthenticationService) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
@@ -70,7 +73,8 @@ internal fun LoginView() {
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = {  },
+            onClick = {
+                coroutineScope.launch { authenticationService.login(email, password) } },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Log in")
