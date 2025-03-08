@@ -1,3 +1,7 @@
 namespace StarWarsProgressBarIssueTracker.App.Authorization;
 
-public record LoginDto(string UserName, string Password);
+public record LoginDto
+{
+    public required string UserName { get; init; }
+    public required string Password { get; init; }
+}
