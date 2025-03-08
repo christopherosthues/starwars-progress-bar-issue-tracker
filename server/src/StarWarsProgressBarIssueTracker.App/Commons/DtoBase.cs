@@ -1,4 +1,4 @@
-namespace StarWarsProgressBarIssueTracker.App;
+namespace StarWarsProgressBarIssueTracker.App.Commons;
 
 public class DtoBase
 {

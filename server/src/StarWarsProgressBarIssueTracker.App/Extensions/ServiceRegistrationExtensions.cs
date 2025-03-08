@@ -1,4 +1,5 @@
 using StarWarsProgressBarIssueTracker.App.Appearances;
+using StarWarsProgressBarIssueTracker.App.Authorization;
 using StarWarsProgressBarIssueTracker.App.Issues;
 using StarWarsProgressBarIssueTracker.App.Labels;
 using StarWarsProgressBarIssueTracker.App.Milestones;
@@ -23,6 +24,7 @@ public static class ServiceRegistrationExtensions
     {
         serviceCollection.Configure<GitlabConfiguration>(configuration.GetSection("Gitlab"));
         serviceCollection.Configure<GitHubConfiguration>(configuration.GetSection("GitHub"));
+        serviceCollection.Configure<KeycloakConfiguration>(configuration.GetSection("Keycloak"));
 
         return serviceCollection;
     }

@@ -1,3 +1,5 @@
+using StarWarsProgressBarIssueTracker.App.Commons;
+
 namespace StarWarsProgressBarIssueTracker.App.Milestones;
 
 public class MilestoneLabelDto : DtoBase

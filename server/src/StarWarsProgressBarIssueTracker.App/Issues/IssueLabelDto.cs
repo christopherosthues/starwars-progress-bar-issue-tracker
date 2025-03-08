@@ -1,3 +1,5 @@
+using StarWarsProgressBarIssueTracker.App.Commons;
+
 namespace StarWarsProgressBarIssueTracker.App.Issues;
 
 public class IssueLabelDto : DtoBase

@@ -1,3 +1,4 @@
+using StarWarsProgressBarIssueTracker.App.Commons;
 using StarWarsProgressBarIssueTracker.Domain.Milestones;
 
 namespace StarWarsProgressBarIssueTracker.App.Issues;

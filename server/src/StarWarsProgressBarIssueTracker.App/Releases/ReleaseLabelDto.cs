@@ -1,3 +1,5 @@
+using StarWarsProgressBarIssueTracker.App.Commons;
+
 namespace StarWarsProgressBarIssueTracker.App.Releases;
 
 public class ReleaseLabelDto : DtoBase
