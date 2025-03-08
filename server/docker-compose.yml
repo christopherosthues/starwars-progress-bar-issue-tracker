@@ -111,7 +111,11 @@ services:
         - KEYCLOAK_AUDIENCE=${KEYCLOAK_AUDIENCE}
         - KEYCLOAK_METADATA_ADDRESS=${KEYCLOAK_METADATA_ADDRESS}
         - KEYCLOAK_VALID_ISSUER=${KEYCLOAK_VALID_ISSUER}
-        - KEYCLOAK_AUTHORIZATION_URL=${KEYCLOAK_AUTHORIZATION_URL}
+        - KEYCLOAK_AUTHORITY=${KEYCLOAK_AUTHORITY}
+        - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
+        - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
+        - KEYCLOAK_REGISTRATION_URL=${KEYCLOAK_REGISTRATION_URL}
+        - KEYCLOAK_TOKEN_URL=${KEYCLOAK_TOKEN_URL}
         - HUSKY=0
     hostname: issuetrackerserver
     container_name: issue_tracker_server
@@ -127,7 +131,11 @@ services:
       - Keycloak__Audience=${KEYCLOAK_AUDIENCE}
       - Keycloak__MetadataAddress=${KEYCLOAK_METADATA_ADDRESS}
       - Keycloak__ValidIssuer=${KEYCLOAK_VALID_ISSUER}
-      - Keycloak__AuthorizationUrl=${KEYCLOAK_AUTHORIZATION_URL}
+      - Keycloak__ClientID=${KEYCLOAK_CLIENT_ID}
+      - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET}
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY}
+      - Keycloak__RegistrationUrl=${KEYCLOAK_REGISTRATION_URL}
+      - Keycloak__TokenUrl=${KEYCLOAK_TOKEN_URL}
     restart: unless-stopped
     depends_on:
       - postgres

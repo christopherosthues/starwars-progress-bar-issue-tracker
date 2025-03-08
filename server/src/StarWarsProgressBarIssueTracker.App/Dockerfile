@@ -29,7 +29,11 @@ ENV GitHub__Token=${GITHUB_TOKEN}
 ENV Keycloak__Audience=${KEYCLOAK_AUDIENCE}
 ENV Keycloak__MetadataAddress=${KEYCLOAK_METADATA_ADDRESS}
 ENV Keycloak__ValidIssuer=${KEYCLOAK_VALID_ISSUER}
-ENV Keycloak__AuthorizationUrl=${KEYCLOAK_AUTHORIZATION_URL}
+ENV Keycloak__ClientId=${KEYCLOAK_CLIENT_ID}
+ENV Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET}
+ENV Keycloak__Authority=${KEYCLOAK_AUTHORITY}
+ENV Keycloak__RegistrationUrl=${KEYCLOAK_REGISTRATION_URL}
+ENV Keycloak__TokenUrl=${KEYCLOAK_TOKEN_URL}
 ENV HUSKY=${HUSKY}
 RUN dotnet restore "StarWarsProgressBarIssueTracker.App/StarWarsProgressBarIssueTracker.App.csproj"
 COPY . .

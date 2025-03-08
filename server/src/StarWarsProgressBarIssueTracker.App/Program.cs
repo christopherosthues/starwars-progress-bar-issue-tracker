@@ -1,7 +1,6 @@
 using System.Net.Http.Headers;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
+using StarWarsProgressBarIssueTracker.App.Authorization;
 using StarWarsProgressBarIssueTracker.App.Extensions;
 using StarWarsProgressBarIssueTracker.App.Mutations;
 using StarWarsProgressBarIssueTracker.App.Queries;
@@ -13,22 +12,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders().AddConsole();
 
 IConfigurationSection keycloakConfig = builder.Configuration.GetSection("Keycloak");
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.RequireHttpsMetadata = false;
-        options.Audience = keycloakConfig.GetValue<string>("Audience");
-        options.MetadataAddress = keycloakConfig.GetValue<string>("MetadataAddress")!;
-        options.TokenValidationParameters = new()
-        {
-            ValidIssuer = keycloakConfig.GetValue<string>("ValidIssuer"),
-            ValidateIssuerSigningKey = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuer = true
-        };
-    });
+builder.Services.AddKeycloakAuthorization(keycloakConfig);
 
 IConfigurationSection gitlabConfig = builder.Configuration.GetSection("Gitlab");
 string gitlabToken = gitlabConfig.GetValue<string>("Token")!;
@@ -118,10 +102,11 @@ builder.Services.AddMappers();
 builder.Services.AddGraphQlQueries();
 builder.Services.AddGraphQlMutations();
 builder.Services.AddGitlabServices();
+builder.Services.AddHttpClient();
 
-// builder.Services.AddCors(corsOptions =>
-//     corsOptions.AddDefaultPolicy(corsPolicyBuilder =>
-//         corsPolicyBuilder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+builder.Services.AddCors(corsOptions =>
+    corsOptions.AddDefaultPolicy(corsPolicyBuilder =>
+        corsPolicyBuilder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(o =>
@@ -166,6 +151,9 @@ WebApplication app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     await app.Services.ConfigureDatabaseAsync();
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 else
 {
@@ -173,32 +161,20 @@ else
     await app.Services.ConfigureDatabaseAsync();
 }
 
-// // app.UseCors();
-
-app.UseSwagger();
-app.UseSwaggerUI();
-
+app.UseCors();
 app.UseRouting();
-
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapGraphQL();
 
-app.MapSwagger();
-app.MapGet("users/me", (ClaimsPrincipal user) =>
+if (app.Environment.IsDevelopment())
 {
-    Dictionary<string, string> claims = new Dictionary<string, string>();
-    foreach (var claim in user.Claims)
-    {
-        claims.TryAdd(claim.Type, claim.Value);
-    }
-    return claims;
-}).RequireAuthorization();
+    app.MapSwagger();
+}
 
+app.MapAuthenticationEndpoints();
 
 await app.RunAsync();
 return;

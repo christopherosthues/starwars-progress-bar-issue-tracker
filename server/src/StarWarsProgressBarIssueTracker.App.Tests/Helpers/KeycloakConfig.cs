@@ -11,4 +11,5 @@ internal static class KeycloakConfig
     internal const string TestFirstName = "Test";
     internal const string TestLastName = "User";
     internal const string TestPassword = "Test123";
+    internal const string TestClientSecret = "H3ESDjZpmoCiVKCF34S19NnbFu90ETX3";
 }

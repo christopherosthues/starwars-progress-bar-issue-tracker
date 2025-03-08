@@ -2,6 +2,8 @@ namespace StarWarsProgressBarIssueTracker.App.Tests.Helpers;
 
 public static class NotInParallelTests
 {
+    public const string Authentication = nameof(Authentication);
+
     public const string AppearanceRetrieval = nameof(AppearanceRetrieval);
     public const string IssueRetrieval = nameof(IssueRetrieval);
     public const string LabelRetrieval = nameof(LabelRetrieval);

@@ -42,9 +42,14 @@ public class IssueTrackerWebApplicationFactory : WebApplicationFactory<Program>,
                 new Dictionary<string, string>
                 {
                     { "Keycloak:Audience", "TestTracker" },
-                    { "Keycloak:MetadataAddress", $"{keycloakBaseAddress}/realms/{KeycloakConfig.Realm}/.well-known/openid-configuration" },
-                    { "Keycloak:ValidIssuer", $"{keycloakBaseAddress}/realms/{KeycloakConfig.Realm}" },
-                    { "Keycloak:AuthorizationUrl", $"{keycloakBaseAddress}/realms/{KeycloakConfig.Realm}/protocol/openid-connect/auth" },
+                    { "Keycloak:MetadataAddress", $"{keycloakBaseAddress}realms/{KeycloakConfig.Realm}/.well-known/openid-configuration" },
+                    { "Keycloak:ValidIssuer", $"{keycloakBaseAddress}realms/{KeycloakConfig.Realm}" },
+                    { "Keycloak:AuthorizationUrl", $"{keycloakBaseAddress}realms/{KeycloakConfig.Realm}/protocol/openid-connect/auth" },
+                    { "Keycloak:ClientId", KeycloakConfig.ClientId },
+                    { "Keycloak:ClientSecret", KeycloakConfig.TestClientSecret },
+                    { "Keycloak:Authority", $"{keycloakBaseAddress}realms/{KeycloakConfig.Realm}" },
+                    { "Keycloak:RegistrationUrl", $"{keycloakBaseAddress}admin/realms/{KeycloakConfig.Realm}/users" },
+                    { "Keycloak:TokenUrl", $"{keycloakBaseAddress}realms/{KeycloakConfig.Realm}/protocol/openid-connect/token" },
                 }!
             );
         });

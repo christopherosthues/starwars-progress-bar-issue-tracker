@@ -21,6 +21,12 @@ public class IntegrationTestBase
     [ClassDataSource<IssueTrackerWebApplicationFactory>(Shared = SharedType.PerClass)]
     public required IssueTrackerWebApplicationFactory ApiFactory { get; init; }
 
+    protected HttpClient CreateHttpClient()
+    {
+        HttpClient httpClient = ApiFactory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        return httpClient;
+    }
+
     protected GraphQLHttpClient CreateUnauthenticatedGraphQLClient()
     {
         HttpClient httpClient = ApiFactory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
