@@ -31,7 +31,7 @@ public static class AuthenticationEndpoints
             { "grant_type", "password" },
             { "client_id", keycloakConfiguration.Value.ClientId },
             { "client_secret", keycloakConfiguration.Value.ClientSecret },
-            { "username", user.UserName },
+            { "username", user.Username },
             { "password", user.Password },
         };
         HttpResponseMessage response = await httpClient.PostAsync(keycloakConfiguration.Value.TokenUrl,

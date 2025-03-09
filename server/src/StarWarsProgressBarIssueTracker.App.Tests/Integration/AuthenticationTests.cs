@@ -16,7 +16,7 @@ public class AuthenticationTests : IntegrationTestBase
     {
         // Arrange
         HttpClient httpClient = CreateHttpClient();
-        LoginDto loginDto = new() { UserName = KeycloakConfig.TestUserName, Password = KeycloakConfig.TestPassword };
+        LoginDto loginDto = new() { Username = KeycloakConfig.TestUserName, Password = KeycloakConfig.TestPassword };
 
         // Act
         HttpResponseMessage response = await httpClient.PostAsync("login",
@@ -76,7 +76,7 @@ public class AuthenticationTests : IntegrationTestBase
     {
         // Arrange
         HttpClient httpClient = CreateHttpClient();
-        LoginDto loginDto = new() { UserName = KeycloakConfig.TestUserName, Password = "wrong password" };
+        LoginDto loginDto = new() { Username = KeycloakConfig.TestUserName, Password = "wrong password" };
         // Act
         HttpResponseMessage response = await httpClient.PostAsync("login",
             new StringContent(JsonSerializer.Serialize(loginDto), Encoding.UTF8, "application/json"));
@@ -92,7 +92,7 @@ public class AuthenticationTests : IntegrationTestBase
         HttpClient httpClient = CreateHttpClient();
         LoginDto loginDto = new()
         {
-            UserName = KeycloakConfig.TestUserName,
+            Username = KeycloakConfig.TestUserName,
             Password = KeycloakConfig.TestPassword
         };
 
@@ -144,7 +144,7 @@ public class AuthenticationTests : IntegrationTestBase
         HttpClient httpClient = CreateHttpClient();
         LoginDto loginDto = new()
         {
-            UserName = KeycloakConfig.TestUserName,
+            Username = KeycloakConfig.TestUserName,
             Password = KeycloakConfig.TestPassword
         };
 
@@ -183,7 +183,7 @@ public class AuthenticationTests : IntegrationTestBase
         HttpClient httpClient = CreateHttpClient();
         LoginDto loginDto = new()
         {
-            UserName = KeycloakConfig.TestUserName,
+            Username = KeycloakConfig.TestUserName,
             Password = KeycloakConfig.TestPassword
         };
 
@@ -367,7 +367,7 @@ public class AuthenticationTests : IntegrationTestBase
 
         LoginDto loginDto = new()
         {
-            UserName = username,
+            Username = username,
             Password = password
         };
 
