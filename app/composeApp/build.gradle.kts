@@ -78,10 +78,14 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+
             api(libs.androidx.datastore)
             api(libs.androidx.datastore.preferences)
-            implementation(libs.androidx.lifecycle.viewmodel)
+
+            implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.androidx.navigation.compose)
+
             implementation(libs.apollographql.client)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization)
