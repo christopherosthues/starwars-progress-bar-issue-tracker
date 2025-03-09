@@ -16,22 +16,16 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.http.formUrlEncode
 
 class AuthenticationService(private val client: HttpClient, private val prefs: DataStore<Preferences>) {
     suspend fun login(username: String, password: String) {
-        val keycloakUrl = "https://your-keycloak-server/auth/realms/your-realm/protocol/openid-connect/token"
+        val loginUrl = "https://localhost:8080/login"
 
         try {
-            val response: HttpResponse = client.post(keycloakUrl) {
-                contentType(ContentType.Application.FormUrlEncoded)
+            val response: HttpResponse = client.post(loginUrl) {
+                contentType(ContentType.Application.Json)
                 setBody(
-                    listOf(
-                        "client_id" to "your-client-id",
-                        "grant_type" to "password",
-                        "username" to username,
-                        "password" to password
-                    ).formUrlEncode()
+                    LoginDto(username, password)
                 )
             }
 
@@ -39,11 +33,13 @@ class AuthenticationService(private val client: HttpClient, private val prefs: D
                 val tokenResponse = response.body<TokenResponse>()
                 prefs.edit {
                     val accessTokenKey = stringPreferencesKey("access_token")
-                    it[accessTokenKey] = tokenResponse.access_token
+                    it[accessTokenKey] = tokenResponse.accessToken
                     val refreshTokenKey = stringPreferencesKey("refresh_token")
-                    it[refreshTokenKey] = tokenResponse.refresh_token
+                    it[refreshTokenKey] = tokenResponse.refreshToken
                     val expiresInKey = intPreferencesKey("expires_in")
-                    it[expiresInKey] = tokenResponse.expires_in
+                    it[expiresInKey] = tokenResponse.expiresIn
+                    val refreshExpiresInKey = intPreferencesKey("refresh_expires_in")
+                    it[refreshExpiresInKey] = tokenResponse.refreshExpiresIn
                 }
             }
         } catch (e: RedirectResponseException) {
