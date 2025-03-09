@@ -6,7 +6,7 @@ import com.christopherosthues.starwarsprogressbarissuetracker.authentication.cre
 import com.christopherosthues.starwarsprogressbarissuetracker.authentication.dataStoreFileName
 
 fun main() {
-    val appName = "IssueTracker"
+
     val prefs = createDataStore {
         val osName = System.getProperty("os.name").lowercase()
         val directory = when {
@@ -22,9 +22,7 @@ fun main() {
             onCloseRequest = ::exitApplication,
             title = "starwars-progress-bar-issue-tracker-app",
         ) {
-            App(
-                prefs = prefs
-            )
+            App()
         }
     }
 }

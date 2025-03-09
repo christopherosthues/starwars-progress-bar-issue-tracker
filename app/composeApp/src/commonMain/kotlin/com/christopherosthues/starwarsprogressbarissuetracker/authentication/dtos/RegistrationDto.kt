@@ -1,4 +1,4 @@
-package com.christopherosthues.starwarsprogressbarissuetracker.authentication
+package com.christopherosthues.starwarsprogressbarissuetracker.authentication.dtos
 
 import kotlinx.serialization.Serializable
 

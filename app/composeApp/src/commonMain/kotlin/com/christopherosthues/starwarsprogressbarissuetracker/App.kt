@@ -22,7 +22,7 @@ import starwars_progress_bar_issue_tracker_app.composeapp.generated.resources.co
 @Composable
 @Preview
 fun App(
-    prefs: DataStore<Preferences>
+
 ) {
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
